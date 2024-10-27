@@ -11,11 +11,15 @@ Render::~Render()
   this->renderer = NULL;
 }
 
-void Render::setWindow(Window &window)
+void Render::setWindow(Window &window, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
   this->renderer = SDL_CreateRenderer(window.getWindow(), NULL);
   if (!this->renderer)
     printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
+
+  // Immediately set the color of the window to reduce the black flash.
+  this->clear(r, g, b, a);
+  this->draw();
 }
 
 void Render::clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a)

@@ -23,7 +23,7 @@ public:
   void setWindowTitle(const std::string &title);
   void setWindowDimensions(int w, int h);
 
-  void launch();
+  void launch(Uint8 r = 255, Uint8 g = 255, Uint8 b = 255, Uint8 a = SDL_ALPHA_OPAQUE);
 
   virtual void onDraw(float deltaTime) = 0;
   virtual void onInput(SDL_Event event) = 0;

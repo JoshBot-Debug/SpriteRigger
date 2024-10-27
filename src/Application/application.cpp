@@ -5,10 +5,10 @@ Application::~Application()
   SDL_Quit();
 }
 
-void Application::launch()
+void Application::launch(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
   this->window.open();
-  this->render.setWindow(this->window);
+  this->render.setWindow(this->window, r, g, b, a);
   this->loop();
 }
 
