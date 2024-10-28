@@ -1,4 +1,5 @@
 #include "mouse_event_handler.h"
+#include <stdio.h>
 
 // 500ms, same as react native
 const int LONG_PRESS_TIME = 500;
@@ -22,12 +23,30 @@ void MouseEventHandler::onEvent(SDL_Event event)
   if (event.type == SDL_EVENT_MOUSE_MOTION)
   {
     SDL_GetMouseState(&this->point->x, &this->point->y);
+    
+    if (!SDL_PointInRectFloat(this->point, this->boundingRect))
+    {
+      if (this->state != MouseState::MOUSE_STATE_NONE)
+      {
+        this->pressed_time = 0;
+        this->state = MouseState::MOUSE_STATE_NONE;
+      }
+      return;
+    }
   }
 
   if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP)
   {
+
     if (!SDL_PointInRectFloat(this->point, this->boundingRect))
+    {
+      if (this->state != MouseState::MOUSE_STATE_NONE)
+      {
+        this->pressed_time = 0;
+        this->state = MouseState::MOUSE_STATE_NONE;
+      }
       return;
+    }
 
     bool left_button = event.button.button == SDL_BUTTON_LEFT;
 
@@ -45,12 +64,16 @@ void MouseEventHandler::onEvent(SDL_Event event)
 
     if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
     {
-      if (this->state == MouseState::MOUSE_STATE_NONE)
+      if (this->state == MouseState::MOUSE_STATE_LONG_CLICK)
         return;
 
       this->callListeners(CLICK_OUT);
-      this->callListeners(CLICK);
-      this->state = MouseState::MOUSE_STATE_NONE;
+
+      if (this->state != MouseState::MOUSE_STATE_NONE)
+      {
+        this->callListeners(CLICK);
+        this->state = MouseState::MOUSE_STATE_NONE;
+      }
     }
   }
 }
@@ -62,8 +85,6 @@ void MouseEventHandler::onEventLoopStart()
 
   if (SDL_GetTicks() < this->pressed_time)
     return;
-
-  this->pressed_time = 0;
 
   switch (this->state)
   {
@@ -77,7 +98,8 @@ void MouseEventHandler::onEventLoopStart()
     break;
   }
 
-  this->state = MouseState::MOUSE_STATE_NONE;
+  this->pressed_time = 0;
+  this->state = MouseState::MOUSE_STATE_LONG_CLICK;
 }
 
 void MouseEventHandler::addEventListener(MouseEvent event, Callback callback)
