@@ -45,13 +45,12 @@ void MouseEventHandler::onEvent(SDL_Event event)
 
     if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
     {
-      this->callListeners(CLICK_OUT);
+      if (this->state == MouseState::MOUSE_STATE_NONE)
+        return;
 
-      if (this->state != MouseState::MOUSE_STATE_NONE)
-      {
-        this->callListeners(CLICK);
-        this->state = MouseState::MOUSE_STATE_NONE;
-      }
+      this->callListeners(CLICK_OUT);
+      this->callListeners(CLICK);
+      this->state = MouseState::MOUSE_STATE_NONE;
     }
   }
 }
@@ -77,6 +76,8 @@ void MouseEventHandler::onEventLoopStart()
   default:
     break;
   }
+
+  this->state = MouseState::MOUSE_STATE_NONE;
 }
 
 void MouseEventHandler::addEventListener(MouseEvent event, Callback callback)
