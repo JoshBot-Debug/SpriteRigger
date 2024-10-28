@@ -12,8 +12,9 @@ public:
   Render() : renderer(NULL) {};
   ~Render();
 
-  void setWindow(Window &window, Uint8 r = 255, Uint8 g = 255, Uint8 b = 255, Uint8 a = SDL_ALPHA_OPAQUE);
+  void setWindow(Window &window, SDL_Color backgroundColor = {255, 255, 255, SDL_ALPHA_OPAQUE});
 
-  void clear(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+  void clear(SDL_Color backgroundColor);
   void draw();
+  void rect(SDL_FRect &rect, SDL_Color backgroundColor);
 };
