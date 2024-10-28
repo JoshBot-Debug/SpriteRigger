@@ -3,7 +3,7 @@
 // 500ms, same as react native
 const int LONG_PRESS_TIME = 500;
 
-MouseEventHandler::MouseEventHandler() : state(MouseState::MOUSE_STATE_NONE), pressed_time(0), listeners({}), boundingRect(new SDL_FRect({0.0f, 0.0f, 0.0f, 0.0f})), point(new SDL_FPoint({0.0f, 0.0f})) {}
+MouseEventHandler::MouseEventHandler() : state(MouseState::MOUSE_STATE_NONE), pressed_time(0), listeners({}), boundingRect(nullptr), point(new SDL_FPoint({0.0f, 0.0f})) {}
 
 MouseEventHandler::~MouseEventHandler()
 {

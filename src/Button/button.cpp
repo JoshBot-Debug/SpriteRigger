@@ -30,14 +30,14 @@ void Button::setDimensions(float w, float h)
 {
   this->rect.w = w;
   this->rect.h = h;
-  this->setBoundingRect(&this->rect);
+  Pressable::setBoundingRect(&this->rect);
 }
 
 void Button::setPosition(float x, float y)
 {
   this->rect.x = x;
   this->rect.y = y;
-  this->setBoundingRect(&this->rect);
+  Pressable::setBoundingRect(&this->rect);
 }
 
 void Button::setBackgroundColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
