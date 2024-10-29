@@ -16,7 +16,7 @@ protected:
   Window window;
   Render render;
   FrameRate frame_rate;
-  MouseEventHandler mouse_event_handler;
+  MouseEventHandler m_event_handler;
 
 public:
   Application();
@@ -27,6 +27,7 @@ public:
 
   void launch(SDL_Color backgroundColor = {255, 255, 255, SDL_ALPHA_OPAQUE});
 
+  virtual void onInitialize() = 0;
   virtual void onDraw(float deltaTime) = 0;
   virtual void onInput(SDL_Event event) = 0;
 };

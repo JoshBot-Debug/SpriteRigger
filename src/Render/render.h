@@ -13,6 +13,7 @@ public:
   ~Render();
 
   void setWindow(Window &window, SDL_Color backgroundColor = {255, 255, 255, SDL_ALPHA_OPAQUE});
+  SDL_Renderer *getRenderer();
 
   void clear(SDL_Color backgroundColor);
   void draw();

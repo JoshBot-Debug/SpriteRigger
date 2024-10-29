@@ -3,6 +3,8 @@ project(ShadowFrame)
 
 # Find SDL3 package
 find_package(SDL3 REQUIRED)
+find_package(SDL3_image REQUIRED)
+find_package(SDL3_ttf REQUIRED)
 
 # Specify the source files
 file(GLOB_RECURSE SOURCES src/*.cpp)
@@ -15,6 +17,8 @@ include_directories(src)
 
 # Link SDL3 to the executable
 target_link_libraries(ShadowFrame PRIVATE SDL3::SDL3)
+target_link_libraries(ShadowFrame PRIVATE SDL3_image::SDL3_image)
+target_link_libraries(ShadowFrame PRIVATE SDL3_ttf::SDL3_ttf)
 
 # Specify C++ standard
 set_target_properties(ShadowFrame PROPERTIES

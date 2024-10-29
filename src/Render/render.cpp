@@ -11,20 +11,23 @@ Render::~Render()
   this->renderer = NULL;
 }
 
-void Render::setWindow(Window &window, SDL_Color backgroundColor)
+void Render::setWindow(Window &window, SDL_Color background_color)
 {
   this->renderer = SDL_CreateRenderer(window.getWindow(), NULL);
   if (!this->renderer)
     printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
 
+  if (this->renderer)
+    SDL_SetRenderVSync(this->renderer, 1);
+
   // Immediately set the color of the window to reduce the black flash.
-  this->clear(backgroundColor);
+  this->clear(background_color);
   this->draw();
 }
 
-void Render::clear(SDL_Color backgroundColor)
+void Render::clear(SDL_Color background_color)
 {
-  SDL_SetRenderDrawColor(this->renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+  SDL_SetRenderDrawColor(this->renderer, background_color.r, background_color.g, background_color.b, background_color.a);
   SDL_RenderClear(this->renderer);
 }
 
@@ -34,8 +37,13 @@ void Render::draw()
     printf("SDL_RenderPresent Error: %s\n", SDL_GetError());
 }
 
-void Render::rect(SDL_FRect &rect, SDL_Color backgroundColor)
+void Render::rect(SDL_FRect &rect, SDL_Color background_color)
 {
-  SDL_SetRenderDrawColor(this->renderer, backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+  SDL_SetRenderDrawColor(this->renderer, background_color.r, background_color.g, background_color.b, background_color.a);
   SDL_RenderFillRect(this->renderer, &rect);
+}
+
+SDL_Renderer *Render::getRenderer()
+{
+  return this->renderer;
 }

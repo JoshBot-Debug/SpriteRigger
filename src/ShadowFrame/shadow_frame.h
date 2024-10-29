@@ -10,6 +10,7 @@ public:
   ShadowFrame();
   ~ShadowFrame();
 
+  void onInitialize() override;
   void onDraw(float deltaTime) override;
   void onInput(SDL_Event event) override;
 };

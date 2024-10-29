@@ -15,11 +15,11 @@ class Pressable
 {
 private:
   using Callback = std::function<void()>;
-  MouseEventHandler &mouse_event_handler;
+  MouseEventHandler *event_handler;
   std::map<PressableEvent, Callback> callbacks;
 
 public:
-  Pressable(MouseEventHandler &mouse_event_handler);
+  Pressable(MouseEventHandler *event_handler);
   virtual ~Pressable();
 
   virtual void onPress() {};

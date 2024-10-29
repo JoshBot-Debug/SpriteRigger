@@ -1,6 +1,6 @@
 #include "application.h"
 
-Application::Application() : window(), render(), frame_rate(), mouse_event_handler() {}
+Application::Application() : window(), render(), frame_rate(), m_event_handler() {}
 
 Application::~Application()
 {
@@ -11,6 +11,7 @@ void Application::launch(SDL_Color backgroundColor)
 {
   this->window.open();
   this->render.setWindow(this->window, backgroundColor);
+  this->onInitialize();
   this->loop();
 }
 
@@ -51,10 +52,10 @@ void Application::loop()
 
 void Application::onDraw(float deltaTime)
 {
-  this->mouse_event_handler.onEventLoopStart();
+  this->m_event_handler.onEventLoopStart();
 }
 
 void Application::onInput(SDL_Event event)
 {
-  this->mouse_event_handler.onEvent(event);
+  this->m_event_handler.onEvent(event);
 }
