@@ -6,14 +6,11 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/ShadowFrame",
-      "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
-      "environment": [],
       "externalConsole": false,
       "preLaunchTask": "Build Debug",
       "MIMode": "gdb",
-      "miDebuggerPath": "/usr/bin/gdb",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",

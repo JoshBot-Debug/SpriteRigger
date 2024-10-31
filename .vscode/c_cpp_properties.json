@@ -1,15 +1,15 @@
 {
   "configurations": [
     {
-      "name": "Linux",
+      "name": "c++23",
       "includePath": [
         "${workspaceFolder}/src/**"
       ],
       "defines": [],
-      "cStandard": "c17",
-      "cppStandard": "c++17",
-      "intelliSenseMode": "linux-clang-x64",
-      "configurationProvider": "ms-vscode.cmake-tools",
+      "cStandard": "c23",
+      "cppStandard": "c++23",
+      "intelliSenseMode": "linux-gcc-x64",
+      "compilerPath": "/usr/bin/g++"
     }
   ],
   "version": 4

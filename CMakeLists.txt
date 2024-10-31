@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.22)
 project(ShadowFrame)
 
 # Find SDL3 package
@@ -22,7 +22,7 @@ target_link_libraries(ShadowFrame PRIVATE SDL3_ttf::SDL3_ttf)
 
 # Specify C++ standard
 set_target_properties(ShadowFrame PROPERTIES
-  CXX_STANDARD 17
+  CXX_STANDARD 20
   CXX_STANDARD_REQUIRED ON
   CXX_EXTENSIONS OFF
 )

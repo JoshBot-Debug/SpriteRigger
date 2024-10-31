@@ -3,55 +3,79 @@
 
 #include <string>
 
-#include "FPSManager/FPSManager.h"
+#include "ShadowFrame/shadowFrame.h"
+// #include "Application/FPSManager/fpsManager.h"
 
 int main(int argc, char *argv[])
 {
-  SDL_Init(SDL_INIT_VIDEO);
-  TTF_Init();
+  ShadowFrame shadowFrame;
 
-  SDL_Window *window = SDL_CreateWindow("Window", 640, 480, SDL_WINDOW_RESIZABLE);
-  SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
-  SDL_SetRenderVSync(renderer, 1);
+  shadowFrame.setWindowTitle("Shadow Frame");
+  shadowFrame.setVSync(1);
+  shadowFrame.setWindowDimensions(800, 600);
+  shadowFrame.setBackgroundColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+  shadowFrame.showFPS("DefaultFont", "DefaultText", "fonts/Roboto-Regular.ttf", 14, 255, 255, 255, SDL_ALPHA_OPAQUE);
+  shadowFrame.open();
 
-  bool quit = false;
-  SDL_Event e;
-  FPSManager fpsManager;
+  // SDL_Init(SDL_INIT_VIDEO);
+  // TTF_Init();
 
-  const char *content = "Hello world";
-  TTF_Font *font = TTF_OpenFont("fonts/Roboto-Regular.ttf", 32);
-  TTF_TextEngine *engine = TTF_CreateRendererTextEngine(renderer);
-  TTF_Text *text = TTF_CreateText(engine, font, content, strlen(content));
+  // SDL_Window *window = SDL_CreateWindow("Window", 640, 480, SDL_WINDOW_RESIZABLE);
+  // SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
+  // SDL_SetRenderVSync(renderer, 1);
 
-  while (!quit)
-  {
-    float deltaTime = fpsManager.update();
+  // bool quit = false;
+  // SDL_Event e;
+  // FPSManager fpsManager;
 
-    while (SDL_PollEvent(&e) != 0)
-    {
-      if (e.type == SDL_EVENT_QUIT)
-      {
-        quit = true;
-        break;
-      }
-    }
+  // const char *content = "Hello world";
+  // TTF_TextEngine *engine = TTF_CreateRendererTextEngine(renderer);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-    SDL_RenderClear(renderer);
+  // TTF_Font *font = TTF_OpenFont("fonts/Roboto-Regular.ttf", 32);
+  // TTF_Text *text1 = TTF_CreateText(engine, font, NULL, 0);
 
-    std::string content = "FPS: " + std::to_string((int)(1 / deltaTime));
-    TTF_SetTextString(text, content.c_str(), 0);
-    TTF_DrawRendererText(text, 0, 0);
+  // TTF_Font *font2 = TTF_OpenFont("fonts/Roboto-Regular.ttf", 32);
+  // TTF_Text *text2 = TTF_CreateText(engine, font2, NULL, 0);
 
-    SDL_RenderPresent(renderer);
-  }
+  // TTF_SetTextColor(text2, 255, 0, 0, 255);
+  // while (!quit)
+  // {
+  //   float deltaTime = fpsManager.update();
 
-  TTF_DestroyText(text);
-  TTF_DestroyRendererTextEngine(engine);
-  TTF_CloseFont(font);
-  TTF_Quit();
+  //   while (SDL_PollEvent(&e) != 0)
+  //   {
+  //     if (e.type == SDL_EVENT_QUIT)
+  //     {
+  //       quit = true;
+  //       break;
+  //     }
+  //   }
 
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
+  //   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+  //   SDL_RenderClear(renderer);
+
+  //   std::string content1 = "1 FPS: " + std::to_string((int)(1 / deltaTime));
+  //   // TTF_SetTextString(text1, content1.c_str(), 0);
+  //   TTF_DrawRendererText(text1, 0, 0);
+
+  //   std::string content2 = "2 FPS: " + std::to_string((int)(1 / deltaTime));
+  //   TTF_SetTextString(text2, content2.c_str(), 0);
+  //   TTF_DrawRendererText(text2, 0, 100);
+
+  //   std::string content3 = "3 FPS: " + std::to_string((int)(1 / deltaTime));
+  //   TTF_SetTextString(text2, content3.c_str(), 0);
+  //   TTF_DrawRendererText(text2, 0, 200);
+
+  //   SDL_RenderPresent(renderer);
+  // }
+
+  // TTF_DestroyText(text1);
+  // TTF_DestroyText(text2);
+  // TTF_DestroyRendererTextEngine(engine);
+  // TTF_CloseFont(font);
+  // TTF_Quit();
+
+  // SDL_DestroyRenderer(renderer);
+  // SDL_DestroyWindow(window);
   return 0;
 }
