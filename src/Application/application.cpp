@@ -75,11 +75,6 @@ void Application::open()
     {
       printf("PositionComponent  x:%i, y:%i\n", x, y);
     }
-
-    ~PositionComponent()
-    {
-      printf("PositionComponent was destroyed\n");
-    }
   };
 
   struct RectComponent
@@ -91,23 +86,21 @@ void Application::open()
     {
       printf("RectComponent  w:%i, h:%i\n", width, height);
     }
-
-    ~RectComponent()
-    {
-      printf("RectComponent was destroyed\n");
-    }
   };
 
   Registry registry;
-  Entity *entity = registry.createEntity();
+  Entity *entityA = registry.createEntity();
+  Entity *entityB = registry.createEntity();
 
-  entity->add<RectComponent>(100, 200);
+  entityA->add<RectComponent>(100, 200);
 
-  PositionComponent *pos = entity->add<PositionComponent>(10, 20);
+  PositionComponent *pos = entityA->add<PositionComponent>(10, 20);
   pos->x = -99;
-  entity->add<RectComponent>(99, 88);
+  entityA->add<RectComponent>(99, 88);
 
-  auto [positions, rects] = registry.get<PositionComponent, RectComponent>();
+  entityB->add<RectComponent>(1001, 1002);
+
+  auto [positions, rects] = registry.collect<PositionComponent, RectComponent>(*entityA);
 
   for (auto pos : positions)
   {

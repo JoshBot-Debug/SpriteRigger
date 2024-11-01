@@ -6,6 +6,11 @@
 #include <algorithm>
 #include <stdio.h>
 
+// This is called all so it's easy to undersand when looking at the
+// intellisense for methods, basically it's the initial value which is zero.
+// all ids start from 1
+const int ALL = 0;
+
 class Entity;
 
 using EntityId = int;
@@ -13,7 +18,7 @@ using EntityId = int;
 class Registry
 {
 private:
-  EntityId nEID = 0;
+  EntityId nEID = ALL;
   std::vector<Entity *> entities;
   std::unordered_map<EntityId, std::vector<std::any>> storage;
 
@@ -36,56 +41,41 @@ public:
     return (this->storage.find(entity) != this->storage.end());
   }
 
-  template <typename T>
-  std::vector<T *> get(EntityId entity)
-  {
-    std::vector<T *> components;
-
-    if (this->storage.find(entity) == this->storage.end())
-      return components;
-
-    for (const auto &component : this->storage[entity])
-    {
-      try
-      {
-        components.push_back(std::any_cast<T *>(component));
-      }
-      catch (const std::bad_any_cast &e)
-      {
-        // The cast failed, this is no the object we want, skip.
-      }
-    }
-
-    return components;
-  }
-
   template <typename... T>
-  std::tuple<std::vector<T *>...> get()
+  std::tuple<std::vector<T *>...> collect(EntityId entity = ALL)
   {
-    return std::make_tuple(collect<T>()...);
+    return std::make_tuple(get<T>(entity)...);
   }
 
   template <typename U>
-  std::vector<U *> collect()
+  std::vector<U *> get(EntityId entity = ALL)
   {
-    std::vector<U *> results;
+    std::vector<U *> result;
 
-    for (const auto &[eid, components] : this->storage)
+    if (entity > ALL)
     {
-      for (auto &component : components)
-      {
+      for (auto &component : this->storage[entity])
         try
         {
-          results.push_back(std::any_cast<U *>(component));
+          result.push_back(std::any_cast<U *>(component));
         }
         catch (const std::bad_any_cast &e)
         {
-          // The cast failed, this is no the object we want, skip.
         }
-      }
+      return result;
     }
 
-    return results;
+    for (const auto &[eid, components] : this->storage)
+      for (auto &component : components)
+        try
+        {
+          result.push_back(std::any_cast<U *>(component));
+        }
+        catch (const std::bad_any_cast &e)
+        {
+        }
+
+    return result;
   }
 
   template <typename T>

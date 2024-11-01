@@ -42,4 +42,9 @@ public:
   {
     return id == other.id;
   };
+
+  operator EntityId() const
+  {
+    return this->id;
+  }
 };
