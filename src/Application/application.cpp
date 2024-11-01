@@ -107,16 +107,17 @@ void Application::open()
   pos->x = -99;
   entity->add<RectComponent>(99, 88);
 
-  for (auto component : entity->get<PositionComponent>())
+  auto [positions, rects] = registry.get<PositionComponent, RectComponent>();
+
+  for (auto pos : positions)
   {
-    component->print();
-    component->y = 88;
+    pos->print();
   }
 
-  for (auto component : registry.get<PositionComponent>())
-    component->print();
-
-  printf("HAS: %i\n", entity->has<PositionComponent>());
+  for (auto rect : rects)
+  {
+    rect->print();
+  }
 
   registry.free<PositionComponent, RectComponent>();
   // entity->free<RectComponent, PositionComponent>();

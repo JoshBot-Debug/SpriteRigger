@@ -59,20 +59,34 @@ public:
     return components;
   }
 
-  template <typename T>
-  std::vector<T *> get()
+  template <typename... T>
+  std::tuple<std::vector<T *>...> get()
   {
-    std::vector<T *> components;
-
-    for (const auto &[eid, _] : this->storage)
-    {
-      std::vector<T *> entityComponents = this->get<T>(eid);
-      components.insert(components.end(), entityComponents.begin(), entityComponents.end());
-    }
-
-    return components;
+    return std::make_tuple(collect<T>()...);
   }
 
+  template <typename U>
+  std::vector<U *> collect()
+  {
+    std::vector<U *> results;
+
+    for (const auto &[eid, components] : this->storage)
+    {
+      for (auto &component : components)
+      {
+        try
+        {
+          results.push_back(std::any_cast<U *>(component));
+        }
+        catch (const std::bad_any_cast &e)
+        {
+          // The cast failed, this is no the object we want, skip.
+        }
+      }
+    }
+
+    return results;
+  }
 
   template <typename T>
   void free(EntityId entity)
