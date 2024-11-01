@@ -73,6 +73,7 @@ public:
     return components;
   }
 
+
   template <typename T>
   void free(EntityId entity)
   {
