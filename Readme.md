@@ -1,13 +1,10 @@
 # Application Development Plan: Pivot Animator-like Tool
 
 # Entity-Component-System Design
-- [ ] Entity is a uint32
-- [ ] A registry is used to create an Entity. Entity entity = registry.create();
-- [ ] Add components to an entity via registry registry.emplace<StructComponent>(entity, ...constructor args);
-- [ ] All comonents must have a default constructor and a copy constructor
-- [ ] To get entities in render, you need to call registry.get<StructComponent>(), it will return all entities that have a StructComponent
-- [ ] Need to create a registry.get<StructComponent>(entity);
-- [ ] https://www.youtube.com/watch?v=D4hz0wEB978
+- [x] Entity is a uint32
+- [x] A registry is used to create an Entity. Entity entity = registry.createEntity();
+- [x] Add components to an entity via Entity entity.add<StructComponent>(entity, ...constructor args);
+- [x] To get entities in render, you need to call (entity/registry).get<StructComponent>(), it will return all components that have a StructComponent
 
 
 ## Basic Version (1-2 Months)

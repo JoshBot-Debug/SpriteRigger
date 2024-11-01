@@ -19,17 +19,16 @@ TextManager::~TextManager()
 
 void TextManager::free()
 {
-  for (const auto &text : this->texts)
-    TTF_DestroyText(text.second);
+  for (const auto &[name, text] : this->texts)
+    TTF_DestroyText(text);
 
-  for (const auto &font : this->fonts)
-    TTF_CloseFont(font.second);
+  for (const auto &[name, font] : this->fonts)
+    TTF_CloseFont(font);
 
   TTF_DestroyRendererTextEngine(this->textEngine);
 
   this->fonts.clear();
   this->texts.clear();
-  this->textEngine = nullptr;
 }
 
 TTF_Font *TextManager::createFont(const char *name, const char *file, float ptsize)

@@ -60,6 +60,20 @@ public:
   }
 
   template <typename T>
+  std::vector<T *> get()
+  {
+    std::vector<T *> components;
+
+    for (const auto &[eid, _] : this->storage)
+    {
+      std::vector<T *> entityComponents = this->get<T>(eid);
+      components.insert(components.end(), entityComponents.begin(), entityComponents.end());
+    }
+
+    return components;
+  }
+
+  template <typename T>
   void free(EntityId entity)
   {
     if (this->storage.find(entity) == this->storage.end())

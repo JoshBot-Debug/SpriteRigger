@@ -26,6 +26,7 @@ Application::~Application()
   SDL_DestroyRenderer(this->renderer);
   SDL_DestroyWindow(this->window);
   TTF_Quit();
+  SDL_QuitSubSystem(SDL_INIT_VIDEO);
   SDL_Quit();
 }
 
@@ -112,7 +113,7 @@ void Application::open()
     component->y = 88;
   }
 
-  for (auto component : entity->get<PositionComponent>())
+  for (auto component : registry.get<PositionComponent>())
     component->print();
 
   printf("HAS: %i\n", entity->has<PositionComponent>());

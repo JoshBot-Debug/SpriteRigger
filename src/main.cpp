@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
 
   // bool quit = false;
   // SDL_Event e;
-  // FPSManager fpsManager;
 
   // const char *content = "Hello world";
   // TTF_TextEngine *engine = TTF_CreateRendererTextEngine(renderer);
@@ -38,7 +37,6 @@ int main(int argc, char *argv[])
   // TTF_SetTextColor(text2, 255, 0, 0, 255);
   // while (!quit)
   // {
-  //   float deltaTime = fpsManager.update();
 
   //   while (SDL_PollEvent(&e) != 0)
   //   {
@@ -52,15 +50,15 @@ int main(int argc, char *argv[])
   //   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
   //   SDL_RenderClear(renderer);
 
-  //   std::string content1 = "1 FPS: " + std::to_string((int)(1 / deltaTime));
+  //   std::string content1 = "1 FPS: " + std::to_string((int)(1 / 1));
   //   // TTF_SetTextString(text1, content1.c_str(), 0);
   //   TTF_DrawRendererText(text1, 0, 0);
 
-  //   std::string content2 = "2 FPS: " + std::to_string((int)(1 / deltaTime));
+  //   std::string content2 = "2 FPS: " + std::to_string((int)(1 / 1));
   //   TTF_SetTextString(text2, content2.c_str(), 0);
   //   TTF_DrawRendererText(text2, 0, 100);
 
-  //   std::string content3 = "3 FPS: " + std::to_string((int)(1 / deltaTime));
+  //   std::string content3 = "3 FPS: " + std::to_string((int)(1 / 1));
   //   TTF_SetTextString(text2, content3.c_str(), 0);
   //   TTF_DrawRendererText(text2, 0, 200);
 

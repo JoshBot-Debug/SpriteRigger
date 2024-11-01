@@ -7,11 +7,11 @@ void ShadowFrame::onInitialize()
   // Was removed when I removed showFPS();
   // This needs to be reworked in a better way, need to set fonts and texts at the start of the application
   // and then use them throughout the app.
-  this->text = new Text;
-  this->text->content = "Hi there";
-  this->text->textName = "DefaultText";
-  this->text->x = 0;
-  this->text->y = 300;
+  // this->text = new Text;
+  // this->text->content = "Hi there";
+  // this->text->textName = "DefaultText";
+  // this->text->x = 0;
+  // this->text->y = 300;
 }
 
 void ShadowFrame::onInput(SDL_Event *event, float deltaTime)
@@ -25,10 +25,10 @@ void ShadowFrame::onUpdate(float deltaTime)
 
 void ShadowFrame::onDraw(float deltaTime)
 {
-  this->textManager->render(this->text);
+  // this->textManager->render(this->text);
 }
 
 void ShadowFrame::onCleanUp()
 {
-  delete this->text;
+  // delete this->text;
 }
