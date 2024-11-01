@@ -4,17 +4,15 @@
 #include <string>
 
 #include "ShadowFrame/shadowFrame.h"
-// #include "Application/FPSManager/fpsManager.h"
 
 int main(int argc, char *argv[])
 {
   ShadowFrame shadowFrame;
 
   shadowFrame.setWindowTitle("Shadow Frame");
-  shadowFrame.setVSync(1);
+  // shadowFrame.setVSync(1);
   shadowFrame.setWindowDimensions(800, 600);
-  shadowFrame.setBackgroundColor(0, 0, 0, SDL_ALPHA_OPAQUE);
-  shadowFrame.showFPS("DefaultFont", "DefaultText", "fonts/Roboto-Regular.ttf", 14, 255, 255, 255, SDL_ALPHA_OPAQUE);
+  shadowFrame.setBackgroundColor(255, 0, 0, SDL_ALPHA_OPAQUE);
   shadowFrame.open();
 
   // SDL_Init(SDL_INIT_VIDEO);

@@ -3,18 +3,19 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include "TextManager/textManager.h"
-#include "FPSManager/fpsManager.h"
 
 class Application
 {
-private:
-  SDL_Window *window = nullptr;       // Pointer to the SDL window.
-  SDL_Renderer *renderer = nullptr;   // Pointer to the SDL renderer used for drawing.
-  TextManager *textManager = nullptr; // Pointer to the TextManager for handling text resources.
-  FPSManager *fpsManager = nullptr;   // Pointer to the FPSManager.
+protected:
+  SDL_Window *window = nullptr;     // Pointer to the SDL window.
+  SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
 
-  Text *displayFPS = nullptr; // Pointer to the Text used to display the FPS or null_ptr.
-  SDL_Color backgroundColor;  // Background color of the window.
+  // TODO need to remove text manager, this needs to be managed through an ecs.
+  // Fonts need to be registered and the used through the ecs.
+  TextManager *textManager = nullptr; // Pointer to the TextManager for handling text resources.
+
+private:
+  SDL_Color backgroundColor; // Background color of the window.
 
 public:
   Application();
@@ -64,26 +65,6 @@ public:
   void open();
 
   /**
-   * Shows the FPS in the top left corner of the screen.
-   *
-   * To show the FPS, you must create a font and a text.
-   *
-   * @param file The file path of the font file to be loaded.
-   * @param ptsize The size of the font in points.
-   *
-   * @param r the red value of the text.
-   * @param g the green value of the text.
-   * @param b the blue value of the text.
-   * @param a the alpha value of the text.; usually SDL_ALPHA_OPAQUE (255). Use SDL_SetRenderDrawBlendMode to specify how the alpha channel is used.
-   */
-  void showFPS(const char *fontName, const char *textName, const char *file, float ptsize, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-
-  /**
-   * @returns A pointer to the FPSManager
-   */
-  FPSManager *getFPSManager();
-
-  /**
    * @brief Called once at the start of each frame.
    *
    * This method is responsible for processing user input events,
@@ -124,4 +105,24 @@ public:
    *                   movement and animations.
    */
   virtual void onDraw(float deltaTime) = 0;
+
+  /**
+   * @brief Called to initialize the game or application resources.
+   *
+   * This method is responsible for setting up necessary components,
+   * loading assets, creating game objects, and performing any initial
+   * configuration required before the game starts. It should be called
+   * at the beginning of the game loop.
+   */
+  virtual void onInitialize() = 0;
+
+  /**
+   * @brief Called to clean up resources before the game or application exits.
+   *
+   * This method is responsible for releasing or unloading any resources
+   * that were allocated during initialization, such as textures, sounds,
+   * and other game data. It should be called before shutting down the
+   * application to prevent memory leaks and ensure proper cleanup.
+   */
+  virtual void onCleanUp() = 0;
 };
