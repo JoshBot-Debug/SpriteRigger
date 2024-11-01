@@ -10,6 +10,7 @@
       "cwd": "${workspaceFolder}",
       "externalConsole": false,
       "preLaunchTask": "Build Debug",
+      "postDebugTask": "valgrind",
       "MIMode": "gdb",
       "setupCommands": [
         {

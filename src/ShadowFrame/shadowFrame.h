@@ -7,10 +7,6 @@ class ShadowFrame : public Application
 {
 private:
   Text *text;
-  FPS FPS60;
-  FPS FPS50;
-  FPS FPS20;
-
 
 public:
   ShadowFrame() = default;

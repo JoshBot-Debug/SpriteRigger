@@ -20,6 +20,25 @@
         "isDefault": false
       },
       "problemMatcher": ["$gcc"]
+    },
+
+    {
+      "label": "valgrind",
+      "type": "shell",
+      "command": "valgrind",
+      "args": [
+        "--leak-check=full",
+        "--track-origins=yes",
+        "${workspaceFolder}/build/ShadowFrame"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"],
+      "presentation": {
+        "reveal": "always"
+      }
     }
   ]
 }

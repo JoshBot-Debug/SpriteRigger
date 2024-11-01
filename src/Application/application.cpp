@@ -63,6 +63,63 @@ void Application::open()
 
   this->onInitialize();
 
+  ///////////////////////////////////////////
+
+  struct PositionComponent
+  {
+    int x;
+    int y;
+
+    void print()
+    {
+      printf("PositionComponent  x:%i, y:%i\n", x, y);
+    }
+
+    ~PositionComponent()
+    {
+      printf("PositionComponent was destroyed\n");
+    }
+  };
+
+  struct RectComponent
+  {
+    int width;
+    int height;
+
+    void print()
+    {
+      printf("RectComponent  w:%i, h:%i\n", width, height);
+    }
+
+    ~RectComponent()
+    {
+      printf("RectComponent was destroyed\n");
+    }
+  };
+
+  Registry registry;
+  Entity *entity = registry.createEntity();
+
+  entity->add<RectComponent>(100, 200);
+
+  PositionComponent *pos = entity->add<PositionComponent>(10, 20);
+  pos->x = -99;
+  entity->add<RectComponent>(99, 88);
+
+  for (auto component : entity->get<PositionComponent>())
+  {
+    component->print();
+    component->y = 88;
+  }
+
+  for (auto component : entity->get<PositionComponent>())
+    component->print();
+
+  printf("HAS: %i\n", entity->has<PositionComponent>());
+
+  registry.free<PositionComponent, RectComponent>();
+  // entity->free<RectComponent, PositionComponent>();
+
   while (!quit)
   {
     applicationFPS.at(0);

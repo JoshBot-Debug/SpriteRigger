@@ -65,7 +65,10 @@
     "stop_token": "cpp",
     "thread": "cpp",
     "cfenv": "cpp",
-    "span": "cpp"
+    "span": "cpp",
+    "list": "cpp",
+    "any": "cpp",
+    "typeindex": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++-12"
 }

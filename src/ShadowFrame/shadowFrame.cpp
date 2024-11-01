@@ -20,16 +20,7 @@ void ShadowFrame::onInput(SDL_Event *event, float deltaTime)
 
 void ShadowFrame::onUpdate(float deltaTime)
 {
-  // printf("MAIN FPS: %i\n", (int)(1 / deltaTime));
-
-  if (FPS20.at(20))
-    printf("[20] FPS: %i\n", (int)(1 / this->FPS20.getDeltaTime()));
-
-  if (FPS60.at(60))
-    printf("[60] FPS: %i\n", (int)(1 / this->FPS60.getDeltaTime()));
-
-  if (FPS50.at(30))
-    printf("[30] FPS: %i\n", (int)(1 / this->FPS50.getDeltaTime()));
+  // printf("MAIN FPS: %i\n", (int)(1 / deltaTime));=
 }
 
 void ShadowFrame::onDraw(float deltaTime)

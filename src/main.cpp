@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
   ShadowFrame shadowFrame;
 
   shadowFrame.setWindowTitle("Shadow Frame");
-  // shadowFrame.setVSync(1);
+  shadowFrame.setVSync(1);
   shadowFrame.setWindowDimensions(800, 600);
   shadowFrame.setBackgroundColor(255, 0, 0, SDL_ALPHA_OPAQUE);
   shadowFrame.open();
