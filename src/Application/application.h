@@ -21,6 +21,8 @@ protected:
   SDL_Window *window = nullptr;     // Pointer to the SDL window.
   SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
 
+  ImGuiIO *io = nullptr;
+
 private:
   SDL_Color backgroundColor; // Background color of the window.
 
