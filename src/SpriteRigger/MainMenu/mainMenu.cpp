@@ -1,15 +1,27 @@
+#include <string>
+
+#include "nfd.h"
 #include "imgui.h"
 #include "mainMenu.h"
 
 void MainMenu::fileMenu()
 {
+
   if (ImGui::MenuItem("New"))
   {
   }
 
   if (ImGui::MenuItem("Open", "Ctrl+O"))
   {
+    nfdchar_t *path = nullptr;
+    nfdresult_t result = NFD_OpenDialog("txt;cpp;h", NULL, &path);
+    if (result == nfdresult_t::NFD_OKAY)
+    {
+      printf("OUTPATH: %s\n", path);
+      delete path;
+    }
   }
+
   if (ImGui::BeginMenu("Open Recent"))
   {
     ImGui::MenuItem("fish_hat.c");
@@ -82,6 +94,6 @@ void MainMenu::draw()
 
 /**
  * TODO
- * 
- * Create a parent class, it should 
+ *
+ * Create a parent class, it should
  */

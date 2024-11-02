@@ -18,13 +18,23 @@ add_executable(SpriteRigger ${SOURCES_FILES})
 target_include_directories(SpriteRigger PRIVATE 
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_SOURCE_DIR}/include/imgui
+  ${CMAKE_SOURCE_DIR}/include/nfd
 )
 
 # Link libraries
 target_link_libraries(SpriteRigger PRIVATE
   SDL3::SDL3
   SDL3_image::SDL3_image
+
+  # Libs for nfd
+  gtk-3
+  gobject-2.0
+  glib-2.0
 )
+
+# Collect all bin files (.o files)
+file(GLOB_RECURSE BIN_FILES ${CMAKE_SOURCE_DIR}/bin/*.o)
+target_sources(SpriteRigger PRIVATE ${BIN_FILES})
 
 # Specify C++ standard
 set_target_properties(SpriteRigger PROPERTIES
