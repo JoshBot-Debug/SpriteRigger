@@ -87,7 +87,7 @@ void Application::open()
 
     while (SDL_PollEvent(&event) != 0)
     {
-      if (event.type == SDL_EVENT_QUIT)
+      if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window)))
       {
         quit = true;
         break;
