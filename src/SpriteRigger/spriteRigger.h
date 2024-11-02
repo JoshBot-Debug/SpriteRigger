@@ -5,14 +5,14 @@
 
 #include "MainMenu/mainMenu.h"
 
-class SpriteSkel : public Application
+class SpriteRigger : public Application
 {
 private:
   MainMenu mainMenu;
 
 public:
-  SpriteSkel();
-  ~SpriteSkel() = default;
+  SpriteRigger();
+  ~SpriteRigger() = default;
 
   void onInitialize() override;
   void onInput(SDL_Event *event, float deltaTime) override;
