@@ -4,12 +4,57 @@
 #include "imgui.h"
 #include "mainMenu.h"
 
-void MainMenu::fileMenu()
+void MainMenu::setApplication(Application *application)
 {
+  this->application = application;
+}
 
+void MainMenu::onDraw()
+{
+  if (ImGui::BeginMainMenuBar())
+  {
+    if (ImGui::BeginMenu("File_"))
+    {
+      this->File_Menu();
+      ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Edit"))
+      this->Edit_Menu();
+
+    ImGui::EndMainMenuBar();
+  }
+}
+
+void MainMenu::File_Menu()
+{
+  this->File_New();
+  this->File_Open();
+  this->File_OpenRecent();
+
+  ImGui::Separator();
+
+  this->File_Save();
+  this->File_SaveAs();
+
+  ImGui::Separator();
+
+  this->File_Options();
+
+  ImGui::Separator();
+
+  this->File_Quit();
+}
+
+void MainMenu::File_New()
+{
   if (ImGui::MenuItem("New"))
   {
   }
+}
+
+void MainMenu::File_Open()
+{
 
   if (ImGui::MenuItem("Open", "Ctrl+O"))
   {
@@ -21,7 +66,10 @@ void MainMenu::fileMenu()
       delete path;
     }
   }
+}
 
+void MainMenu::File_OpenRecent()
+{
   if (ImGui::BeginMenu("Open Recent"))
   {
     ImGui::MenuItem("fish_hat.c");
@@ -29,71 +77,96 @@ void MainMenu::fileMenu()
     ImGui::MenuItem("fish_hat.h");
     ImGui::EndMenu();
   }
+}
 
-  ImGui::Separator();
-
+void MainMenu::File_Save()
+{
   if (ImGui::MenuItem("Save", "Ctrl+S"))
   {
   }
+}
+
+void MainMenu::File_SaveAs()
+{
+
   if (ImGui::MenuItem("Save As.."))
   {
   }
+}
 
-  ImGui::Separator();
-
+void MainMenu::File_Options()
+{
   if (ImGui::BeginMenu("Options"))
   {
-    ImGui::MenuItem("Theme", nullptr);
+    if (ImGui::BeginMenu("Theme"))
+    {
+      Theme currentTheme = this->application->getTheme();
+
+      if (ImGui::MenuItem("Light", nullptr, currentTheme == Theme::LIGHT) && currentTheme != Theme::LIGHT)
+        this->application->setTheme(Theme::LIGHT);
+
+      if (ImGui::MenuItem("Dark", nullptr, currentTheme == Theme::DARK) && currentTheme != Theme::DARK)
+        this->application->setTheme(Theme::DARK);
+
+      ImGui::EndMenu();
+    }
+
     ImGui::EndMenu();
   }
+}
 
-  ImGui::Separator();
-
+void MainMenu::File_Quit()
+{
   if (ImGui::MenuItem("Quit", "Alt+F4"))
   {
   }
 }
 
-void MainMenu::editMenu()
+void MainMenu::Edit_Menu()
+{
+  this->Edit_Undo();
+  this->Edit_Redo();
+
+  ImGui::Separator();
+
+  this->Edit_Cut();
+  this->Edit_Copy();
+  this->Edit_Paste();
+
+  ImGui::EndMenu();
+}
+
+void MainMenu::Edit_Undo()
 {
   if (ImGui::MenuItem("Undo", "Ctrl+Z"))
   {
   }
+}
+
+void MainMenu::Edit_Redo()
+{
   if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false))
   {
   }
-  ImGui::Separator();
+}
+
+void MainMenu::Edit_Cut()
+{
   if (ImGui::MenuItem("Cut", "Ctrl+X"))
   {
   }
+}
+
+void MainMenu::Edit_Copy()
+{
   if (ImGui::MenuItem("Copy", "Ctrl+C"))
   {
   }
+}
+
+void MainMenu::Edit_Paste()
+{
   if (ImGui::MenuItem("Paste", "Ctrl+V"))
   {
   }
-  ImGui::EndMenu();
 }
-
-void MainMenu::draw()
-{
-  if (ImGui::BeginMainMenuBar())
-  {
-    if (ImGui::BeginMenu("File"))
-    {
-      this->fileMenu();
-      ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Edit"))
-    {
-      this->editMenu();
-    }
-    ImGui::EndMainMenuBar();
-  }
-}
-
-/**
- * TODO
- *
- * Create a parent class, it should
- */

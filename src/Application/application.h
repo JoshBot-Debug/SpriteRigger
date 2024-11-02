@@ -22,7 +22,8 @@ protected:
   SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
 
 private:
-  SDL_Color backgroundColor; // Background color of the window.
+  Theme theme = Theme::LIGHT; // Theme of the app.
+  SDL_Color backgroundColor;  // Background color of the window.
 
 public:
   Application();
@@ -75,6 +76,13 @@ public:
    *       can be safely performed, as it may require re-rendering components.
    */
   void setTheme(Theme theme);
+
+    /**
+   * @brief Gets the application's theme.
+   *
+   * This function returns the current theme of the application.
+   */
+  Theme getTheme();
 
   /**
    * @brief Sets the default font for the application.

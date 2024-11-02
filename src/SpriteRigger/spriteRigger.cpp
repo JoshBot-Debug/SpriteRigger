@@ -4,6 +4,7 @@
 
 SpriteRigger::SpriteRigger()
 {
+  this->mainMenu.setApplication(this);
 }
 
 void SpriteRigger::onInitialize()
@@ -21,7 +22,7 @@ void SpriteRigger::onUpdate(float deltaTime)
 
 void SpriteRigger::onDraw(float deltaTime)
 {
-  this->mainMenu.draw();
+  this->mainMenu.onDraw();
 }
 
 void SpriteRigger::onCleanUp()

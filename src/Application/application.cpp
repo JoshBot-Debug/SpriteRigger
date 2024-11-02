@@ -67,6 +67,7 @@ void Application::setBackgroundColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 
 void Application::setTheme(Theme theme)
 {
+  this->theme = theme;
   switch (theme)
   {
   case Theme::LIGHT:
@@ -78,6 +79,11 @@ void Application::setTheme(Theme theme)
   default:
     break;
   }
+}
+
+Theme Application::getTheme()
+{
+  return this->theme;
 }
 
 void Application::setDefaultFont(const char *ttfPath, float fontSize)
