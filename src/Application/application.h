@@ -21,8 +21,6 @@ protected:
   SDL_Window *window = nullptr;     // Pointer to the SDL window.
   SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
 
-  ImGuiIO *io = nullptr; // Pointer to ImGuiIO.
-
 private:
   SDL_Color backgroundColor; // Background color of the window.
 
@@ -90,6 +88,19 @@ public:
    *                 is optional and defaults to 16.0f if not provided.
    */
   void setDefaultFont(const char *ttfPath, float fontSize = 16.0f);
+
+  /**
+   * @brief Adds fonts that you can use in the application.
+   *
+   * This function loads a TrueType font (TTF) from the specified file path.
+   *
+   * @param ttfPath The file path to the TrueType font (.ttf) file.
+   *                This path must be valid and accessible; otherwise,
+   *                the font may fail to load.
+   * @param fontSize The size of the font to be applied. This parameter
+   *                 is optional and defaults to 16.0f if not provided.
+   */
+  void addFont(const char *ttfPath, float fontSize = 16.0f);
 
   /**
    * Open the SDL window and renderer.

@@ -3,13 +3,16 @@
 #include "Application/application.h"
 #include "Application/FPS/fps.h"
 
-class ShadowFrame : public Application
+#include "MainMenu/mainMenu.h"
+
+class SpriteSkel : public Application
 {
 private:
+  MainMenu mainMenu;
 
 public:
-  ShadowFrame() = default;
-  ~ShadowFrame() = default;
+  SpriteSkel();
+  ~SpriteSkel() = default;
 
   void onInitialize() override;
   void onInput(SDL_Event *event, float deltaTime) override;

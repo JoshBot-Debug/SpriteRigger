@@ -21,8 +21,8 @@ Application::Application()
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
 
-  this->io = &ImGui::GetIO();
-  this->io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
   ImGui::StyleColorsLight();
 
@@ -82,7 +82,14 @@ void Application::setTheme(Theme theme)
 
 void Application::setDefaultFont(const char *ttfPath, float fontSize)
 {
-  this->io->FontDefault = this->io->Fonts->AddFontFromFileTTF(ttfPath, fontSize);
+  ImGuiIO &io = ImGui::GetIO();
+  io.FontDefault = io.Fonts->AddFontFromFileTTF(ttfPath, fontSize);
+}
+
+void Application::addFont(const char *ttfPath, float fontSize)
+{
+  ImGuiIO &io = ImGui::GetIO();
+  io.Fonts->AddFontFromFileTTF(ttfPath, fontSize);
 }
 
 void Application::open()
@@ -96,6 +103,7 @@ void Application::open()
   FPS applicationFPS;
 
   this->onInitialize();
+  ImGuiIO &io = ImGui::GetIO();
 
   while (!quit)
   {
@@ -119,7 +127,7 @@ void Application::open()
         continue;
       }
 
-      if (!this->io->WantCaptureMouse && !this->io->WantCaptureKeyboard)
+      if (!io.WantCaptureMouse && !io.WantCaptureKeyboard)
         this->onInput(&event, deltaTime);
     }
 
