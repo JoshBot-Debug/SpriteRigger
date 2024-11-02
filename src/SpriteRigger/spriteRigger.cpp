@@ -2,13 +2,10 @@
 
 #include <stdio.h>
 
-SpriteRigger::SpriteRigger()
-{
-  this->mainMenu.setApplication(this);
-}
 
 void SpriteRigger::onInitialize()
 {
+  this->mainMenu.setApplication(this);
 }
 
 void SpriteRigger::onInput(SDL_Event *event, float deltaTime)

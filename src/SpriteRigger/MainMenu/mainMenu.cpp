@@ -1,8 +1,8 @@
 #include <string>
 
-#include "nfd.h"
 #include "imgui.h"
 #include "mainMenu.h"
+#include "SpriteRigger/NativeFileSystemDialog/nativeFileSystemDialog.h"
 
 void MainMenu::setApplication(Application *application)
 {
@@ -13,7 +13,7 @@ void MainMenu::onDraw()
 {
   if (ImGui::BeginMainMenuBar())
   {
-    if (ImGui::BeginMenu("File_"))
+    if (ImGui::BeginMenu("File"))
     {
       this->File_Menu();
       ImGui::EndMenu();
@@ -55,16 +55,15 @@ void MainMenu::File_New()
 
 void MainMenu::File_Open()
 {
-
   if (ImGui::MenuItem("Open", "Ctrl+O"))
   {
-    nfdchar_t *path = nullptr;
-    nfdresult_t result = NFD_OpenDialog("txt;cpp;h", NULL, &path);
-    if (result == nfdresult_t::NFD_OKAY)
+    auto callback = [this](nfdchar_t *path)
     {
-      printf("OUTPATH: %s\n", path);
+      printf("Open file: %s\n", path);
       delete path;
-    }
+    };
+
+    Application::AsyncTask(NativeFileSystemDialog, callback, NativeFileSystem::FILE_PICKER, "txt;png,jpg");
   }
 }
 
@@ -91,6 +90,13 @@ void MainMenu::File_SaveAs()
 
   if (ImGui::MenuItem("Save As.."))
   {
+    auto callback = [this](nfdchar_t *path)
+    {
+      printf("Save to: %s\n", path);
+      delete path;
+    };
+
+    Application::AsyncTask(NativeFileSystemDialog, callback, NativeFileSystem::FOLDER_PICKER, nullptr);
   }
 }
 
@@ -118,8 +124,7 @@ void MainMenu::File_Options()
 void MainMenu::File_Quit()
 {
   if (ImGui::MenuItem("Quit", "Alt+F4"))
-  {
-  }
+    this->application->quit();
 }
 
 void MainMenu::Edit_Menu()

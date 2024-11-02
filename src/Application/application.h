@@ -1,4 +1,5 @@
 #pragma once
+#include <future>
 
 #include <SDL3/SDL.h>
 
@@ -24,10 +25,16 @@ protected:
 private:
   Theme theme = Theme::LIGHT; // Theme of the app.
   SDL_Color backgroundColor;  // Background color of the window.
+  bool isRunning = true;
 
 public:
   Application();
   virtual ~Application();
+
+  /**
+   * Quit the application gracefully.
+   */
+  void quit();
 
   /**
    * Enable or disable vertical synchronization (vsync).
@@ -77,7 +84,7 @@ public:
    */
   void setTheme(Theme theme);
 
-    /**
+  /**
    * @brief Gets the application's theme.
    *
    * This function returns the current theme of the application.
@@ -178,4 +185,34 @@ public:
    * application to prevent memory leaks and ensure proper cleanup.
    */
   virtual void onCleanUp() = 0;
+
+  /**
+   * @brief Executes a task asynchronously and invokes a callback with its result.
+   *
+   * This function allows for running a specified task in a separate thread
+   * while providing a mechanism to handle the result through a callback function.
+   * The task can accept any number of arguments, which will be forwarded
+   * appropriately, ensuring both flexibility and type safety.
+   *
+   * @tparam Task      The type of the task function. This should be a callable type.
+   * @tparam Callback  The type of the callback function that will be invoked with the result of the task.
+   * @tparam Args      A variadic template parameter representing the types of the arguments passed to the task.
+   *
+   * @param task The function to be executed asynchronously. It should match the type T.
+   * @param callback The function to be called with the result of the task. It should match the type C.
+   * @param args The arguments to be passed to the task function.
+   */
+  template <typename Task, typename Callback, typename... Args>
+  static void AsyncTask(Task task, Callback callback, Args &&...args)
+  {
+    using ReturnType = decltype(task(std::declval<Args>()...));
+
+    std::future<ReturnType> result = std::async(std::launch::async, task, std::forward<Args>(args)...);
+
+    std::thread([callback, result = std::move(result)]() mutable
+                {
+        ReturnType data = result.get();
+        callback(data); })
+        .detach();
+  }
 };

@@ -68,7 +68,8 @@
     "span": "cpp",
     "list": "cpp",
     "any": "cpp",
-    "typeindex": "cpp"
+    "typeindex": "cpp",
+    "future": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

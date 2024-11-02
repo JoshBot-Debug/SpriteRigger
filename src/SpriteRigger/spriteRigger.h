@@ -11,7 +11,7 @@ private:
   MainMenu mainMenu;
 
 public:
-  SpriteRigger();
+  SpriteRigger() = default;
   ~SpriteRigger() = default;
 
   void onInitialize() override;

@@ -42,6 +42,11 @@ Application::~Application()
   SDL_Quit();
 }
 
+void Application::quit()
+{
+  this->isRunning = false;
+}
+
 void Application::setVSync(int vsync)
 {
   if (!SDL_SetRenderVSync(renderer, vsync))
@@ -103,7 +108,6 @@ void Application::open()
   SDL_ShowWindow(this->window);
   SDL_SetWindowPosition(this->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
-  bool quit = false;
   Uint64 lastTime = SDL_GetTicks();
   SDL_Event event;
   FPS applicationFPS;
@@ -111,7 +115,7 @@ void Application::open()
   this->onInitialize();
   ImGuiIO &io = ImGui::GetIO();
 
-  while (!quit)
+  while (this->isRunning)
   {
     applicationFPS.at(0);
 
@@ -123,7 +127,7 @@ void Application::open()
 
       if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window)))
       {
-        quit = true;
+        this->isRunning = false;
         break;
       }
 
