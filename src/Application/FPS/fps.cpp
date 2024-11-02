@@ -1,5 +1,4 @@
 #include "fps.h"
-#include <stdio.h>
 
 bool FPS::at(int fps)
 {

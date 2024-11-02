@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
+
 #include "TextManager/textManager.h"
 #include "ECS/registry.h"
 #include "ECS/entity.h"

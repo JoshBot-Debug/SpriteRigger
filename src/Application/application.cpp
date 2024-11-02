@@ -64,57 +64,6 @@ void Application::open()
 
   this->onInitialize();
 
-  ///////////////////////////////////////////
-
-  struct PositionComponent
-  {
-    int x;
-    int y;
-
-    void print()
-    {
-      printf("PositionComponent  x:%i, y:%i\n", x, y);
-    }
-  };
-
-  struct RectComponent
-  {
-    int width;
-    int height;
-
-    void print()
-    {
-      printf("RectComponent  w:%i, h:%i\n", width, height);
-    }
-  };
-
-  Registry registry;
-  Entity *entityA = registry.createEntity();
-  Entity *entityB = registry.createEntity();
-
-  entityA->add<RectComponent>(100, 200);
-
-  PositionComponent *pos = entityA->add<PositionComponent>(10, 20);
-  pos->x = -99;
-  entityA->add<RectComponent>(99, 88);
-
-  entityB->add<RectComponent>(1001, 1002);
-
-  auto [positions, rects] = registry.collect<PositionComponent, RectComponent>(*entityA);
-
-  for (auto pos : positions)
-  {
-    pos->print();
-  }
-
-  for (auto rect : rects)
-  {
-    rect->print();
-  }
-
-  registry.free<PositionComponent, RectComponent>();
-  // entity->free<RectComponent, PositionComponent>();
-
   while (!quit)
   {
     applicationFPS.at(0);

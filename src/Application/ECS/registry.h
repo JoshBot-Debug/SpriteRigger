@@ -3,8 +3,6 @@
 #include <any>
 #include <vector>
 #include <unordered_map>
-#include <algorithm>
-#include <stdio.h>
 
 // This is called all so it's easy to undersand when looking at the
 // intellisense for methods, basically it's the initial value which is zero.
