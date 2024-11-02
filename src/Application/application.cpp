@@ -3,7 +3,7 @@
 #include "application.h"
 #include "FPS/fps.h"
 
-Application::Application()
+Application::Application(RendererDriver driver)
 {
   if (!SDL_Init(SDL_INIT_VIDEO))
     throw std::runtime_error(SDL_GetError());
@@ -12,7 +12,7 @@ Application::Application()
   if (this->window == NULL)
     throw std::runtime_error(SDL_GetError());
 
-  this->renderer = SDL_CreateRenderer(this->window, NULL);
+  this->renderer = SDL_CreateRenderer(this->window, rendererDriverToIdentifier(driver));
   if (this->renderer == NULL)
     throw std::runtime_error(SDL_GetError());
 

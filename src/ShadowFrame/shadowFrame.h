@@ -9,7 +9,7 @@ private:
   Text *text;
 
 public:
-  ShadowFrame() = default;
+  ShadowFrame() : Application(RendererDriver::VULKAN) {};
   ~ShadowFrame() = default;
 
   void onInitialize() override;

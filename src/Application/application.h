@@ -21,7 +21,7 @@ private:
   SDL_Color backgroundColor; // Background color of the window.
 
 public:
-  Application();
+  Application(RendererDriver driver = RendererDriver::OPENGL);
   virtual ~Application();
 
   /**
@@ -129,3 +129,25 @@ public:
    */
   virtual void onCleanUp() = 0;
 };
+
+enum class RendererDriver
+{
+  VULKAN,
+  OPENGL,
+  SOFTWARE
+};
+
+const char *rendererDriverToIdentifier(RendererDriver driver)
+{
+  switch (driver)
+  {
+  case RendererDriver::VULKAN:
+    return "vulkan";
+  case RendererDriver::OPENGL:
+    return "opengl";
+  case RendererDriver::SOFTWARE:
+    return "software";
+  default:
+    return NULL;
+  }
+}
