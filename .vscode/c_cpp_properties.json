@@ -3,7 +3,8 @@
     {
       "name": "c++23",
       "includePath": [
-        "${workspaceFolder}/src/**"
+        "${workspaceFolder}/src/**",
+        "${workspaceFolder}/include/**"
       ],
       "defines": [],
       "cStandard": "c23",
