@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
   shadowFrame.setVSync(1);
   shadowFrame.setWindowDimensions(800, 600);
   shadowFrame.setBackgroundColor(255, 255, 255, SDL_ALPHA_OPAQUE);
-  shadowFrame.setDefaultFont("fonts/Roboto-Regular.ttf");
+  shadowFrame.setDefaultFont("assets/fonts/roboto/Roboto-Regular.ttf");
   shadowFrame.open();
 
   return 0;
