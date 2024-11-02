@@ -82,7 +82,7 @@ void Application::setTheme(Theme theme)
 
 void Application::setDefaultFont(const char *ttfPath, float fontSize)
 {
-  this->io->Fonts->AddFontFromFileTTF(ttfPath, fontSize);
+  this->io->FontDefault = this->io->Fonts->AddFontFromFileTTF(ttfPath, fontSize);
 }
 
 void Application::open()
