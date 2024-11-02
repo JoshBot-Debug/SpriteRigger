@@ -3,45 +3,42 @@
 #include "application.h"
 #include "FPS/fps.h"
 
-const char *getDriverName(RendererDriver driver)
-{
-  switch (driver)
-  {
-  case RendererDriver::VULKAN:
-    return "vulkan";
-  case RendererDriver::OPENGL:
-    return "opengl";
-  case RendererDriver::SOFTWARE:
-    return "software";
-  default:
-    return NULL;
-  }
-}
+const SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 
-Application::Application(RendererDriver driver)
+Application::Application()
 {
   if (!SDL_Init(SDL_INIT_VIDEO))
     throw std::runtime_error(SDL_GetError());
 
-  this->window = SDL_CreateWindow("Application", 640, 480, SDL_WINDOW_HIDDEN);
+  this->window = SDL_CreateWindow("Application", 1920, 1080, WINDOW_FLAGS);
   if (this->window == NULL)
     throw std::runtime_error(SDL_GetError());
 
-  this->renderer = SDL_CreateRenderer(this->window, getDriverName(driver));
+  this->renderer = SDL_CreateRenderer(this->window, nullptr);
   if (this->renderer == NULL)
     throw std::runtime_error(SDL_GetError());
 
-  this->textManager = new TextManager(this->renderer);
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+
+  ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+  ImGui::StyleColorsLight();
+
+  ImGui_ImplSDL3_InitForSDLRenderer(this->window, this->renderer);
+  ImGui_ImplSDLRenderer3_Init(this->renderer);
 }
 
 Application::~Application()
 {
-  delete this->textManager;
+  ImGui_ImplSDLRenderer3_Shutdown();
+  ImGui_ImplSDL3_Shutdown();
+  ImGui::DestroyContext();
 
   SDL_DestroyRenderer(this->renderer);
   SDL_DestroyWindow(this->window);
-  TTF_Quit();
-  SDL_QuitSubSystem(SDL_INIT_VIDEO);
+  SDL_QuitSubSystem(WINDOW_FLAGS);
   SDL_Quit();
 }
 
@@ -68,9 +65,31 @@ void Application::setBackgroundColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
   this->backgroundColor = {r, g, b, a};
 }
 
+void Application::setTheme(Theme theme)
+{
+  switch (theme)
+  {
+  case Theme::LIGHT:
+    ImGui::StyleColorsLight();
+    break;
+  case Theme::DARK:
+    ImGui::StyleColorsDark();
+    break;
+  default:
+    break;
+  }
+}
+
+void Application::setDefaultFont(const char *ttfPath, float fontSize)
+{
+  ImGuiIO &io = ImGui::GetIO();
+  io.Fonts->AddFontFromFileTTF(ttfPath, fontSize);
+}
+
 void Application::open()
 {
   SDL_ShowWindow(this->window);
+  SDL_SetWindowPosition(this->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
   bool quit = false;
   Uint64 lastTime = SDL_GetTicks();
@@ -87,10 +106,18 @@ void Application::open()
 
     while (SDL_PollEvent(&event) != 0)
     {
+      ImGui_ImplSDL3_ProcessEvent(&event);
+
       if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window)))
       {
         quit = true;
         break;
+      }
+
+      if (SDL_GetWindowFlags(this->window) & SDL_WINDOW_MINIMIZED)
+      {
+        SDL_Delay(10);
+        continue;
       }
 
       this->onInput(&event, deltaTime);
@@ -98,12 +125,20 @@ void Application::open()
 
     this->onUpdate(deltaTime);
 
-    auto [r, g, b, a] = this->backgroundColor;
-    SDL_SetRenderDrawColor(this->renderer, r, g, b, a);
-    SDL_RenderClear(this->renderer);
+    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
     this->onDraw(deltaTime);
 
+    ImGui::Render();
+    auto [r, g, b, a] = this->backgroundColor;
+    SDL_SetRenderDrawColor(this->renderer, r, g, b, a);
+    SDL_RenderClear(renderer);
+
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
     SDL_RenderPresent(renderer);
   }
 

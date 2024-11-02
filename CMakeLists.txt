@@ -4,8 +4,6 @@ project(ShadowFrame)
 # Find SDL3 package
 find_package(SDL3 REQUIRED)
 find_package(SDL3_image REQUIRED)
-find_package(SDL3_ttf REQUIRED)
-find_package(Vulkan REQUIRED)
 
 # Collect all source files (.cpp files)
 file(GLOB_RECURSE SOURCES_FILES
@@ -26,10 +24,6 @@ target_include_directories(ShadowFrame PRIVATE
 target_link_libraries(ShadowFrame PRIVATE
   SDL3::SDL3
   SDL3_image::SDL3_image
-  SDL3_ttf::SDL3_ttf
-  Vulkan::Vulkan
-  pthread
-  dl
 )
 
 # Specify C++ standard

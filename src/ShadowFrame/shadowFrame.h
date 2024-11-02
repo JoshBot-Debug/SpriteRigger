@@ -6,7 +6,6 @@
 class ShadowFrame : public Application
 {
 private:
-  Text *text;
 
 public:
   ShadowFrame() = default;

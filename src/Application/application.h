@@ -1,17 +1,18 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-#include <SDL3_ttf/SDL_ttf.h>
 
-#include "TextManager/textManager.h"
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlrenderer3.h"
+
 #include "ECS/registry.h"
 #include "ECS/entity.h"
 
-enum class RendererDriver
+enum class Theme
 {
-  VULKAN,
-  OPENGL,
-  SOFTWARE
+  LIGHT,
+  DARK
 };
 
 class Application
@@ -20,15 +21,11 @@ protected:
   SDL_Window *window = nullptr;     // Pointer to the SDL window.
   SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
 
-  // TODO need to remove text manager, this needs to be managed through an ecs.
-  // Fonts need to be registered and the used through the ecs.
-  TextManager *textManager = nullptr; // Pointer to the TextManager for handling text resources.
-
 private:
   SDL_Color backgroundColor; // Background color of the window.
 
 public:
-  Application(RendererDriver driver = RendererDriver::OPENGL);
+  Application();
   virtual ~Application();
 
   /**
@@ -66,6 +63,31 @@ public:
    * @param a the alpha value used to draw on the rendering target; usually SDL_ALPHA_OPAQUE (255). Use SDL_SetRenderDrawBlendMode to specify how the alpha channel is used.
    */
   void setBackgroundColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+
+  /**
+   * @brief Sets the application's theme.
+   *
+   * This function updates the current theme of the application.
+   *
+   * @param theme The Theme
+   *
+   * @note Make sure to call this function in a context where UI updates
+   *       can be safely performed, as it may require re-rendering components.
+   */
+  void setTheme(Theme theme);
+
+  /**
+   * @brief Sets the default font for the application.
+   *
+   * This function loads a TrueType font (TTF) from the specified file path.
+   *
+   * @param ttfPath The file path to the TrueType font (.ttf) file.
+   *                This path must be valid and accessible; otherwise,
+   *                the font may fail to load.
+   * @param fontSize The size of the font to be applied. This parameter
+   *                 is optional and defaults to 16.0f if not provided.
+   */
+  void setDefaultFont(const char *ttfPath, float fontSize = 16.0f);
 
   /**
    * Open the SDL window and renderer.
