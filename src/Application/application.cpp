@@ -3,6 +3,21 @@
 #include "application.h"
 #include "FPS/fps.h"
 
+const char *getDriverName(RendererDriver driver)
+{
+  switch (driver)
+  {
+  case RendererDriver::VULKAN:
+    return "vulkan";
+  case RendererDriver::OPENGL:
+    return "opengl";
+  case RendererDriver::SOFTWARE:
+    return "software";
+  default:
+    return NULL;
+  }
+}
+
 Application::Application(RendererDriver driver)
 {
   if (!SDL_Init(SDL_INIT_VIDEO))
@@ -12,7 +27,7 @@ Application::Application(RendererDriver driver)
   if (this->window == NULL)
     throw std::runtime_error(SDL_GetError());
 
-  this->renderer = SDL_CreateRenderer(this->window, rendererDriverToIdentifier(driver));
+  this->renderer = SDL_CreateRenderer(this->window, getDriverName(driver));
   if (this->renderer == NULL)
     throw std::runtime_error(SDL_GetError());
 

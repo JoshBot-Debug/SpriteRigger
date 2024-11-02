@@ -7,6 +7,13 @@
 #include "ECS/registry.h"
 #include "ECS/entity.h"
 
+enum class RendererDriver
+{
+  VULKAN,
+  OPENGL,
+  SOFTWARE
+};
+
 class Application
 {
 protected:
@@ -129,25 +136,3 @@ public:
    */
   virtual void onCleanUp() = 0;
 };
-
-enum class RendererDriver
-{
-  VULKAN,
-  OPENGL,
-  SOFTWARE
-};
-
-const char *rendererDriverToIdentifier(RendererDriver driver)
-{
-  switch (driver)
-  {
-  case RendererDriver::VULKAN:
-    return "vulkan";
-  case RendererDriver::OPENGL:
-    return "opengl";
-  case RendererDriver::SOFTWARE:
-    return "software";
-  default:
-    return NULL;
-  }
-}
