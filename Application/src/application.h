@@ -13,6 +13,7 @@
 
 #include "NativeFileDialog/dialog.h"
 #include "Viewport/viewport.h"
+#include "Vec/vec.h"
 
 enum class Theme
 {

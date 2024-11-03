@@ -9,6 +9,8 @@ private:
   MainMenu mainMenu;
   Viewport viewport;
 
+  Vec2 mouse{0, 0};
+
 public:
   SpriteRigger() = default;
   ~SpriteRigger() = default;
@@ -18,4 +20,6 @@ public:
   void onUpdate(float deltaTime) override;
   void onDraw(float deltaTime) override;
   void onCleanUp() override;
+
+  void onDrawViewport(float deltaTime);
 };

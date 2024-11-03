@@ -140,8 +140,7 @@ void Application::open()
         continue;
       }
 
-      if (!io.WantCaptureMouse && !io.WantCaptureKeyboard)
-        this->onInput(&event, deltaTime);
+      this->onInput(&event, deltaTime);
     }
 
     this->onUpdate(deltaTime);
@@ -154,7 +153,7 @@ void Application::open()
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(),ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
     this->onDraw(deltaTime);
 

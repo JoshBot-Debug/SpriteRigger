@@ -4,7 +4,7 @@
 
 void SpriteRigger::onInitialize()
 {
-  this->viewport.setBackgroundColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+  this->viewport.setBackgroundColor(0, 0, 0);
   this->viewport.setDimensions(1080, 720);
   this->viewport.setRenderer(this->renderer);
 
@@ -13,11 +13,14 @@ void SpriteRigger::onInitialize()
 
 void SpriteRigger::onInput(SDL_Event *event, float deltaTime)
 {
+  this->mouse.set(event->button.x, event->button.y);
 }
 
 void SpriteRigger::onUpdate(float deltaTime)
 {
-  // printf("FPS: %i\n", (int)(1 / deltaTime));
+  auto [x, y] = this->viewport.getMousePosition(this->mouse);
+
+  printf("Viewport mPos: x:%f y:%f\n", x, y);
 }
 
 void SpriteRigger::onDraw(float deltaTime)
@@ -28,16 +31,17 @@ void SpriteRigger::onDraw(float deltaTime)
   ImGui::Text("FPS: %i", (int)(1 / deltaTime));
   ImGui::End();
 
-  auto renderViewport = [this, deltaTime]()
-  {
-    SDL_FRect rect = {0, 0, 100, 100};
-    SDL_SetRenderDrawColor(this->renderer, 100, 50, 255, SDL_ALPHA_OPAQUE);
-    SDL_RenderFillRect(this->renderer, &rect);
-  };
-
-  this->viewport.draw("Viewport", renderViewport);
+  this->viewport.draw("Viewport", [this, deltaTime]()
+                      { this->onDrawViewport(deltaTime); });
 }
 
 void SpriteRigger::onCleanUp()
 {
+}
+
+void SpriteRigger::onDrawViewport(float deltaTime)
+{
+  SDL_FRect rect = {0, 0, 100, 100};
+  SDL_SetRenderDrawColor(this->renderer, 100, 50, 255, SDL_ALPHA_OPAQUE);
+  SDL_RenderFillRect(this->renderer, &rect);
 }
