@@ -17,13 +17,13 @@ class Registry
 {
 private:
   EntityId nEID = ALL;
-  std::vector<Entity *> entities;
+  std::vector<Entity *> entt;
   std::unordered_map<EntityId, std::vector<std::any>> storage;
 
 public:
   ~Registry();
 
-  Entity *createEntity();
+  Entity *createEntity(const char *name);
 
   template <typename T, typename... Args>
   T *add(EntityId entity, Args &&...args)
@@ -39,29 +39,58 @@ public:
     return (this->storage.find(entity) != this->storage.end());
   }
 
+  /**
+   * If we are retrieving components from an entity
+   * Then we can have only one component of each kind in the entity
+   * auto [meshe, transform] = get<Mesh, Transform>();
+   * meshe & transform will both be a single object.
+   */
   template <typename... T>
-  std::tuple<std::vector<T *>...> collect(EntityId entity = ALL)
+  std::tuple<T *...> collect(EntityId entity)
   {
     return std::make_tuple(get<T>(entity)...);
   }
 
+  /**
+   * If we are retrieving components from an entity
+   * Then we can have only one component of each kind in the entity
+   * @returns a component or nullptr if nothing was found
+   */
   template <typename U>
-  std::vector<U *> get(EntityId entity = ALL)
+  U *get(EntityId entity)
+  {
+    for (auto &component : this->storage[entity])
+      try
+      {
+        return std::any_cast<U *>(component);
+      }
+      catch (const std::bad_any_cast &e)
+      {
+      }
+    return nullptr;
+  }
+
+  /**
+   * If we are just all components regardless of entity
+   * Then we will receive many of each components. They will be grouped together
+   * in a vector.
+   * auto [meshes, transforms] = get<Mesh, Transform>();
+   * meshes & transforms will both be a vector.
+   */
+  template <typename... T>
+  std::tuple<std::vector<T *>...> collect()
+  {
+    return std::make_tuple(get<T>()...);
+  }
+
+  /**
+   * If we are just all components regardless of entity
+   * Then we will receive a vector of components.
+   */
+  template <typename U>
+  std::vector<U *> get()
   {
     std::vector<U *> result;
-
-    if (entity > ALL)
-    {
-      for (auto &component : this->storage[entity])
-        try
-        {
-          result.push_back(std::any_cast<U *>(component));
-        }
-        catch (const std::bad_any_cast &e)
-        {
-        }
-      return result;
-    }
 
     for (const auto &[eid, components] : this->storage)
       for (auto &component : components)
@@ -74,6 +103,11 @@ public:
         }
 
     return result;
+  }
+
+  std::vector<Entity *> entities()
+  {
+    return this->entt;
   }
 
   template <typename T>

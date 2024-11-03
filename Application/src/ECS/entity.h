@@ -8,10 +8,11 @@ class Entity
 {
 private:
   EntityId id;
+  const char *name;
   Registry *registry;
 
 public:
-  Entity(int id, Registry *registry) : id(id), registry(registry) {};
+  Entity(const char *name, int id, Registry *registry) : id(id), name(name), registry(registry) {};
 
   template <typename T, typename... Args>
   T *add(Args &&...args)
@@ -25,10 +26,21 @@ public:
     return this->registry->has<T>(this->id);
   }
 
+  template <typename... T>
+  std::tuple<T *...> collect()
+  {
+    return this->registry->collect<T...>(this->id);
+  }
+
   template <typename T>
-  std::vector<T *> get()
+  T *get()
   {
     return this->registry->get<T>(this->id);
+  }
+
+  bool is(const char *name)
+  {
+    return this->name == name;
   }
 
   template <typename... T>
