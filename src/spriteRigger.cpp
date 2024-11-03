@@ -108,7 +108,10 @@ void SpriteRigger::onUpdate(float deltaTime)
       auto [mesh, transform] = entity->collect<MeshComponent, TransformComponent>();
 
       if (mouse.intersects(transform->position, mesh->size) && this->mouse.isPressed(MouseButton::LEFT))
-        transform->position = Vec2::lerp(transform->position, (mouse - transform->position), 0.1f);
+      {
+        float smoothing = 20.0f * deltaTime;
+        transform->position = Vec2::lerp(transform->position, (mouse - transform->position), smoothing);
+      }
     }
   }
 }
