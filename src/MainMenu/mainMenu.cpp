@@ -2,7 +2,6 @@
 
 #include "imgui.h"
 #include "mainMenu.h"
-#include "SpriteRigger/NativeFileSystemDialog/nativeFileSystemDialog.h"
 
 void MainMenu::setApplication(Application *application)
 {
@@ -57,13 +56,13 @@ void MainMenu::File_Open()
 {
   if (ImGui::MenuItem("Open", "Ctrl+O"))
   {
-    auto callback = [this](nfdchar_t *path)
+    auto callback = [this](NativeFileDialog::UTF8Char *path)
     {
       printf("Open file: %s\n", path);
-      delete path;
+      NativeFileDialog::Free(path);
     };
 
-    Application::AsyncTask(callback, NativeFileSystemDialog, NativeFileSystem::FILE_PICKER, "txt;png,jpg");
+    this->application->AsyncTask(callback, NativeFileDialog::SelectFile, this->application->getWindow(), nullptr, 0);
   }
 }
 
@@ -90,13 +89,13 @@ void MainMenu::File_SaveAs()
 
   if (ImGui::MenuItem("Save As.."))
   {
-    auto callback = [this](nfdchar_t *path)
+    auto callback = [this](NativeFileDialog::UTF8Char *path)
     {
       printf("Save to: %s\n", path);
-      delete path;
+      NativeFileDialog::Free(path);
     };
 
-    Application::AsyncTask(callback, NativeFileSystemDialog, NativeFileSystem::FOLDER_PICKER, nullptr);
+    this->application->AsyncTask(callback, NativeFileDialog::SaveFile, this->application->getWindow(), nullptr, 0);
   }
 }
 

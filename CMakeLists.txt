@@ -8,7 +8,10 @@ find_package(SDL3_image REQUIRED)
 # Collect all source files (.cpp files)
 file(GLOB_RECURSE SOURCES_FILES
   ${CMAKE_SOURCE_DIR}/src/*.cpp
-  ${CMAKE_SOURCE_DIR}/lib/*.cpp
+
+  # Application folder
+  ${CMAKE_SOURCE_DIR}/Application/src/*.cpp
+  ${CMAKE_SOURCE_DIR}/Application/lib/*.cpp
 )
 
 # Include all source files (.cpp files)
@@ -17,24 +20,34 @@ add_executable(SpriteRigger ${SOURCES_FILES})
 # Specify include directories. (header files)
 target_include_directories(SpriteRigger PRIVATE 
   ${CMAKE_SOURCE_DIR}/src
-  ${CMAKE_SOURCE_DIR}/include/imgui
-  ${CMAKE_SOURCE_DIR}/include/nfd
+
+  # Application folder
+  ${CMAKE_SOURCE_DIR}/Application/src
+  ${CMAKE_SOURCE_DIR}/Application/include/imgui
+  ${CMAKE_SOURCE_DIR}/Application/include/nfd
 )
+
+# Collect all bin files (.o files)
+file(GLOB_RECURSE SHARED_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.o)
+target_sources(SpriteRigger PRIVATE ${SHARED_LIB})
+
+
+
+# Collect all bin files (.a files)
+file(GLOB_RECURSE STATIC_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.a)
 
 # Link libraries
 target_link_libraries(SpriteRigger PRIVATE
   SDL3::SDL3
   SDL3_image::SDL3_image
+  ${STATIC_LIB}
 
   # Libs for nfd
+  gdk-3
   gtk-3
   gobject-2.0
   glib-2.0
 )
-
-# Collect all bin files (.o files)
-file(GLOB_RECURSE BIN_FILES ${CMAKE_SOURCE_DIR}/bin/*.o)
-target_sources(SpriteRigger PRIVATE ${BIN_FILES})
 
 # Specify C++ standard
 set_target_properties(SpriteRigger PROPERTIES

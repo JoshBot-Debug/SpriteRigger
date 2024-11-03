@@ -1,7 +1,6 @@
 #include <stdexcept>
 
 #include "application.h"
-#include "FPS/fps.h"
 
 const SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 
@@ -9,6 +8,9 @@ Application::Application()
 {
   if (!SDL_Init(SDL_INIT_VIDEO))
     throw std::runtime_error(SDL_GetError());
+
+  if (NFD_Init() != NFD_OKAY)
+    throw std::runtime_error(NFD_GetError());
 
   this->window = SDL_CreateWindow("Application", 1920, 1080, WINDOW_FLAGS);
   if (this->window == NULL)
@@ -36,6 +38,7 @@ Application::~Application()
   ImGui_ImplSDL3_Shutdown();
   ImGui::DestroyContext();
 
+  NFD_Quit();
   SDL_DestroyRenderer(this->renderer);
   SDL_DestroyWindow(this->window);
   SDL_QuitSubSystem(WINDOW_FLAGS);

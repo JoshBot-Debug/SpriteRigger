@@ -9,6 +9,9 @@
 
 #include "ECS/registry.h"
 #include "ECS/entity.h"
+#include "FPS/fps.h"
+
+#include "NativeFileDialog/dialog.h"
 
 enum class Theme
 {
@@ -35,6 +38,16 @@ public:
    * Quit the application gracefully.
    */
   void quit();
+
+  SDL_Window *getWindow()
+  {
+    return this->window;
+  };
+
+  SDL_Renderer *getRenderer()
+  {
+    return this->renderer;
+  };
 
   /**
    * Enable or disable vertical synchronization (vsync).
@@ -203,12 +216,10 @@ public:
    * @param args The arguments to be passed to the task function.
    */
   template <typename Callback, typename Task, typename... TaskArgs>
-  static void AsyncTask(Callback callback, Task task, TaskArgs &&...args)
+  void AsyncTask(Callback callback, Task task, TaskArgs &&...args)
   {
     std::thread([callback, task, args...]() mutable
-                {
-        auto data = task(std::forward<TaskArgs>(args)...);
-        callback(data); })
+                { callback(task(std::forward<TaskArgs>(args)...)); })
         .detach();
   }
 };

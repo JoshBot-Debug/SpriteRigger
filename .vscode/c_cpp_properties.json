@@ -4,7 +4,8 @@
       "name": "c++23",
       "includePath": [
         "${workspaceFolder}/src/**",
-        "${workspaceFolder}/include/**"
+        "${workspaceFolder}/Application/src/**",
+        "${workspaceFolder}/Application/include/**"
       ],
       "defines": [],
       "cStandard": "c23",

@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Application/application.h"
-#include "Application/FPS/fps.h"
-
+#include "application.h"
 #include "MainMenu/mainMenu.h"
 
 class SpriteRigger : public Application
