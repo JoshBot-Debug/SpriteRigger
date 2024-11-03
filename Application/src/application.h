@@ -1,5 +1,6 @@
 #pragma once
 #include <future>
+#include <cstdint>
 
 #include <SDL3/SDL.h>
 
@@ -13,7 +14,7 @@
 
 #include "NativeFileDialog/dialog.h"
 #include "Viewport/viewport.h"
-#include "Vec/vec.h"
+#include "common.h"
 
 enum class Theme
 {
@@ -28,9 +29,9 @@ protected:
   SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
 
 private:
-  Theme theme = Theme::LIGHT; // Theme of the app.
-  SDL_Color backgroundColor;  // Background color of the window.
-  bool isRunning = true;
+  bool isRunning = true; 
+  Theme theme = Theme::LIGHT;                      // Theme of the app.
+  Vec4 backgroundColor = Vec4{255, 255, 255, 255}; // Background color of the window.
 
 public:
   Application();
@@ -64,10 +65,9 @@ public:
   /**
    * Set the dimensions of the SDL window.
    *
-   * @param w The width of the window in pixels.
-   * @param h The height of the window in pixels.
+   * @param size This new width and height of the viewport
    */
-  void setWindowDimensions(int w, int h);
+  void setWindowDimensions(Vec2 size);
 
   /**
    * Set the title of the SDL window.
@@ -80,12 +80,9 @@ public:
    * Set the background color of the window. Every frame will
    * call SDL_RenderClear with this color to set the background
    *
-   * @param r the red value used to draw on the rendering target.
-   * @param g the green value used to draw on the rendering target.
-   * @param b the blue value used to draw on the rendering target.
-   * @param a the alpha value used to draw on the rendering target; usually SDL_ALPHA_OPAQUE (255). Use SDL_SetRenderDrawBlendMode to specify how the alpha channel is used.
+   * @param backgroundColor a Vec4 that sets that backgound color.
    */
-  void setBackgroundColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+  void setBackgroundColor(Vec4 backgroundColor);
 
   /**
    * @brief Sets the application's theme.

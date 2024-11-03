@@ -7,8 +7,8 @@ int main(int argc, char *argv[])
 
   SpriteRigger.setWindowTitle("SpriteRigger");
   SpriteRigger.setVSync(1);
-  SpriteRigger.setWindowDimensions(800, 600);
-  SpriteRigger.setBackgroundColor(255, 255, 255, SDL_ALPHA_OPAQUE);
+  SpriteRigger.setWindowDimensions({800, 600});
+  SpriteRigger.setBackgroundColor({30, 30, 30, 255});
   SpriteRigger.setDefaultFont("assets/fonts/roboto/Roboto-Regular.ttf", 18);
   SpriteRigger.addFont("assets/fonts/roboto/Roboto-Regular.ttf", 20);
   SpriteRigger.setTheme(Theme::DARK);

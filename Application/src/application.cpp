@@ -56,9 +56,9 @@ void Application::setVSync(int vsync)
     throw std::runtime_error(SDL_GetError());
 }
 
-void Application::setWindowDimensions(int w, int h)
+void Application::setWindowDimensions(Vec2 size)
 {
-  if (!SDL_SetWindowSize(this->window, w, h))
+  if (!SDL_SetWindowSize(this->window, size.x, size.y))
     throw std::runtime_error(SDL_GetError());
 }
 
@@ -68,9 +68,9 @@ void Application::setWindowTitle(const char *title)
     throw std::runtime_error(SDL_GetError());
 }
 
-void Application::setBackgroundColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+void Application::setBackgroundColor(Vec4 backgroundColor)
 {
-  this->backgroundColor = {r, g, b, a};
+  this->backgroundColor = backgroundColor;
 }
 
 void Application::setTheme(Theme theme)

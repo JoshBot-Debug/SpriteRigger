@@ -4,8 +4,8 @@
 
 void SpriteRigger::onInitialize()
 {
-  this->viewport.setBackgroundColor(0, 0, 0);
-  this->viewport.setDimensions(1080, 720);
+  this->viewport.setBackgroundColor({0, 0, 0, 255});
+  this->viewport.setDimensions({1080, 720});
   this->viewport.setRenderer(this->renderer);
 
   this->mainMenu.setApplication(this);

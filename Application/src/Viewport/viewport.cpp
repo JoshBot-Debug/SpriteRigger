@@ -1,9 +1,9 @@
 #include "viewport.h"
 #include <stdio.h>
 
-Viewport::Viewport(SDL_Renderer *renderer, float w, float h, SDL_Color backgroundColor) : renderer(renderer), size{w, h}, backgroundColor(backgroundColor)
+Viewport::Viewport(SDL_Renderer *renderer, Vec2 size, Vec4 backgroundColor) : renderer(renderer), size(size), backgroundColor(backgroundColor)
 {
-  this->texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+  this->texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 }
 
 Viewport::~Viewport()
@@ -11,18 +11,17 @@ Viewport::~Viewport()
   this->free();
 }
 
-void Viewport::setDimensions(float w, float h)
+void Viewport::setDimensions(Vec2 size)
 {
-  this->size.x = w;
-  this->size.y = h;
+  this->size = size;
 }
 
-void Viewport::resize(float w, float h)
+void Viewport::resize(Vec2 size)
 {
   SDL_DestroyTexture(this->texture);
 
-  this->setDimensions(w, h);
-  this->texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h);
+  this->setDimensions(size);
+  this->texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 }
 
 void Viewport::setRenderer(SDL_Renderer *renderer)
@@ -31,12 +30,9 @@ void Viewport::setRenderer(SDL_Renderer *renderer)
   this->texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, this->size.x, this->size.y);
 }
 
-void Viewport::setBackgroundColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+void Viewport::setBackgroundColor(Vec4 setBackgroundColor)
 {
-  this->backgroundColor.r = r;
-  this->backgroundColor.g = g;
-  this->backgroundColor.b = b;
-  this->backgroundColor.a = a;
+  this->backgroundColor = setBackgroundColor;
 }
 
 void Viewport::free()
@@ -53,7 +49,7 @@ void Viewport::draw(const char *title, std::function<void()> callback)
   this->position = (Vec2)ImGui::GetWindowPos();
 
   if (this->size != size)
-    this->resize(size.x, size.y);
+    this->resize(size);
 
   SDL_SetRenderTarget(this->renderer, this->texture);
 

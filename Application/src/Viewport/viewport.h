@@ -6,7 +6,7 @@
 
 #include "imgui.h"
 
-#include "Vec/vec.h"
+#include "common.h"
 
 class Viewport
 {
@@ -14,7 +14,7 @@ private:
   SDL_Renderer *renderer = nullptr;
   SDL_Texture *texture = nullptr;
 
-  SDL_Color backgroundColor = SDL_Color{255, 255, 255, SDL_ALPHA_OPAQUE}; // Background color
+  Vec4 backgroundColor = Vec4{255, 255, 255, 255};
 
   // Viewport width and height
   Vec2 size{0, 0};
@@ -30,10 +30,9 @@ private:
   /**
    * Resizes the viewport and updates the texture accordingly.
    *
-   * @param w The new width of the viewport.
-   * @param h The new height of the viewport.
+   * @param size This new width and height of the viewport
    */
-  void resize(float w, float h);
+  void resize(Vec2 size);
 
 public:
   /**
@@ -49,7 +48,7 @@ public:
    * @param h The height of the viewport.
    * @param backgroundColor The background color of the viewport.
    */
-  Viewport(SDL_Renderer *renderer, float w, float h, SDL_Color backgroundColor);
+  Viewport(SDL_Renderer *renderer, Vec2 size, Vec4 backgroundColor);
 
   /**
    * Destructor to clean up resources.
@@ -71,21 +70,16 @@ public:
    * NOTE: This will not update a texture that has already been created
    *       for that, you have to call resize.
    *
-   * @param w The new width of the viewport.
-   * @param h The new height of the viewport.
+   * @param size This new width and height of the viewport
    */
-  void setDimensions(float w, float h);
+  void setDimensions(Vec2 size);
 
   /**
    * Sets the background color of the viewport.
    *
-   * @param r The red component of the background color.
-   * @param g The green component of the background color.
-   * @param b The blue component of the background color.
-   * @param a The alpha (transparency) component of the background color.
-   *          Defaults to SDL_ALPHA_OPAQUE
+   * @param backgroundColor a Vec4 that sets that backgound color.
    */
-  void setBackgroundColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a = SDL_ALPHA_OPAQUE);
+  void setBackgroundColor(Vec4 backgroundColor);
 
   /**
    * Draws the viewport, executing the provided callback function for custom rendering.
