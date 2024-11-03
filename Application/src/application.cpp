@@ -9,6 +9,9 @@ Application::Application()
   if (!SDL_Init(SDL_INIT_VIDEO))
     throw std::runtime_error(SDL_GetError());
 
+  const char *driver = SDL_GetCurrentVideoDriver();
+  printf("Driver %s\n", driver);
+
   if (NFD_Init() != NFD_OKAY)
     throw std::runtime_error(NFD_GetError());
 

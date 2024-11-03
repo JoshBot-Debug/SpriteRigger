@@ -69,14 +69,14 @@ namespace NativeFileDialog
     }
     else if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
     {
-      struct wl_surface *surface = (struct wl_surface *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
-      if (surface)
-      {
-        nativeWindow->type = NFD_WINDOW_HANDLE_TYPE_X11;
-
-        nativeWindow->handle = (void *)surface;
-        return true;
-      }
+      // Native window handle for Wayland is not supported by nfd yet. 
+      // struct wl_window *wayland = (struct wl_window *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WAYLAND_EGL_WINDOW_POINTER, NULL);
+      // if (wayland)
+      // {
+      //   nativeWindow->type = NFD_WINDOW_HANDLE_TYPE_UNSET;
+      //   nativeWindow->handle = (void *)wayland;
+      //   return true;
+      // }
     }
 
 #endif
