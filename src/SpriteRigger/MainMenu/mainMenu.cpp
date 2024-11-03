@@ -63,7 +63,7 @@ void MainMenu::File_Open()
       delete path;
     };
 
-    Application::AsyncTask(NativeFileSystemDialog, callback, NativeFileSystem::FILE_PICKER, "txt;png,jpg");
+    Application::AsyncTask(callback, NativeFileSystemDialog, NativeFileSystem::FILE_PICKER, "txt;png,jpg");
   }
 }
 
@@ -96,7 +96,7 @@ void MainMenu::File_SaveAs()
       delete path;
     };
 
-    Application::AsyncTask(NativeFileSystemDialog, callback, NativeFileSystem::FOLDER_PICKER, nullptr);
+    Application::AsyncTask(callback, NativeFileSystemDialog, NativeFileSystem::FOLDER_PICKER, nullptr);
   }
 }
 

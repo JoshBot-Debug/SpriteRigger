@@ -187,31 +187,27 @@ public:
   virtual void onCleanUp() = 0;
 
   /**
-   * @brief Executes a task asynchronously and invokes a callback with its result.
+   * @brief Executes a blocking task on a seperate thread and invokes a callback with its result.
    *
    * This function allows for running a specified task in a separate thread
    * while providing a mechanism to handle the result through a callback function.
    * The task can accept any number of arguments, which will be forwarded
    * appropriately, ensuring both flexibility and type safety.
    *
-   * @tparam Task      The type of the task function. This should be a callable type.
    * @tparam Callback  The type of the callback function that will be invoked with the result of the task.
+   * @tparam Task      The type of the task function. This should be a callable type.
    * @tparam Args      A variadic template parameter representing the types of the arguments passed to the task.
    *
-   * @param task The function to be executed asynchronously. It should match the type T.
-   * @param callback The function to be called with the result of the task. It should match the type C.
+   * @param callback The function to be called with the result of the task. It should match the type Callback.
+   * @param task The function to be executed. It should match the type Task.
    * @param args The arguments to be passed to the task function.
    */
-  template <typename Task, typename Callback, typename... Args>
-  static void AsyncTask(Task task, Callback callback, Args &&...args)
+  template <typename Callback, typename Task, typename... TaskArgs>
+  static void AsyncTask(Callback callback, Task task, TaskArgs &&...args)
   {
-    using ReturnType = decltype(task(std::declval<Args>()...));
-
-    std::future<ReturnType> result = std::async(std::launch::async, task, std::forward<Args>(args)...);
-
-    std::thread([callback, result = std::move(result)]() mutable
+    std::thread([callback, task, args...]() mutable
                 {
-        ReturnType data = result.get();
+        auto data = task(std::forward<TaskArgs>(args)...);
         callback(data); })
         .detach();
   }
