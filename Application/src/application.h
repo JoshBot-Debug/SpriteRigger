@@ -12,6 +12,7 @@
 #include "FPS/fps.h"
 
 #include "NativeFileDialog/dialog.h"
+#include "Viewport/viewport.h"
 
 enum class Theme
 {

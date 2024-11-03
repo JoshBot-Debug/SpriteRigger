@@ -9,9 +9,6 @@ Application::Application()
   if (!SDL_Init(SDL_INIT_VIDEO))
     throw std::runtime_error(SDL_GetError());
 
-  const char *driver = SDL_GetCurrentVideoDriver();
-  printf("Driver %s\n", driver);
-
   if (NFD_Init() != NFD_OKAY)
     throw std::runtime_error(NFD_GetError());
 
@@ -149,18 +146,19 @@ void Application::open()
 
     this->onUpdate(deltaTime);
 
+    auto [r, g, b, a] = this->backgroundColor;
+    SDL_SetRenderDrawColor(this->renderer, r, g, b, a);
+    SDL_RenderClear(renderer);
+
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(),ImGuiDockNodeFlags_PassthruCentralNode);
 
     this->onDraw(deltaTime);
 
     ImGui::Render();
-    auto [r, g, b, a] = this->backgroundColor;
-    SDL_SetRenderDrawColor(this->renderer, r, g, b, a);
-    SDL_RenderClear(renderer);
 
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
     SDL_RenderPresent(renderer);

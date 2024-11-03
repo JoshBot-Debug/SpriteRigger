@@ -7,6 +7,7 @@ class SpriteRigger : public Application
 {
 private:
   MainMenu mainMenu;
+  Viewport viewport;
 
 public:
   SpriteRigger() = default;
