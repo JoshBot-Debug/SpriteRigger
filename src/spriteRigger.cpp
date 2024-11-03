@@ -4,8 +4,10 @@
 
 void SpriteRigger::onInitialize()
 {
+  this->viewport.setBackgroundColor(0, 0, 0, SDL_ALPHA_OPAQUE);
+  this->viewport.setDimensions(1080, 720);
   this->viewport.setRenderer(this->renderer);
-  this->viewport.resize(1080, 720);
+
   this->mainMenu.setApplication(this);
 }
 
@@ -22,14 +24,12 @@ void SpriteRigger::onDraw(float deltaTime)
 {
   this->mainMenu.onDraw();
 
-  ImGui::Begin("Dock Window");
-  ImGui::Text("I am dockable");
+  ImGui::Begin("Window");
+  ImGui::Text("FPS: %i", (int)(1 / deltaTime));
   ImGui::End();
 
   auto renderViewport = [this, deltaTime]()
   {
-    // ImGui::Text("FPS: %i", (int)(1 / deltaTime));
-
     SDL_FRect rect = {0, 0, 100, 100};
     SDL_SetRenderDrawColor(this->renderer, 100, 50, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(this->renderer, &rect);
