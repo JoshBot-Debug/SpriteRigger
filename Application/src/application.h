@@ -14,6 +14,7 @@
 
 #include "NativeFileDialog/dialog.h"
 #include "Viewport/viewport.h"
+#include "Mouse/mouse.h"
 #include "common.h"
 
 enum class Theme

@@ -40,10 +40,10 @@ void Viewport::free()
   SDL_DestroyTexture(this->texture);
 }
 
-void Viewport::draw(const char *title, std::function<void()> callback)
+void Viewport::draw(const char *title, std::function<void()> callback, ImGuiWindowFlags flags)
 {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-  ImGui::Begin(title);
+  ImGui::Begin(title, nullptr, flags);
 
   ImVec2 size = ImGui::GetContentRegionAvail();
   this->position = (Vec2)ImGui::GetWindowPos();
@@ -69,7 +69,7 @@ Vec2 Viewport::getMousePosition(Vec2 position)
 {
   Vec2 relative{
       position.x - this->position.x,
-      position.y - this->position.y - ImGui::GetFrameHeight(),
+      position.y - this->position.y,
   };
 
   if (relative.x < 0 || relative.x > this->size.x ||

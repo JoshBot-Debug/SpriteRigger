@@ -89,7 +89,7 @@ public:
    * @param title The title to be displayed.
    * @param callback The function to be called for custom rendering.
    */
-  void draw(const char *title, std::function<void()> callback);
+  void draw(const char *title, std::function<void()> callback, ImGuiWindowFlags flags = 0);
 
   /**
    * Takes in the global mouse position and returns its position relative to this viewport.

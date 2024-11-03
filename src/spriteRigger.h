@@ -8,8 +8,7 @@ class SpriteRigger : public Application
 private:
   MainMenu mainMenu;
   Viewport viewport;
-
-  Vec2 mouse{0, 0};
+  Mouse mouse;
 
 public:
   SpriteRigger() = default;

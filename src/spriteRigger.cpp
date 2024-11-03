@@ -3,17 +3,25 @@
 #include <stdio.h>
 #include <vector>
 
+#include <imgui_internal.h>
+
 struct ColorComponent
 {
   Vec4 color{255, 255, 255, 255};
 
+  float colorByPercent[4]{1.0f, 1.0f, 1.0f, 1.0f};
+
   void renderProperties()
   {
     ImGui::SeparatorText("Color");
-    ImGui::SliderFloat("Color X", &this->color.x, 0, 255);
-    ImGui::SliderFloat("Color Y", &this->color.y, 0, 255);
-    ImGui::SliderFloat("Color Z", &this->color.z, 0, 255);
-    ImGui::SliderFloat("Color A", &this->color.w, 0, 255);
+
+    if (ImGui::ColorPicker4("Background color", colorByPercent))
+    {
+      this->color.x = colorByPercent[0] * 255.0f;
+      this->color.y = colorByPercent[1] * 255.0f;
+      this->color.z = colorByPercent[2] * 255.0f;
+      this->color.w = colorByPercent[3] * 255.0f;
+    }
   }
 };
 
@@ -72,14 +80,37 @@ void SpriteRigger::onInitialize()
 
 void SpriteRigger::onInput(SDL_Event *event, float deltaTime)
 {
-  this->mouse.set(event->button.x, event->button.y);
+  this->mouse.setPosition(event->button.x, event->button.y);
+
+  switch (event->type)
+  {
+  case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    if (event->button.button == SDL_BUTTON_LEFT)
+      this->mouse.setState(MouseState::PRESSED_LEFT);
+    break;
+  case SDL_EVENT_MOUSE_BUTTON_UP:
+    if (event->button.button == SDL_BUTTON_LEFT)
+      this->mouse.setState(MouseState::RELEASED);
+    break;
+  default:
+    break;
+  }
 }
 
 void SpriteRigger::onUpdate(float deltaTime)
 {
-  auto [x, y] = this->viewport.getMousePosition(this->mouse);
+  Vec2 mouse = this->viewport.getMousePosition(this->mouse);
 
-  printf("Viewport mPos: x:%f y:%f\n", x, y);
+  for (auto entity : this->registry.entities())
+  {
+    if (entity->is("Bone"))
+    {
+      auto [mesh, transform] = entity->collect<MeshComponent, TransformComponent>();
+
+      if (mouse.intersects(transform->position, mesh->size) && this->mouse.isPressed(MouseButton::LEFT))
+        transform->position = Vec2::lerp(transform->position, (mouse - transform->position), 0.1f);
+    }
+  }
 }
 
 void SpriteRigger::onDraw(float deltaTime)
@@ -87,6 +118,8 @@ void SpriteRigger::onDraw(float deltaTime)
   this->mainMenu.onDraw();
 
   ImGui::Begin("Window");
+  Vec2 mouse = this->viewport.getMousePosition(this->mouse);
+  ImGui::Text("Mouse: x(%f) y(%f)", mouse.x, mouse.y);
 
   for (auto entity : this->registry.entities())
   {
@@ -101,8 +134,11 @@ void SpriteRigger::onDraw(float deltaTime)
 
   ImGui::End();
 
+  ImGuiWindowClass winClass;
+  winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
+  ImGui::SetNextWindowClass(&winClass);
   this->viewport.draw("Viewport", [this, deltaTime]()
-                      { this->onDrawViewport(deltaTime); });
+                      { this->onDrawViewport(deltaTime); }, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
 }
 
 void SpriteRigger::onCleanUp()

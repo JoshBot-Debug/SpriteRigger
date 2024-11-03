@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imgui.h"
+#include <cmath>
 
 struct Vec2
 {
@@ -17,6 +18,47 @@ struct Vec2
   {
     this->x = x;
     this->y = y;
+  }
+
+  bool intersects(const Vec2 &position, const Vec2 &size) const
+  {
+    return (x >= position.x && x <= position.x + size.x) &&
+           (y >= position.y && y <= position.y + size.y);
+  }
+
+  static Vec2 lerp(const Vec2 &start, const Vec2 &end, float t)
+  {
+    return Vec2{
+        start.x + t * (end.x - start.x),
+        start.y + t * (end.y - start.y)};
+  }
+
+  friend Vec2 operator+(const Vec2 &lhs, const Vec2 &rhs)
+  {
+    return Vec2{
+        lhs.x + rhs.x,
+        lhs.y + rhs.y};
+  }
+
+  friend Vec2 operator-(const Vec2 &lhs, const Vec2 &rhs)
+  {
+    return Vec2{
+        lhs.x - rhs.x,
+        lhs.y - rhs.y};
+  }
+
+  Vec2 &operator+=(const Vec2 &rhs)
+  {
+    x += rhs.x;
+    y += rhs.y;
+    return *this;
+  }
+
+  Vec2 &operator-=(const Vec2 &rhs)
+  {
+    x -= rhs.x;
+    y -= rhs.y;
+    return *this;
   }
 
   friend bool operator==(const Vec2 &lhs, const Vec2 &rhs)
@@ -37,10 +79,7 @@ struct Vec2
 
 struct Vec4
 {
-  float x;
-  float y;
-  float z;
-  float w;
+  float x, y, z, w;
 
   Vec4() : x(0), y(0), z(0), w(0) {}
 
