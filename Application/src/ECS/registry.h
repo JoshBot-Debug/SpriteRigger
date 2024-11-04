@@ -13,18 +13,37 @@ class Entity;
 
 using EntityId = int;
 
+/**
+ * Registry is a container for managing entities and their associated components.
+ * It supports adding, retrieving, and deleting components of various types
+ * associated with each entity.
+ */
 class Registry
 {
 private:
-  EntityId nEID = ALL;
-  std::vector<Entity *> entt;
-  std::unordered_map<EntityId, std::vector<std::any>> storage;
+  EntityId nEID = ALL;                                         ///< The next available entity ID.
+  std::vector<Entity *> entt;                                  ///< List of all entities in the registry.
+  std::unordered_map<EntityId, std::vector<std::any>> storage; ///< Storage of components indexed by entity ID.
 
 public:
+  Registry() = default;
   ~Registry();
 
+  /**
+   * Creates a new entity with a given name.
+   *
+   * @param name The name of the entity.
+   * @return A pointer to the newly created entity.
+   */
   Entity *createEntity(const char *name);
 
+  /**
+   * Adds a component of type T to the specified entity.
+   *
+   * @param entity The entity ID to which the component will be added.
+   * @param args Constructor arguments for the component.
+   * @return A pointer to the newly created component.
+   */
   template <typename T, typename... Args>
   T *add(EntityId entity, Args &&...args)
   {
@@ -33,6 +52,12 @@ public:
     return component;
   }
 
+  /**
+   * Checks if an entity has a specific component type.
+   *
+   * @param entity The entity ID to check.
+   * @return True if the entity has the component, false otherwise.
+   */
   template <typename T>
   bool has(EntityId entity)
   {
@@ -40,10 +65,10 @@ public:
   }
 
   /**
-   * If we are retrieving components from an entity
-   * Then we can have only one component of each kind in the entity
-   * auto [meshe, transform] = get<Mesh, Transform>();
-   * meshe & transform will both be a single object.
+   * Collects components of specified types from a single entity.
+   *
+   * @param entity The entity ID from which to collect components.
+   * @return A tuple containing pointers to the components.
    */
   template <typename... T>
   std::tuple<T *...> collect(EntityId entity)
@@ -52,17 +77,18 @@ public:
   }
 
   /**
-   * If we are retrieving components from an entity
-   * Then we can have only one component of each kind in the entity
-   * @returns a component or nullptr if nothing was found
+   * Retrieves a component of type T from a specified entity.
+   *
+   * @param entity The entity ID from which to retrieve the component.
+   * @return A pointer to the component, or nullptr if not found.
    */
-  template <typename U>
-  U *get(EntityId entity)
+  template <typename T>
+  T *get(EntityId entity)
   {
     for (auto &component : this->storage[entity])
       try
       {
-        return std::any_cast<U *>(component);
+        return std::any_cast<T *>(component);
       }
       catch (const std::bad_any_cast &e)
       {
@@ -71,11 +97,9 @@ public:
   }
 
   /**
-   * If we are just all components regardless of entity
-   * Then we will receive many of each components. They will be grouped together
-   * in a vector.
-   * auto [meshes, transforms] = get<Mesh, Transform>();
-   * meshes & transforms will both be a vector.
+   * Collects all components of specified types across all entities.
+   *
+   * @return A tuple containing vectors of pointers to the components.
    */
   template <typename... T>
   std::tuple<std::vector<T *>...> collect()
@@ -84,19 +108,20 @@ public:
   }
 
   /**
-   * If we are just all components regardless of entity
-   * Then we will receive a vector of components.
+   * Retrieves all components of a specified type across all entities.
+   *
+   * @return A vector of pointers to the components.
    */
-  template <typename U>
-  std::vector<U *> get()
+  template <typename T>
+  std::vector<T *> get()
   {
-    std::vector<U *> result;
+    std::vector<T *> result;
 
     for (const auto &[eid, components] : this->storage)
       for (auto &component : components)
         try
         {
-          result.push_back(std::any_cast<U *>(component));
+          result.push_back(std::any_cast<T *>(component));
         }
         catch (const std::bad_any_cast &e)
         {
@@ -105,11 +130,21 @@ public:
     return result;
   }
 
+  /**
+   * Retrieves all entities in the registry.
+   *
+   * @return A vector of pointers to all entities.
+   */
   std::vector<Entity *> entities()
   {
     return this->entt;
   }
 
+  /**
+   * Frees a specific component type from the specified entity.
+   *
+   * @param entity The entity ID from which to free the component.
+   */
   template <typename T>
   void free(EntityId entity)
   {
@@ -129,10 +164,13 @@ public:
     }
   }
 
+  /**
+   * Frees all components of a specified type across all entities.
+   */
   template <typename... T>
   void free()
   {
-    for (auto [eid, component] : this->storage)
+    for (const auto [eid, components] : this->storage)
       (this->free<T>(eid), ...);
   }
 };

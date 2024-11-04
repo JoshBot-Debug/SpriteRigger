@@ -1,14 +1,25 @@
-#include "viewport.h"
-#include <stdio.h>
+#include <imgui_internal.h>
 
-Viewport::Viewport(SDL_Renderer *renderer, Vec2 size, Vec4 backgroundColor) : renderer(renderer), size(size), backgroundColor(backgroundColor)
+#include "viewport.h"
+
+Viewport::Viewport(Application *application) : Scene(application)
 {
-  this->texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+  this->texture = SDL_CreateTexture(application->getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 }
 
 Viewport::~Viewport()
 {
   this->free();
+}
+
+void Viewport::setTitle(const char *title)
+{
+  this->title = title;
+}
+
+void Viewport::setWindowFlags(ImGuiWindowFlags flags)
+{
+  this->flags = flags;
 }
 
 void Viewport::setDimensions(Vec2 size)
@@ -21,13 +32,7 @@ void Viewport::resize(Vec2 size)
   SDL_DestroyTexture(this->texture);
 
   this->setDimensions(size);
-  this->texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
-}
-
-void Viewport::setRenderer(SDL_Renderer *renderer)
-{
-  this->renderer = renderer;
-  this->texture = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, this->size.x, this->size.y);
+  this->texture = SDL_CreateTexture(this->application->getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 }
 
 void Viewport::setBackgroundColor(Vec4 setBackgroundColor)
@@ -40,10 +45,16 @@ void Viewport::free()
   SDL_DestroyTexture(this->texture);
 }
 
-void Viewport::draw(const char *title, std::function<void()> callback, ImGuiWindowFlags flags)
+void Viewport::onDraw(float deltaTime)
 {
+  SDL_Renderer *renderer = this->application->getRenderer();
+
+  ImGuiWindowClass winClass;
+  winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
+  ImGui::SetNextWindowClass(&winClass);
+
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-  ImGui::Begin(title, nullptr, flags);
+  ImGui::Begin(this->title, nullptr, this->flags);
 
   ImVec2 size = ImGui::GetContentRegionAvail();
   this->position = (Vec2)ImGui::GetWindowPos();
@@ -51,14 +62,15 @@ void Viewport::draw(const char *title, std::function<void()> callback, ImGuiWind
   if (this->size != size)
     this->resize(size);
 
-  SDL_SetRenderTarget(this->renderer, this->texture);
+  SDL_SetRenderTarget(renderer, this->texture);
 
   auto [r, g, b, a] = this->backgroundColor;
-  SDL_SetRenderDrawColor(this->renderer, r, g, b, a);
-  SDL_RenderClear(this->renderer);
+  SDL_SetRenderDrawColor(renderer, r, g, b, a);
+  SDL_RenderClear(renderer);
 
-  callback();
-  SDL_SetRenderTarget(this->renderer, nullptr);
+  this->onDrawViewport(deltaTime);
+
+  SDL_SetRenderTarget(renderer, nullptr);
 
   ImGui::Image(reinterpret_cast<ImTextureID>(this->texture), ImVec2(this->size));
   ImGui::End();

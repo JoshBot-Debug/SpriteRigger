@@ -2,22 +2,22 @@
 
 #include <functional>
 
-#include "SDL3/SDL.h"
+#include "application.h"
+#include "Scene/scene.h"
 
-#include "imgui.h"
-
-#include "common.h"
-
-class Viewport
+class Viewport : public Scene
 {
 private:
-  SDL_Renderer *renderer = nullptr;
   SDL_Texture *texture = nullptr;
 
-  Vec4 backgroundColor = Vec4{255, 255, 255, 255};
+  const char *title = "Viewport";
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
+
+  Vec4 backgroundColor = Vec4{0, 0, 0, 255};
 
   // Viewport width and height
-  Vec2 size{0, 0};
+  Vec2 size{1080, 720};
 
   // Viewport position
   Vec2 position{0, 0};
@@ -35,34 +35,32 @@ private:
   void resize(Vec2 size);
 
 public:
-  /**
-   * Default constructor.
-   */
-  Viewport() = default;
+  Viewport(Application *application);
+
+  virtual ~Viewport();
 
   /**
-   * Constructor that initializes the viewport with a renderer and dimensions.
+   * @brief Sets the title of the window.
    *
-   * @param renderer The SDL_Renderer used for rendering.
-   * @param w The width of the viewport.
-   * @param h The height of the viewport.
-   * @param backgroundColor The background color of the viewport.
+   * This method updates the window title to the specified string.
+   *
+   * @param title A pointer to a null-terminated character string that
+   *              represents the new title for the window.
+   *              It should not be modified after this call.
    */
-  Viewport(SDL_Renderer *renderer, Vec2 size, Vec4 backgroundColor);
+  void setTitle(const char *title);
 
   /**
-   * Destructor to clean up resources.
-   */
-  ~Viewport();
-
-  /**
-   * Sets the SDL_Renderer for the viewport.
+   * @brief Sets the flags for the window.
    *
-   * Note: This should be called last, before invoking the draw function and only once.
+   * This method configures the window's behavior and appearance
+   * using the specified ImGuiWindowFlags.
    *
-   * @param renderer The SDL_Renderer to be set for the viewport.
+   * @param flags A bitwise combination of ImGuiWindowFlags that determine
+   *              the properties of the window, such as whether it is
+   *              collapsible, resizable, or has a title bar.
    */
-  void setRenderer(SDL_Renderer *renderer);
+  void setWindowFlags(ImGuiWindowFlags flags);
 
   /**
    * Sets the dimensions of the viewport.
@@ -82,20 +80,21 @@ public:
   void setBackgroundColor(Vec4 backgroundColor);
 
   /**
-   * Draws the viewport, executing the provided callback function for custom rendering.
-   *
-   * Any rendering done in the callback will be performed inside the viewport that was created.
-   *
-   * @param title The title to be displayed.
-   * @param callback The function to be called for custom rendering.
-   */
-  void draw(const char *title, std::function<void()> callback, ImGuiWindowFlags flags = 0);
-
-  /**
    * Takes in the global mouse position and returns its position relative to this viewport.
    *
    * @param gPosition The global mouse position.
    * @return The position of the mouse relative to the viewport.
    */
   Vec2 getMousePosition(Vec2 position);
+
+  /**
+   * Do not override this method, the implimentation is done in the viewport.
+   * Instead use onDrawViewport()
+   */
+  void onDraw(float deltaTime) final;
+
+  /**
+   * Use this in place of onDraw();
+   */
+  virtual void onDrawViewport(float deltaTime) = 0;
 };

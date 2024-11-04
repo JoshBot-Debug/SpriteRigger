@@ -1,18 +1,16 @@
-#include "imgui.h"
+#pragma once
+
 #include "application.h"
+#include "Scene/scene.h"
 
-class MainMenu
+class HeaderPanelScene : public Scene
 {
-private:
-  Application *application = nullptr;
-
 public:
-  MainMenu() {}
-  ~MainMenu() {}
+  HeaderPanelScene(Application *application) : Scene(application) {}
+  ~HeaderPanelScene() {}
 
-  void setApplication(Application *application);
+  void onDraw(float deltaTime) override;
 
-  void onDraw();
   void File_Menu();
 
   void File_New();
@@ -23,7 +21,6 @@ public:
 
   void File_Options();
   void File_Quit();
-
 
   void Edit_Menu();
 

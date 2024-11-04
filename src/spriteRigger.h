@@ -1,17 +1,18 @@
 #pragma once
 
 #include "application.h"
-#include "MainMenu/mainMenu.h"
+#include "Scene/HeaderPanelScene/headerPanelScene.h"
+#include "Scene/ExplorerScene/explorerScene.h"
+#include "Scene/AnimatorViewport/animatorViewport.h"
 
 class SpriteRigger : public Application
 {
-private:
-  MainMenu mainMenu;
-  Viewport viewport;
-  Mouse mouse;
+  AnimatorViewport animatorViewport;
+  HeaderPanelScene headerPanelScene;
+  ExplorerScene explorerScene;
 
 public:
-  SpriteRigger() = default;
+  SpriteRigger() : headerPanelScene(this), explorerScene(this), animatorViewport(this) {};
   ~SpriteRigger() = default;
 
   void onInitialize() override;
@@ -19,6 +20,4 @@ public:
   void onUpdate(float deltaTime) override;
   void onDraw(float deltaTime) override;
   void onCleanUp() override;
-
-  void onDrawViewport(float deltaTime);
 };

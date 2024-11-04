@@ -1,4 +1,5 @@
 #pragma once
+
 #include <future>
 #include <cstdint>
 
@@ -13,8 +14,7 @@
 #include "FPS/fps.h"
 
 #include "NativeFileDialog/dialog.h"
-#include "Viewport/viewport.h"
-#include "Mouse/mouse.h"
+#include "Input/input.h"
 #include "common.h"
 
 enum class Theme
@@ -29,9 +29,10 @@ protected:
   SDL_Window *window = nullptr;     // Pointer to the SDL window.
   SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
   Registry registry;
+  Input input;
 
 private:
-  bool isRunning = true; 
+  bool isRunning = true;
   Theme theme = Theme::LIGHT;                      // Theme of the app.
   Vec4 backgroundColor = Vec4{255, 255, 255, 255}; // Background color of the window.
 
@@ -52,6 +53,16 @@ public:
   SDL_Renderer *getRenderer()
   {
     return this->renderer;
+  };
+
+  Registry *getRegistry()
+  {
+    return &this->registry;
+  };
+
+  Input *getInput()
+  {
+    return &this->input;
   };
 
   /**
@@ -139,6 +150,16 @@ public:
   void open();
 
   /**
+   * @brief Called to initialize the game or application resources.
+   *
+   * This method is responsible for setting up necessary components,
+   * loading assets, creating game objects, and performing any initial
+   * configuration required before the game starts. It should be called
+   * at the beginning of the game loop.
+   */
+  virtual void onInitialize() = 0;
+
+  /**
    * @brief Called once at the start of each frame.
    *
    * This method is responsible for processing user input events,
@@ -179,16 +200,6 @@ public:
    *                   movement and animations.
    */
   virtual void onDraw(float deltaTime) = 0;
-
-  /**
-   * @brief Called to initialize the game or application resources.
-   *
-   * This method is responsible for setting up necessary components,
-   * loading assets, creating game objects, and performing any initial
-   * configuration required before the game starts. It should be called
-   * at the beginning of the game loop.
-   */
-  virtual void onInitialize() = 0;
 
   /**
    * @brief Called to clean up resources before the game or application exits.

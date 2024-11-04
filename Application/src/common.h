@@ -95,6 +95,62 @@ struct Vec4
     this->w = w;
   }
 
+  bool intersects(const ImVec4 &position, const ImVec4 &size) const
+  {
+    return (x >= position.x && x <= position.x + size.x) &&
+           (y >= position.y && y <= position.y + size.y) &&
+           (z >= position.z && z <= position.z + size.z) &&
+           (w >= position.w && w <= position.w + size.w);
+  }
+
+  static ImVec4 lerp(const ImVec4 &start, const ImVec4 &end, float t)
+  {
+    return ImVec4{
+        start.x + t * (end.x - start.x),
+        start.y + t * (end.y - start.y),
+        start.z + t * (end.z - start.z),
+        start.w + t * (end.w - start.w),
+    };
+  }
+
+  friend Vec4 operator+(const Vec4 &lhs, const Vec4 &rhs)
+  {
+    return Vec4{
+        lhs.x + rhs.x,
+        lhs.y + rhs.y,
+        lhs.z + rhs.z,
+        lhs.w + rhs.w,
+    };
+  }
+
+  friend Vec4 operator-(const Vec4 &lhs, const Vec4 &rhs)
+  {
+    return Vec4{
+        lhs.x - rhs.x,
+        lhs.y - rhs.y,
+        lhs.z - rhs.z,
+        lhs.w - rhs.w,
+    };
+  }
+
+  Vec4 &operator+=(const Vec4 &rhs)
+  {
+    x += rhs.x;
+    y += rhs.y;
+    z += rhs.z;
+    w += rhs.w;
+    return *this;
+  }
+
+  Vec4 &operator-=(const Vec4 &rhs)
+  {
+    x -= rhs.x;
+    y -= rhs.y;
+    z -= rhs.z;
+    w -= rhs.w;
+    return *this;
+  }
+
   friend bool operator==(const Vec4 &lhs, const Vec4 &rhs)
   {
     return (lhs.x == rhs.x) && (lhs.y == rhs.y) && (lhs.z == rhs.z) && (lhs.w == rhs.w);

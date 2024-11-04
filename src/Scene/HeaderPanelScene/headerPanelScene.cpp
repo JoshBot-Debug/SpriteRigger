@@ -1,14 +1,10 @@
 #include <string>
 
-#include "imgui.h"
-#include "mainMenu.h"
+#include "Scene/scene.h"
 
-void MainMenu::setApplication(Application *application)
-{
-  this->application = application;
-}
+#include "headerPanelScene.h"
 
-void MainMenu::onDraw()
+void HeaderPanelScene::onDraw(float deltaTime)
 {
   if (ImGui::BeginMainMenuBar())
   {
@@ -25,7 +21,7 @@ void MainMenu::onDraw()
   }
 }
 
-void MainMenu::File_Menu()
+void HeaderPanelScene::File_Menu()
 {
   this->File_New();
   this->File_Open();
@@ -45,14 +41,14 @@ void MainMenu::File_Menu()
   this->File_Quit();
 }
 
-void MainMenu::File_New()
+void HeaderPanelScene::File_New()
 {
   if (ImGui::MenuItem("New"))
   {
   }
 }
 
-void MainMenu::File_Open()
+void HeaderPanelScene::File_Open()
 {
   if (ImGui::MenuItem("Open", "Ctrl+O"))
   {
@@ -61,12 +57,11 @@ void MainMenu::File_Open()
       printf("Open file: %s\n", path);
       NativeFileDialog::Free(path);
     };
-
     this->application->AsyncTask(callback, NativeFileDialog::SelectFile, this->application->getWindow(), nullptr, 0);
   }
 }
 
-void MainMenu::File_OpenRecent()
+void HeaderPanelScene::File_OpenRecent()
 {
   if (ImGui::BeginMenu("Open Recent"))
   {
@@ -77,14 +72,14 @@ void MainMenu::File_OpenRecent()
   }
 }
 
-void MainMenu::File_Save()
+void HeaderPanelScene::File_Save()
 {
   if (ImGui::MenuItem("Save", "Ctrl+S"))
   {
   }
 }
 
-void MainMenu::File_SaveAs()
+void HeaderPanelScene::File_SaveAs()
 {
 
   if (ImGui::MenuItem("Save As.."))
@@ -99,7 +94,7 @@ void MainMenu::File_SaveAs()
   }
 }
 
-void MainMenu::File_Options()
+void HeaderPanelScene::File_Options()
 {
   if (ImGui::BeginMenu("Options"))
   {
@@ -120,13 +115,13 @@ void MainMenu::File_Options()
   }
 }
 
-void MainMenu::File_Quit()
+void HeaderPanelScene::File_Quit()
 {
   if (ImGui::MenuItem("Quit", "Alt+F4"))
     this->application->quit();
 }
 
-void MainMenu::Edit_Menu()
+void HeaderPanelScene::Edit_Menu()
 {
   this->Edit_Undo();
   this->Edit_Redo();
@@ -140,35 +135,35 @@ void MainMenu::Edit_Menu()
   ImGui::EndMenu();
 }
 
-void MainMenu::Edit_Undo()
+void HeaderPanelScene::Edit_Undo()
 {
   if (ImGui::MenuItem("Undo", "Ctrl+Z"))
   {
   }
 }
 
-void MainMenu::Edit_Redo()
+void HeaderPanelScene::Edit_Redo()
 {
   if (ImGui::MenuItem("Redo", "Ctrl+Y", false, false))
   {
   }
 }
 
-void MainMenu::Edit_Cut()
+void HeaderPanelScene::Edit_Cut()
 {
   if (ImGui::MenuItem("Cut", "Ctrl+X"))
   {
   }
 }
 
-void MainMenu::Edit_Copy()
+void HeaderPanelScene::Edit_Copy()
 {
   if (ImGui::MenuItem("Copy", "Ctrl+C"))
   {
   }
 }
 
-void MainMenu::Edit_Paste()
+void HeaderPanelScene::Edit_Paste()
 {
   if (ImGui::MenuItem("Paste", "Ctrl+V"))
   {

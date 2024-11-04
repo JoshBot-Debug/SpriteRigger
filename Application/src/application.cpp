@@ -12,7 +12,7 @@ Application::Application()
   if (NFD_Init() != NFD_OKAY)
     throw std::runtime_error(NFD_GetError());
 
-  this->window = SDL_CreateWindow("Application", 1920, 1080, WINDOW_FLAGS);
+  this->window = SDL_CreateWindow("Application", 1080, 720, WINDOW_FLAGS);
   if (this->window == NULL)
     throw std::runtime_error(SDL_GetError());
 
@@ -127,6 +127,7 @@ void Application::open()
     while (SDL_PollEvent(&event) != 0)
     {
       ImGui_ImplSDL3_ProcessEvent(&event);
+      this->input.onEvent(&event);
 
       if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window)))
       {
