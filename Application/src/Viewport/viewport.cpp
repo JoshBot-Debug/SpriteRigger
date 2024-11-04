@@ -57,7 +57,7 @@ void Viewport::onDraw(float deltaTime)
   ImGui::Begin(this->title, nullptr, this->flags);
 
   ImVec2 size = ImGui::GetContentRegionAvail();
-  this->position = (Vec2)ImGui::GetWindowPos();
+  this->position = ImGui::GetWindowPos();
 
   if (this->size != size)
     this->resize(size);

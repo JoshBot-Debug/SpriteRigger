@@ -7,6 +7,9 @@
 
 class AnimatorViewport : public Viewport
 {
+private:
+  FPS fps;
+
 public:
   AnimatorViewport(Application *application) : Viewport(application) {}
   ~AnimatorViewport() {}

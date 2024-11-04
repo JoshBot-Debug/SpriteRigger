@@ -1,9 +1,11 @@
 #include "animatorViewport.h"
+#include "string.h"
 
 void AnimatorViewport::onInitialize()
 {
   this->setTitle("Animator");
   this->setWindowFlags(ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
+  this->setBackgroundColor(Vec4{180, 180, 180, 180});
 }
 
 void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
@@ -35,14 +37,11 @@ void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
       }
 
       if (mouse->state == MouseState::RELEASED)
-        mouse->release();
+        mouse->release(entity->getId());
 
       if (mouse->state == MouseState::MOVING)
         if (mouse->isGrabbing(entity->getId()))
-        {
-          auto payload = mouse->getGrabPayload<GrabPayload>();
-          transform->position = Vec2::lerp(transform->position, viewportMouse - payload->offset, 25 * deltaTime);
-        }
+          transform->position = viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset;
     }
   }
 }
@@ -58,7 +57,7 @@ void AnimatorViewport::onDrawViewport(float deltaTime)
   std::vector<std::pair<int, int>> bones;
 
   for (auto entity : registry->entities())
-    if (entity->is("Bone")) 
+    if (entity->is("Bone"))
       bones.emplace_back(entity->getId(), entity->get<PropertiesComponent>()->zIndex);
 
   std::sort(bones.begin(), bones.end(), [](const std::pair<int, int> &a, const std::pair<int, int> &b)

@@ -5,11 +5,11 @@
 #include "Scene/scene.h"
 #include "Entity/components.h"
 
-class ExplorerScene : public Scene
+class ToolsScene : public Scene
 {
 public:
-  ExplorerScene(Application *application) : Scene(application) {}
-  ~ExplorerScene() {}
+  ToolsScene(Application *application) : Scene(application) {}
+  ~ToolsScene() {}
 
   void onInitialize() override;
   void onInput(SDL_Event *event, float deltaTime) override;

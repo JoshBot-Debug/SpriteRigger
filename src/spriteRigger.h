@@ -2,17 +2,18 @@
 
 #include "application.h"
 #include "Scene/HeaderPanelScene/headerPanelScene.h"
-#include "Scene/ExplorerScene/explorerScene.h"
+#include "Scene/ToolsScene/toolsScene.h"
 #include "Scene/AnimatorViewport/animatorViewport.h"
 
 class SpriteRigger : public Application
 {
+private:
   AnimatorViewport animatorViewport;
   HeaderPanelScene headerPanelScene;
-  ExplorerScene explorerScene;
+  ToolsScene toolsScene;
 
 public:
-  SpriteRigger() : headerPanelScene(this), explorerScene(this), animatorViewport(this) {};
+  SpriteRigger() : headerPanelScene(this), toolsScene(this), animatorViewport(this) {};
   ~SpriteRigger() = default;
 
   void onInitialize() override;
