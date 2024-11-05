@@ -10,8 +10,6 @@
 
 namespace NativeFileDialog
 {
-
-  using UTF8Char = nfdu8char_t;
   using Filters = nfdu8filteritem_t;
   using FilterSize = nfdfiltersize_t;
 
@@ -69,7 +67,7 @@ namespace NativeFileDialog
     }
     else if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
     {
-      // Native window handle for Wayland is not supported by nfd yet. 
+      // Native window handle for Wayland is not supported by nfd yet.
       // struct wl_window *wayland = (struct wl_window *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WAYLAND_EGL_WINDOW_POINTER, NULL);
       // if (wayland)
       // {
@@ -95,15 +93,12 @@ namespace NativeFileDialog
    * @param filterSize The number of filters in the filters list. If filters is nullptr,
    *                   this parameter is ignored and can be set to 0.
    *
-   * @return A pointer to a UTF8Char string representing the selected file's path, or nullptr
-   *         if the user cancels the operation or if an error occurs.
-   *
-   * IMPORTANT: You must free the NativeFileDialog::UTF8Char *path using NativeFileDialog::free().
-   *            Failing to do so will result in a memory leak.
+   * @return the file path
    */
-  inline UTF8Char *SelectFile(SDL_Window *window, Filters *filters = nullptr, FilterSize filterSize = 0)
+  inline std::string SelectFile(SDL_Window *window, Filters *filters = nullptr, FilterSize filterSize = 0)
   {
-    UTF8Char *path = nullptr;
+    nfdu8char_t *outPath = nullptr;
+    std::string filePath;
 
     try
     {
@@ -111,19 +106,79 @@ namespace NativeFileDialog
       oargs.filterList = filters;
       oargs.filterCount = filterSize;
       setNativeWindow(window, &oargs.parentWindow);
-      nfdresult_t result = NFD_OpenDialogU8_With(&path, &oargs);
-      if (result == NFD_ERROR)
-        printf("NativeDialog error: %s", NFD_GetError());
+      nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &oargs);
 
       if (result == NFD_OKAY)
-        return path;
+      {
+        filePath = std::string(outPath);
+        NFD_FreePathU8(outPath);
+      }
+
+      if (result == NFD_ERROR)
+        printf("NativeDialog error: %s", NFD_GetError());
     }
     catch (const std::exception &e)
     {
       printf("NativeDialog error: %s", e.what());
     }
 
-    return nullptr;
+    return filePath;
+  }
+
+  /**
+   * Opens a file selection dialog and returns the selected file's path as a UTF-8 encoded string.
+   *
+   * @param window A pointer to the SDL_Window that serves as the parent for the dialog. This helps
+   *               to position the dialog relative to the specified window.
+   * @param filters An optional pointer to a list of file filters to limit the types of files
+   *                that can be selected. If nullptr, no filters will be applied.
+   * @param filterSize The number of filters in the filters list. If filters is nullptr,
+   *                   this parameter is ignored and can be set to 0.
+   *
+   * @return A pointer to a UTF8Char string representing the selected file's path, or nullptr
+   *         if the user cancels the operation or if an error occurs.
+   *
+   * IMPORTANT: You must free the NativeFileDialog::UTF8Char *path using NativeFileDialog::free().
+   *            Failing to do so will result in a memory leak.
+   */
+  inline std::vector<std::string> SelectFiles(SDL_Window *window, Filters *filters = nullptr, FilterSize filterSize = 0)
+  {
+    const nfdpathset_t *outPaths = nullptr;
+    std::vector<std::string> filesPaths;
+
+    try
+    {
+      nfdopendialogu8args_t oargs = {0};
+      oargs.filterList = filters;
+      oargs.filterCount = filterSize;
+      setNativeWindow(window, &oargs.parentWindow);
+      nfdresult_t result = NFD_OpenDialogMultipleU8_With(&outPaths, &oargs);
+      if (result == NFD_ERROR)
+        printf("NativeDialog error: %s", NFD_GetError());
+
+      if (result == NFD_OKAY)
+      {
+        nfdpathsetsize_t numPaths;
+        NFD_PathSet_GetCount(outPaths, &numPaths);
+
+        nfdpathsetsize_t i;
+        for (i = 0; i < numPaths; ++i)
+        {
+          nfdchar_t *pathChar;
+          NFD_PathSet_GetPath(outPaths, i, &pathChar);
+          filesPaths.push_back(std::string(pathChar));
+          NFD_PathSet_FreePath(pathChar);
+        }
+
+        NFD_PathSet_Free(outPaths);
+      }
+    }
+    catch (const std::exception &e)
+    {
+      printf("NativeDialog error: %s", e.what());
+    }
+
+    return filesPaths;
   }
 
   /**
@@ -142,9 +197,10 @@ namespace NativeFileDialog
    * IMPORTANT: You must free the NativeFileDialog::UTF8Char *path using NativeFileDialog::free().
    *            Failing to do so will result in a memory leak.
    */
-  inline UTF8Char *SaveFile(SDL_Window *window, Filters *filters = nullptr, FilterSize filterSize = 0)
+  inline std::string SaveFile(SDL_Window *window, Filters *filters = nullptr, FilterSize filterSize = 0)
   {
-    UTF8Char *path = nullptr;
+    nfdu8char_t *outPath = nullptr;
+    std::string filePath;
 
     try
     {
@@ -152,20 +208,23 @@ namespace NativeFileDialog
       sargs.filterList = filters;
       sargs.filterCount = filterSize;
       setNativeWindow(window, &sargs.parentWindow);
-      nfdresult_t result = NFD_SaveDialogU8_With(&path, &sargs);
+      nfdresult_t result = NFD_SaveDialogU8_With(&outPath, &sargs);
 
       if (result == NFD_ERROR)
         printf("NativeDialog error: %s", NFD_GetError());
 
       if (result == NFD_OKAY)
-        return path;
+      {
+        filePath = std::string(outPath);
+        NFD_FreePathU8(outPath);
+      }
     }
     catch (const std::exception &e)
     {
       printf("NativeDialog error: %s", e.what());
     }
 
-    return nullptr;
+    return filePath;
   }
 
   /**
@@ -174,48 +233,31 @@ namespace NativeFileDialog
    * @param window A pointer to the SDL_Window that serves as the parent for the dialog. This helps
    *               to position the dialog relative to the specified window.
    *
-   * @return A pointer to a UTF8Char string representing the selected file's path, or nullptr
-   *         if the user cancels the operation or if an error occurs.
-   *
-   * IMPORTANT: You must free the NativeFileDialog::UTF8Char *path using NativeFileDialog::free().
-   *            Failing to do so will result in a memory leak.
+   * @return the folder path.
    */
-  inline UTF8Char *SelectFolder(SDL_Window *window)
+  inline std::string SelectFolder(SDL_Window *window)
   {
-    UTF8Char *path = nullptr;
-
+    nfdu8char_t *outPath = nullptr;
+    std::string folderPath;
     try
     {
       nfdpickfolderu8args_t fargs = {0};
       setNativeWindow(window, &fargs.parentWindow);
-      nfdresult_t result = NFD_PickFolderU8_With(&path, &fargs);
+      nfdresult_t result = NFD_PickFolderU8_With(&outPath, &fargs);
       if (result == NFD_ERROR)
         printf("NativeDialog error: %s", NFD_GetError());
 
       if (result == NFD_OKAY)
-        return path;
+      {
+        folderPath = std::string(outPath);
+        NFD_FreePathU8(outPath);
+      }
     }
     catch (const std::exception &e)
     {
       printf("NativeDialog error: %s", e.what());
     }
 
-    return nullptr;
-  }
-
-  /**
-   * Frees a previously allocated UTF-8 encoded string obtained from dialogs.
-   *
-   * @param path A pointer to the UTF8Char string that represents the file path.
-   *             This string must have been allocated by a NativeFileDialog function
-   *             (e.g., SelectFile) and should not be freed using standard delete or free functions.
-   *
-   * IMPORTANT: You must ensure that the pointer passed to this function was previously
-   * allocated by the NativeFileDialog. Failing to use this function on the correct pointer
-   * may lead to undefined behavior or memory leaks.
-   */
-  inline void Free(UTF8Char *path)
-  {
-    NFD_FreePathU8(path);
+    return folderPath;
   }
 }

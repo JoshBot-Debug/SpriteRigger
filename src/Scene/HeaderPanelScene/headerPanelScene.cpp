@@ -52,10 +52,9 @@ void HeaderPanelScene::File_Open()
 {
   if (ImGui::MenuItem("Open", "Ctrl+O"))
   {
-    auto callback = [this](NativeFileDialog::UTF8Char *path)
+    auto callback = [this](std::string path)
     {
-      printf("Open file: %s\n", path);
-      NativeFileDialog::Free(path);
+      printf("Open file: %s\n", path.c_str());
     };
     this->application->AsyncTask(callback, NativeFileDialog::SelectFile, this->application->getWindow(), nullptr, 0);
   }
@@ -84,10 +83,9 @@ void HeaderPanelScene::File_SaveAs()
 
   if (ImGui::MenuItem("Save As.."))
   {
-    auto callback = [this](NativeFileDialog::UTF8Char *path)
+    auto callback = [](std::string path)
     {
-      printf("Save to: %s\n", path);
-      NativeFileDialog::Free(path);
+      printf("Save to: %s\n", path.c_str());
     };
 
     this->application->AsyncTask(callback, NativeFileDialog::SaveFile, this->application->getWindow(), nullptr, 0);

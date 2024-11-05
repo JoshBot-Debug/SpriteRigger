@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
@@ -16,6 +17,8 @@
 #include "NativeFileDialog/dialog.h"
 #include "Input/input.h"
 #include "common.h"
+
+const SDL_WindowFlags APPLICATION_WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 
 enum class Theme
 {
@@ -37,7 +40,7 @@ private:
   Vec4 backgroundColor = Vec4{255, 255, 255, 255}; // Background color of the window.
 
 public:
-  Application();
+  Application(SDL_WindowFlags flags = APPLICATION_WINDOW_FLAGS);
   virtual ~Application();
 
   /**
@@ -143,12 +146,10 @@ public:
   void addFont(const char *ttfPath, float fontSize = 16.0f);
 
   /**
-   * Open the SDL window and renderer.
-   *
-   * This method initializes and displays the SDL window.
+   * Open the SDL window.
    */
   void open();
-
+  
   /**
    * @brief Called to initialize the game or application resources.
    *
@@ -157,7 +158,7 @@ public:
    * configuration required before the game starts. It should be called
    * at the beginning of the game loop.
    */
-  virtual void onInitialize() = 0;
+  virtual void onInitialize() {};
 
   /**
    * @brief Called once at the start of each frame.
@@ -172,7 +173,7 @@ public:
    *                   measured in milliseconds. This value can be used for frame-rate independent
    *                   movement and animations.
    */
-  virtual void onInput(SDL_Event *event, float deltaTime) = 0;
+  virtual void onInput(SDL_Event *event, float deltaTime) {};
 
   /**
    * @brief Called once after onInput() for each frame.
@@ -185,7 +186,7 @@ public:
    *                   measured in milliseconds. This value can be used for frame-rate independent
    *                   movement and animations.
    */
-  virtual void onUpdate(float deltaTime) = 0;
+  virtual void onUpdate(float deltaTime) {};
 
   /**
    * @brief Called once after onUpdate() for each frame.
@@ -199,7 +200,7 @@ public:
    *                   measured in milliseconds. This value can be used for frame-rate independent
    *                   movement and animations.
    */
-  virtual void onDraw(float deltaTime) = 0;
+  virtual void onDraw(float deltaTime) {};
 
   /**
    * @brief Called to clean up resources before the game or application exits.
@@ -209,7 +210,7 @@ public:
    * and other game data. It should be called before shutting down the
    * application to prevent memory leaks and ensure proper cleanup.
    */
-  virtual void onCleanUp() = 0;
+  virtual void onCleanUp() {};
 
   /**
    * @brief Executes a blocking task on a seperate thread and invokes a callback with its result.

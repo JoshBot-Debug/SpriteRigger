@@ -37,8 +37,15 @@ void ToolsScene::onDraw(float deltaTime)
   winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
   ImGui::SetNextWindowClass(&winClass);
 
-  ImGui::Begin("Hierarchy", nullptr);
-  
+  ImGui::Begin("Tools", nullptr);
+
+  if (ImGui::BeginPopupContextWindow("Tools Context"))
+  {
+    if (ImGui::MenuItem("Add bone"))
+      ImGui::CloseCurrentPopup();
+    ImGui::EndPopup();
+  }
+
   ImGui::End();
 
   ImGui::ShowDemoWindow();

@@ -1,5 +1,3 @@
-#include <imgui_internal.h>
-
 #include "viewport.h"
 
 Viewport::Viewport(Application *application) : Scene(application)
@@ -49,10 +47,6 @@ void Viewport::onDraw(float deltaTime)
 {
   SDL_Renderer *renderer = this->application->getRenderer();
 
-  ImGuiWindowClass winClass;
-  winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
-  ImGui::SetNextWindowClass(&winClass);
-
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
   ImGui::Begin(this->title, nullptr, this->flags);
 
@@ -72,7 +66,7 @@ void Viewport::onDraw(float deltaTime)
 
   SDL_SetRenderTarget(renderer, nullptr);
 
-  ImGui::Image(reinterpret_cast<ImTextureID>(this->texture), ImVec2(this->size));
+  ImGui::Image((ImTextureID)this->texture, ImVec2(this->size));
   ImGui::End();
   ImGui::PopStyleVar();
 }

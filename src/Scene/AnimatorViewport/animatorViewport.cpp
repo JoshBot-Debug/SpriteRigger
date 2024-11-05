@@ -4,7 +4,7 @@
 void AnimatorViewport::onInitialize()
 {
   this->setTitle("Animator");
-  this->setWindowFlags(ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
+  // this->setWindowFlags(ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
   this->setBackgroundColor(Vec4{180, 180, 180, 180});
 }
 
@@ -39,9 +39,8 @@ void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
       if (mouse->state == MouseState::RELEASED)
         mouse->release(entity->getId());
 
-      if (mouse->state == MouseState::MOVING)
-        if (mouse->isGrabbing(entity->getId()))
-          transform->position = viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset;
+      if (mouse->isGrabbing(entity->getId()))
+        transform->position = viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset;
     }
   }
 }

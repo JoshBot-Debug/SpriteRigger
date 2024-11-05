@@ -3,17 +3,20 @@
 #include "application.h"
 #include "Scene/HeaderPanelScene/headerPanelScene.h"
 #include "Scene/ToolsScene/toolsScene.h"
+#include "Scene/AssetsScene/assetsScene.h"
 #include "Scene/AnimatorViewport/animatorViewport.h"
 
 class SpriteRigger : public Application
 {
 private:
-  AnimatorViewport animatorViewport;
+  const char *projectRoot;
   HeaderPanelScene headerPanelScene;
+  AnimatorViewport animatorViewport;
   ToolsScene toolsScene;
+  AssetsScene assetsScene;
 
 public:
-  SpriteRigger() : headerPanelScene(this), toolsScene(this), animatorViewport(this) {};
+  SpriteRigger(const char *projectRoot) : projectRoot(projectRoot), headerPanelScene(this), animatorViewport(this), toolsScene(this), assetsScene(this) {};
   ~SpriteRigger() = default;
 
   void onInitialize() override;

@@ -2,9 +2,7 @@
 
 #include "application.h"
 
-const SDL_WindowFlags WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
-
-Application::Application()
+Application::Application(SDL_WindowFlags flags)
 {
   if (!SDL_Init(SDL_INIT_VIDEO))
     throw std::runtime_error(SDL_GetError());
@@ -12,7 +10,7 @@ Application::Application()
   if (NFD_Init() != NFD_OKAY)
     throw std::runtime_error(NFD_GetError());
 
-  this->window = SDL_CreateWindow("Application", 1080, 720, WINDOW_FLAGS);
+  this->window = SDL_CreateWindow("Application", 1080, 720, flags);
   if (this->window == NULL)
     throw std::runtime_error(SDL_GetError());
 
@@ -41,7 +39,7 @@ Application::~Application()
   NFD_Quit();
   SDL_DestroyRenderer(this->renderer);
   SDL_DestroyWindow(this->window);
-  SDL_QuitSubSystem(WINDOW_FLAGS);
+  SDL_QuitSubSystem(APPLICATION_WINDOW_FLAGS);
   SDL_Quit();
 }
 
