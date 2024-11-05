@@ -15,6 +15,7 @@ bool isDirectoryEmpty(const std::filesystem::path &dir)
 
 void Start::onDraw(float deltaTime)
 {
+  // ImGui::ShowDemoWindow();
   ImGuiWindowClass winClass;
   winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
   ImGui::SetNextWindowClass(&winClass);
@@ -32,13 +33,6 @@ void Start::onDraw(float deltaTime)
   ImGui::PopStyleVar(4);
   ImGui::PopStyleColor(1);
 
-  // ImGui::SetCursorScreenPos(ImVec2{windowPosition.x + windowPosition.x - 20.0f, windowPosition.y});
-  // if (ImGui::Button("X", ImVec2(20, 20)))
-  // {
-  //   this->quit();
-  //   ImGui::End();
-  // }
-
   ImGui::Image((ImTextureID)this->banner, ImVec2{windowSize.x / 2, windowSize.y});
 
   ImVec2 containerSize = ImVec2{((windowSize.x / 2) / 1.5f), (windowSize.y / 1.5f)};
@@ -48,12 +42,17 @@ void Start::onDraw(float deltaTime)
   ImGui::SameLine();
 
   float closeButtonSize = 20;
-  ImGui::SetCursorPos(ImVec2{windowSize.x - closeButtonSize, 0});
-  ImGui::PushFont(this->getFont("FontAwesome"));
-  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 0));
-  if (ImGui::Button("\uf00d", ImVec2{closeButtonSize, closeButtonSize}))
+  ImGui::SetCursorPos(ImVec2{windowSize.x - closeButtonSize - 5, 5});
+  ImGui::PushFont(this->getFont("MaterialIcons:18"));
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.3, 0.3, 0.3, 1});
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.25, 0.25, 0.25, 1});
+  ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.15, 0.15, 0.15, 1});
+  ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10);
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0, 0});
+  if (ImGui::Button("\ue5cd", ImVec2{closeButtonSize, closeButtonSize}))
     this->quit();
-  ImGui::PopStyleVar(1);
+  ImGui::PopStyleVar(2);
+  ImGui::PopStyleColor(3);
   ImGui::PopFont();
 
   ImGui::SetCursorPos(centerPos);

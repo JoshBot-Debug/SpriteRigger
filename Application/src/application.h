@@ -135,7 +135,7 @@ public:
    * @param fontSize The size of the font to be applied. This parameter
    *                 is optional and defaults to 16.0f if not provided.
    */
-  void addFont(std::string name, const char *ttfPath, float fontSize = 16.0f);
+  void addFont(std::string name, const char *ttfPath, float fontSize = 16.0f, const ImWchar *glyph_ranges = nullptr);
 
   /**
    * @param name The name of the font. You set this when adding fonts.
