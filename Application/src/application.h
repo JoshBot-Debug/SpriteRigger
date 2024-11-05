@@ -2,6 +2,7 @@
 
 #include <future>
 #include <cstdint>
+#include <map>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
@@ -38,6 +39,7 @@ private:
   bool isRunning = true;
   Theme theme = Theme::LIGHT;                      // Theme of the app.
   Vec4 backgroundColor = Vec4{255, 255, 255, 255}; // Background color of the window.
+  std::map<std::string, ImFont *> fonts;
 
 public:
   Application(SDL_WindowFlags flags = APPLICATION_WINDOW_FLAGS);
@@ -120,22 +122,12 @@ public:
   Theme getTheme();
 
   /**
-   * @brief Sets the default font for the application.
-   *
-   * This function loads a TrueType font (TTF) from the specified file path.
-   *
-   * @param ttfPath The file path to the TrueType font (.ttf) file.
-   *                This path must be valid and accessible; otherwise,
-   *                the font may fail to load.
-   * @param fontSize The size of the font to be applied. This parameter
-   *                 is optional and defaults to 16.0f if not provided.
-   */
-  void setDefaultFont(const char *ttfPath, float fontSize = 16.0f);
-
-  /**
    * @brief Adds fonts that you can use in the application.
    *
    * This function loads a TrueType font (TTF) from the specified file path.
+   * The first font that is added will be the default font.
+   *
+   * @param name The name of the font, you will use this to retrieve the font later.
    *
    * @param ttfPath The file path to the TrueType font (.ttf) file.
    *                This path must be valid and accessible; otherwise,
@@ -143,13 +135,19 @@ public:
    * @param fontSize The size of the font to be applied. This parameter
    *                 is optional and defaults to 16.0f if not provided.
    */
-  void addFont(const char *ttfPath, float fontSize = 16.0f);
+  void addFont(std::string name, const char *ttfPath, float fontSize = 16.0f);
+
+  /**
+   * @param name The name of the font. You set this when adding fonts.
+   * @return A pointer to the font
+   */
+  ImFont *getFont(const char *name);
 
   /**
    * Open the SDL window.
    */
   void open();
-  
+
   /**
    * @brief Called to initialize the game or application resources.
    *

@@ -27,24 +27,42 @@ void Start::onDraw(float deltaTime)
 
   ImGui::Begin("New Project", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
   ImVec2 windowSize = ImGui::GetWindowSize();
+  ImVec2 windowPosition = ImGui::GetWindowPos();
 
   ImGui::PopStyleVar(4);
   ImGui::PopStyleColor(1);
 
-  ImGui::Image((ImTextureID)this->banner, ImVec2{windowSize.x / 2, windowSize.y + 2});
+  // ImGui::SetCursorScreenPos(ImVec2{windowPosition.x + windowPosition.x - 20.0f, windowPosition.y});
+  // if (ImGui::Button("X", ImVec2(20, 20)))
+  // {
+  //   this->quit();
+  //   ImGui::End();
+  // }
+
+  ImGui::Image((ImTextureID)this->banner, ImVec2{windowSize.x / 2, windowSize.y});
 
   ImVec2 containerSize = ImVec2{((windowSize.x / 2) / 1.5f), (windowSize.y / 1.5f)};
   ImVec2 centerPos = ImVec2(((windowSize.x / 2) + (windowSize.x - containerSize.x)) * 0.5f,
                             (windowSize.y - containerSize.y) * 0.5f);
 
   ImGui::SameLine();
-  ImGui::SetCursorPos(centerPos);
 
+  float closeButtonSize = 20;
+  ImGui::SetCursorPos(ImVec2{windowSize.x - closeButtonSize, 0});
+  ImGui::PushFont(this->getFont("FontAwesome"));
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 0));
+  if (ImGui::Button("\uf00d", ImVec2{closeButtonSize, closeButtonSize}))
+    this->quit();
+  ImGui::PopStyleVar(1);
+  ImGui::PopFont();
+
+  ImGui::SetCursorPos(centerPos);
   ImGui::BeginChild("Centered Child", containerSize, ImGuiChildFlags_None);
+
   ImGuiIO &io = ImGui::GetIO();
 
-  ImGui::PushFont(io.Fonts->Fonts[1]);
-  ImGui::Text("Choose a project");
+  ImGui::PushFont(this->getFont("Roboto-Regular:24"));
+  ImGui::Text("Projects");
   ImGui::PopFont();
 
   ImGui::Spacing();

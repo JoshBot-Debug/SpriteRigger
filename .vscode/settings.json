@@ -69,7 +69,10 @@
     "list": "cpp",
     "any": "cpp",
     "typeindex": "cpp",
-    "future": "cpp"
+    "future": "cpp",
+    "codecvt": "cpp",
+    "iomanip": "cpp",
+    "variant": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

@@ -92,16 +92,20 @@ Theme Application::getTheme()
   return this->theme;
 }
 
-void Application::setDefaultFont(const char *ttfPath, float fontSize)
+void Application::addFont(std::string name, const char *ttfPath, float fontSize)
 {
   ImGuiIO &io = ImGui::GetIO();
-  io.FontDefault = io.Fonts->AddFontFromFileTTF(ttfPath, fontSize);
+  ImFont *font = io.Fonts->AddFontFromFileTTF(ttfPath, fontSize);
+
+  if (this->fonts.empty())
+    io.FontDefault = font;
+
+  this->fonts[name] = font;
 }
 
-void Application::addFont(const char *ttfPath, float fontSize)
+ImFont *Application::getFont(const char *name)
 {
-  ImGuiIO &io = ImGui::GetIO();
-  io.Fonts->AddFontFromFileTTF(ttfPath, fontSize);
+  return this->fonts.at(name);
 }
 
 void Application::open()
