@@ -1,6 +1,6 @@
 #include "SDL3/SDL.h"
 #include "start.h"
-#include "spriteRigger.h"
+#include "app.h"
 
 static const ImWchar GlyphRange[] = {
     0xf000,
@@ -12,7 +12,9 @@ static const ImWchar GlyphRange[] = {
 
 int main(int argc, char *argv[])
 {
-  Start *start = new Start();
+  ProjectManager projectManager("SpriteRigger.project");
+
+  Start *start = new Start(&projectManager);
 
   start->setWindowTitle("Sprite Rigger");
   start->setVSync(1);
@@ -24,14 +26,12 @@ int main(int argc, char *argv[])
   start->setTheme(Theme::DARK);
   start->open();
 
-  Project project = start->getProject();
-
   delete start;
 
-  if (!project.isReady())
+  if (!projectManager.isReady())
     return 0;
 
-  SpriteRigger *app = new SpriteRigger(project);
+  App *app = new App(&projectManager);
   app->setWindowTitle("Sprite Rigger");
   app->setVSync(1);
   app->setWindowDimensions({1080, 720});

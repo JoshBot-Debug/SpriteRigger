@@ -1,28 +1,30 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
+
+#include "utility.h"
 #include "application.h"
 #include "bannerImage.h"
-#include "spriteRigger.h"
+#include "ProjectManager/projectManager.h"
 
 class Start : public Application
 {
 private:
-  Project project;
-  SDL_Texture *banner = nullptr;
+  ProjectManager *projectManager;
+  SDL_Texture *banner;
 
 public:
-  Start() : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS)
+  Start(ProjectManager *projectManager) : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS), projectManager(projectManager)
   {
     SDL_IOStream *stream = SDL_IOFromConstMem(BANNER_IMAGE_BUFFER, BANNER_IMAGE_BUFFER_SIZE);
     SDL_Surface *surface = IMG_Load_IO(stream, true);
     this->banner = SDL_CreateTextureFromSurface(this->renderer, surface);
   };
+
   ~Start() = default;
 
   void onDraw(float deltaTime) override;
-
-  Project getProject();
 
   void SelectProjectDirectory();
   void CreateNewProject();

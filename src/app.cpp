@@ -1,4 +1,4 @@
-#include "spriteRigger.h"
+#include "app.h"
 
 #include <string>
 #include <vector>
@@ -8,17 +8,18 @@
 
 #include <imgui_internal.h>
 
-void SpriteRigger::onInitialize()
+void App::onInitialize()
 {
-  ProjectData *projectData = this->project.getData();
+  ProjectData *projectData = this->projectManager->getData();
   printf("SpriteRigger: Name: %s, Directory: %s\n", projectData->name.c_str(), projectData->directory.c_str());
+  
   this->headerPanelScene.onInitialize();
   this->toolsScene.onInitialize();
   this->assetsScene.onInitialize();
   this->animatorViewport.onInitialize();
 }
 
-void SpriteRigger::onInput(SDL_Event *event, float deltaTime)
+void App::onInput(SDL_Event *event, float deltaTime)
 {
   this->headerPanelScene.onInput(event, deltaTime);
   this->toolsScene.onInput(event, deltaTime);
@@ -26,7 +27,7 @@ void SpriteRigger::onInput(SDL_Event *event, float deltaTime)
   this->animatorViewport.onInput(event, deltaTime);
 }
 
-void SpriteRigger::onUpdate(float deltaTime)
+void App::onUpdate(float deltaTime)
 {
   this->headerPanelScene.onUpdate(deltaTime);
   this->toolsScene.onUpdate(deltaTime);
@@ -34,7 +35,7 @@ void SpriteRigger::onUpdate(float deltaTime)
   this->animatorViewport.onUpdate(deltaTime);
 }
 
-void SpriteRigger::onDraw(float deltaTime)
+void App::onDraw(float deltaTime)
 {
   // this->headerPanelScene.onDraw(deltaTime);
   // this->toolsScene.onDraw(deltaTime);
@@ -46,7 +47,7 @@ void SpriteRigger::onDraw(float deltaTime)
   // this->animatorViewport.onDraw(deltaTime);
 }
 
-void SpriteRigger::onCleanUp()
+void App::onCleanUp()
 {
   this->headerPanelScene.onCleanUp();
   this->toolsScene.onCleanUp();

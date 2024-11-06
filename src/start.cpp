@@ -1,12 +1,7 @@
 #include "start.h"
-#include <filesystem>
-#include <utility.h>
 
 void Start::onDraw(float deltaTime)
 {
-  // ImGui::ShowDemoWindow();
-  // return;
-
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
   ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(50, 50, 50, 255));
@@ -84,14 +79,9 @@ void Start::onDraw(float deltaTime)
   ImGui::End();
 }
 
-Project Start::getProject()
-{
-  return this->project;
-}
-
 void Start::CreateNewProject()
 {
-  ProjectData *projectData = this->project.getData();
+  ProjectData *projectData = this->projectManager->getData();
 
   if (ImGui::TextLink("Create a new project"))
     ImGui::OpenPopup("Create Project");
@@ -124,7 +114,7 @@ void Start::CreateNewProject()
     ImGui::Spacing();
     ImGui::Spacing();
 
-    ImGui::BeginDisabled(!this->project.isReady());
+    ImGui::BeginDisabled(!this->projectManager->isReady());
     if (ImGui::Button("OK"))
     {
       this->createProjectInDirectory();
@@ -155,29 +145,28 @@ void Start::SelectProjectDirectory()
     this->AsyncTask(callback, NativeFileDialog::SelectFolder, this->getWindow());
   }
   ImGui::SameLine();
-  Utility::HelpMarker("The selected project directory must \nbe a valid sprite rigger project.");
+  std::string helpText = std::string("The selected project directory must \nbe a valid ") + this->projectManager->getProjectFileName() + " file.";
+  Utility::HelpMarker(helpText.c_str());
 }
 
 /**
  * TODO
- * Validate path for a project.xml
- * Load the main application (this is where the project.xml file will be initialized)
+ * Load the main application (this is where the project.spriterigger file will be initialized)
  */
 void Start::loadProjectFromDirectory(std::string path)
 {
-  this->project.deserialize(path);
+  this->projectManager->deserialize(path);
   this->quit();
   return;
 }
 
 /**
  * TODO
- * Create the project.xml file.
- * Load the main application (this is where the project.xml file will be initialized)
+ * Load the main application (this is where the project.spriterigger file will be initialized)
  */
 void Start::createProjectInDirectory()
 {
-  this->project.serialize();
+  this->projectManager->serialize();
   this->quit();
   return;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <filesystem>
 
 struct ProjectData
 {
@@ -7,11 +8,14 @@ struct ProjectData
   std::string directory;
 };
 
-class Project
+class ProjectManager
 {
 private:
 public:
+  std::string projectFileName;
   ProjectData data;
+
+  ProjectManager(std::string projectFileName) : projectFileName(projectFileName) {}
 
   /**
    * Checks if the project has everything required to initialize
@@ -36,4 +40,9 @@ public:
    * Deserialize the project and load it into memory
    */
   void deserialize(const std::string &path);
+
+  /**
+   * Returns the project's filename
+   */
+  const char *getProjectFileName();
 };

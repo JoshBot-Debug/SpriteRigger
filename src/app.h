@@ -5,20 +5,21 @@
 #include "Scene/ToolsScene/toolsScene.h"
 #include "Scene/AssetsScene/assetsScene.h"
 #include "Scene/AnimatorViewport/animatorViewport.h"
-#include "project.h"
+#include "ProjectManager/projectManager.h"
 
-class SpriteRigger : public Application
+class App : public Application
 {
 private:
-  Project project;
+  ProjectManager *projectManager;
+
   HeaderPanelScene headerPanelScene;
   AnimatorViewport animatorViewport;
   ToolsScene toolsScene;
   AssetsScene assetsScene;
 
 public:
-  SpriteRigger(Project project) : project(project), headerPanelScene(this), animatorViewport(this), toolsScene(this), assetsScene(this) {};
-  ~SpriteRigger() = default;
+  App(ProjectManager *projectManager) : projectManager(projectManager), headerPanelScene(this), animatorViewport(this), toolsScene(this), assetsScene(this) {};
+  ~App() = default;
 
   void onInitialize() override;
   void onInput(SDL_Event *event, float deltaTime) override;
