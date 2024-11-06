@@ -101,7 +101,7 @@ void Start::CreateNewProject()
   if (ImGui::BeginPopupModal("Create Project", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
   {
     ImGui::Text("Project Name:");
-    ImGui::InputText("##ProjectName", projectData->name, IM_ARRAYSIZE(projectData->name));
+    Utility::InputText("##ProjectName", &projectData->name);
 
     ImGui::Spacing();
     ImGui::Spacing();

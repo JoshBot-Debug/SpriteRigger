@@ -72,7 +72,8 @@
     "future": "cpp",
     "codecvt": "cpp",
     "iomanip": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "fstream": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

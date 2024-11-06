@@ -1,14 +1,9 @@
 #pragma once
-
-#pragma once
-#include <cstring>
 #include <string>
-#include <iostream>
-#include <fstream>
 
 struct ProjectData
 {
-  char name[128];
+  std::string name;
   std::string directory;
 };
 
