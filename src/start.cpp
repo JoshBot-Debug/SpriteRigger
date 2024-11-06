@@ -66,13 +66,19 @@ void Start::onDraw(float deltaTime)
   ImGui::Spacing();
   ImGui::Spacing();
 
-  ImGui::TextLink("/home/joshua/Desktop/ProjectA");
-  ImGui::Spacing();
-  ImGui::TextLink("/home/joshua/Desktop/ProjectB");
-  ImGui::Spacing();
-  ImGui::TextLink("/home/joshua/Desktop/ProjectC");
-  ImGui::Spacing();
-  ImGui::TextLink("/home/joshua/Projects/Spy");
+  for (RecentProject &recent : this->projectManager->recentProjects)
+  {
+    std::string recentProject = recent.name + " " + recent.directory;
+    ImGui::TextLink(recentProject.c_str());
+    ImGui::Spacing();
+  }
+  // ImGui::TextLink("/home/joshua/Desktop/ProjectA");
+  // ImGui::Spacing();
+  // ImGui::TextLink("/home/joshua/Desktop/ProjectB");
+  // ImGui::Spacing();
+  // ImGui::TextLink("/home/joshua/Desktop/ProjectC");
+  // ImGui::Spacing();
+  // ImGui::TextLink("/home/joshua/Projects/Spy");
 
   ImGui::EndChild();
 
@@ -149,10 +155,6 @@ void Start::SelectProjectDirectory()
   Utility::HelpMarker(helpText.c_str());
 }
 
-/**
- * TODO
- * Load the main application (this is where the project.spriterigger file will be initialized)
- */
 void Start::loadProjectFromDirectory(std::string path)
 {
   this->projectManager->deserialize(path);
@@ -160,13 +162,9 @@ void Start::loadProjectFromDirectory(std::string path)
   return;
 }
 
-/**
- * TODO
- * Load the main application (this is where the project.spriterigger file will be initialized)
- */
 void Start::createProjectInDirectory()
 {
-  this->projectManager->serialize();
+  this->projectManager->serialize(true);
   this->quit();
   return;
 }

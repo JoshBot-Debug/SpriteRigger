@@ -12,7 +12,7 @@ static const ImWchar GlyphRange[] = {
 
 int main(int argc, char *argv[])
 {
-  ProjectManager projectManager("SpriteRigger.project");
+  ProjectManager projectManager("SpriteRigger.project", "SpriteRigger.recent");
 
   Start *start = new Start(&projectManager);
 

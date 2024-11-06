@@ -10,9 +10,11 @@
 
 void App::onInitialize()
 {
-  ProjectData *projectData = this->projectManager->getData();
-  printf("SpriteRigger: Name: %s, Directory: %s\n", projectData->name.c_str(), projectData->directory.c_str());
+  this->projectManager->updateRecentProjects();
   
+  ProjectData *projectData = this->projectManager->getData();
+  printf("ID: %s, Name: %s, Directory: %s\n", projectData->id.c_str(), projectData->name.c_str(), projectData->directory.c_str());
+
   this->headerPanelScene.onInitialize();
   this->toolsScene.onInitialize();
   this->assetsScene.onInitialize();

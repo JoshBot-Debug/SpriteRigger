@@ -57,8 +57,6 @@ namespace Utility
     if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
     {
       std::string *str = userData->string;      
-      printf("%s\n", userData->string->c_str());
-
       IM_ASSERT(data->Buf == str->c_str());
       str->resize(data->BufTextLen);
       data->Buf = (char *)str->c_str();

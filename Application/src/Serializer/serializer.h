@@ -7,28 +7,28 @@
 
 namespace Serializer
 {
-  void in(std::string filepath, std::function<void(std::ifstream &)> callback)
+  bool in(std::string filepath, std::function<void(std::ifstream &)> callback)
   {
     std::ifstream stream(filepath, std::ios::binary);
     if (stream)
     {
       callback(stream);
       stream.close();
-      return;
+      return true;
     }
-    printf("%s", "SerializerError: Failed to read file.");
+    return false;
   }
 
-  void out(std::string filepath, std::function<void(std::ofstream &)> callback)
+  bool out(std::string filepath, std::function<void(std::ofstream &)> callback)
   {
     std::ofstream stream(filepath, std::ios::binary);
     if (stream)
     {
       callback(stream);
       stream.close();
-      return;
+      return true;
     }
-    printf("%s", "SerializerError: Failed to write to file.");
+    return false;
   }
 
   namespace Serialize
