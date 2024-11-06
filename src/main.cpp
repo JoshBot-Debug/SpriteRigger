@@ -24,14 +24,14 @@ int main(int argc, char *argv[])
   start->setTheme(Theme::DARK);
   start->open();
 
-  std::string projectDirectory = start->getProjectDirectory();
+  Project project = start->getProject();
 
   delete start;
 
-  if (projectDirectory.empty())
+  if (!project.isReady())
     return 0;
 
-  SpriteRigger *app = new SpriteRigger(projectDirectory.c_str());
+  SpriteRigger *app = new SpriteRigger(project);
   app->setWindowTitle("Sprite Rigger");
   app->setVSync(1);
   app->setWindowDimensions({1080, 720});

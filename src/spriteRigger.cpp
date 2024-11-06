@@ -10,6 +10,8 @@
 
 void SpriteRigger::onInitialize()
 {
+  ProjectData *projectData = this->project.getData();
+  printf("SpriteRigger: Name: %s, Directory: %s\n", projectData->name, projectData->directory.c_str());
   this->headerPanelScene.onInitialize();
   this->toolsScene.onInitialize();
   this->assetsScene.onInitialize();

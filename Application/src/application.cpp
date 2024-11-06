@@ -60,6 +60,13 @@ void Application::setWindowDimensions(Vec2 size)
     throw std::runtime_error(SDL_GetError());
 }
 
+Vec2 Application::getWindowDimensions()
+{
+  int gWindowWidth, gWindowHeight;
+  SDL_GetWindowSize(this->window, &gWindowWidth, &gWindowHeight);
+  return Vec2{(float)gWindowWidth, (float)gWindowHeight};
+}
+
 void Application::setWindowTitle(const char *title)
 {
   if (!SDL_SetWindowTitle(this->window, title))

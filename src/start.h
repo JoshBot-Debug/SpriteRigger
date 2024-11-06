@@ -2,17 +2,19 @@
 
 #include <string>
 #include "application.h"
+#include "bannerImage.h"
+#include "spriteRigger.h"
 
 class Start : public Application
 {
 private:
-  std::string projectDirectory;
+  Project project;
   SDL_Texture *banner = nullptr;
 
 public:
   Start() : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS)
   {
-    SDL_IOStream *stream = SDL_IOFromFile("assets/images/start-project-banner.png", "rb");
+    SDL_IOStream *stream = SDL_IOFromConstMem(BANNER_IMAGE_BUFFER, BANNER_IMAGE_BUFFER_SIZE);
     SDL_Surface *surface = IMG_Load_IO(stream, true);
     this->banner = SDL_CreateTextureFromSurface(this->renderer, surface);
   };
@@ -20,6 +22,11 @@ public:
 
   void onDraw(float deltaTime) override;
 
-  std::string getProjectDirectory();
-  void selectProjectDirectory();
+  Project getProject();
+
+  void SelectProjectDirectory();
+  void CreateNewProject();
+
+  void loadProjectFromDirectory(std::string path);
+  void createProjectInDirectory();
 };

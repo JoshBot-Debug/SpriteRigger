@@ -88,6 +88,11 @@ public:
   void setWindowDimensions(Vec2 size);
 
   /**
+   * Returns the window dimensions
+   */
+  Vec2 getWindowDimensions();
+
+  /**
    * Set the title of the SDL window.
    *
    * @param title A C-style string representing the title of the window.

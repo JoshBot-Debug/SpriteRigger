@@ -1,43 +1,26 @@
 #include "start.h"
-#include <imgui_internal.h>
 #include <filesystem>
-
-bool isDirectoryEmpty(const std::filesystem::path &dir)
-{
-  if (std::filesystem::exists(dir) && std::filesystem::is_directory(dir))
-  {
-    for (const auto &entry : std::filesystem::directory_iterator(dir))
-      return false;
-    return true;
-  }
-  return false;
-}
+#include <utility.h>
 
 void Start::onDraw(float deltaTime)
 {
   // ImGui::ShowDemoWindow();
-  ImGuiWindowClass winClass;
-  winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
-  ImGui::SetNextWindowClass(&winClass);
+  // return;
 
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0, 0});
-  ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2{0, 0});
   ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(50, 50, 50, 255));
 
-  ImGui::Begin("New Project", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
-  ImVec2 windowSize = ImGui::GetWindowSize();
-  ImVec2 windowPosition = ImGui::GetWindowPos();
+  ImVec2 windowSize = this->getWindowDimensions();
 
-  ImGui::PopStyleVar(4);
+  ImGui::SetNextWindowPos(ImVec2{0, 0});
+  ImGui::SetNextWindowSize(windowSize);
+  ImGui::Begin("New Project", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings);
+
+  ImGui::PopStyleVar(2);
   ImGui::PopStyleColor(1);
 
   ImGui::Image((ImTextureID)this->banner, ImVec2{windowSize.x / 2, windowSize.y});
-
-  ImVec2 containerSize = ImVec2{((windowSize.x / 2) / 1.5f), (windowSize.y / 1.5f)};
-  ImVec2 centerPos = ImVec2(((windowSize.x / 2) + (windowSize.x - containerSize.x)) * 0.5f,
-                            (windowSize.y - containerSize.y) * 0.5f);
 
   ImGui::SameLine();
 
@@ -55,10 +38,11 @@ void Start::onDraw(float deltaTime)
   ImGui::PopStyleColor(3);
   ImGui::PopFont();
 
+  ImVec2 containerSize = ImVec2{((windowSize.x / 2) / 1.5f), (windowSize.y / 1.5f)};
+  ImVec2 centerPos = ImVec2(((windowSize.x / 2) + (windowSize.x - containerSize.x)) * 0.5f,
+                            (windowSize.y - containerSize.y) * 0.5f);
   ImGui::SetCursorPos(centerPos);
   ImGui::BeginChild("Centered Child", containerSize, ImGuiChildFlags_None);
-
-  ImGuiIO &io = ImGui::GetIO();
 
   ImGui::PushFont(this->getFont("Roboto-Regular:24"));
   ImGui::Text("Projects");
@@ -75,9 +59,9 @@ void Start::onDraw(float deltaTime)
   ImGui::Spacing();
   ImGui::Spacing();
 
-  ImGui::TextLink("Create a new project");
+  this->CreateNewProject();
   ImGui::Spacing();
-  ImGui::TextLink("Select a project directory");
+  this->SelectProjectDirectory();
 
   ImGui::Spacing();
   ImGui::Spacing();
@@ -100,20 +84,100 @@ void Start::onDraw(float deltaTime)
   ImGui::End();
 }
 
-std::string Start::getProjectDirectory()
+Project Start::getProject()
 {
-  return this->projectDirectory;
+  return this->project;
 }
 
-void Start::selectProjectDirectory()
+void Start::CreateNewProject()
 {
-  auto callback = [this](std::string path)
-  {
-    if (path.empty() || !isDirectoryEmpty(path))
-      return;
-    this->projectDirectory = path;
-    this->quit();
-  };
+  ProjectData *projectData = this->project.getData();
 
-  this->AsyncTask(callback, NativeFileDialog::SelectFolder, this->getWindow());
+  if (ImGui::TextLink("Create a new project"))
+    ImGui::OpenPopup("Create Project");
+
+  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+  ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+  if (ImGui::BeginPopupModal("Create Project", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
+  {
+    ImGui::Text("Project Name:");
+    ImGui::InputText("##ProjectName", projectData->name, IM_ARRAYSIZE(projectData->name));
+
+    ImGui::Spacing();
+    ImGui::Spacing();
+
+    ImGui::Text("Project Directory:");
+    if (ImGui::Button("Select folder"))
+    {
+      auto callback = [projectData](std::string path)
+      {
+        if (path.empty() || !Utility::isDirectoryEmpty(path))
+          return;
+        projectData->directory = path;
+      };
+
+      this->AsyncTask(callback, NativeFileDialog::SelectFolder, this->getWindow());
+    }
+
+    ImGui::SameLine();
+    Utility::EllipsizeTextBegin(projectData->directory, 100);
+    ImGui::Spacing();
+    ImGui::Spacing();
+
+    ImGui::BeginDisabled(!this->project.isReady());
+    if (ImGui::Button("OK"))
+    {
+      this->createProjectInDirectory();
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndDisabled();
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Cancel"))
+      ImGui::CloseCurrentPopup();
+
+    ImGui::EndPopup();
+  }
+}
+
+void Start::SelectProjectDirectory()
+{
+  if (ImGui::TextLink("Select a project directory"))
+  {
+    auto callback = [this](std::string path)
+    {
+      if (path.empty())
+        return;
+      this->loadProjectFromDirectory(path);
+    };
+
+    this->AsyncTask(callback, NativeFileDialog::SelectFolder, this->getWindow());
+  }
+  ImGui::SameLine();
+  Utility::HelpMarker("The selected project directory must \nbe a valid sprite rigger project.");
+}
+
+/**
+ * TODO
+ * Validate path for a project.xml
+ * Load the main application (this is where the project.xml file will be initialized)
+ */
+void Start::loadProjectFromDirectory(std::string path)
+{
+  this->project.deserialize(path);
+  this->quit();
+  return;
+}
+
+/**
+ * TODO
+ * Create the project.xml file.
+ * Load the main application (this is where the project.xml file will be initialized)
+ */
+void Start::createProjectInDirectory()
+{
+  this->project.serialize();
+  this->quit();
+  return;
 }
