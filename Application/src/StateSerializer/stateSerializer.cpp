@@ -223,6 +223,9 @@ bool StateSerializer::read(SaveFile saveFile)
         vKey.resize(sfmmSize);
         in.read(&vKey[0], sfmmSize);
 
+        /**
+         * Write the value of the value
+         */
         std::string vVal;
         size_t ssmmSize;
         in.read(reinterpret_cast<char *>(&ssmmSize), sizeof(ssmmSize));
