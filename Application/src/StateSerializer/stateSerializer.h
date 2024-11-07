@@ -19,8 +19,8 @@ class StateSerializer
 private:
   SaveFile saveFile;
 
-  std::map<std::string, std::string> map;
-  std::vector<std::string> vector;
+  std::map<std::string, std::map<std::string, std::string>> mMap;
+  std::map<std::string, std::vector<std::string>> mVec;
 
 public:
   StateSerializer() {};
@@ -31,8 +31,8 @@ public:
   void setSaveFileExtension(std::string extension);
   void setSaveFileDirectory(std::string directory);
 
-  std::map<std::string, std::string> *getMap();
-  std::vector<std::string> *getVector();
+  std::map<std::string, std::string> *map(const char * key);
+  std::vector<std::string> *vector(const char * key);
 
   bool write();
   bool write(SaveFile saveFile);

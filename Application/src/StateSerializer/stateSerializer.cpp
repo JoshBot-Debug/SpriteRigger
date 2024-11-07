@@ -21,14 +21,14 @@ void StateSerializer::setSaveFileDirectory(std::string directory)
   this->saveFile.directory = directory;
 }
 
-std::map<std::string, std::string> *StateSerializer::getMap()
+std::map<std::string, std::string> *StateSerializer::map(const char *key)
 {
-  return &this->map;
+  return &this->mMap[key];
 }
 
-std::vector<std::string> *StateSerializer::getVector()
+std::vector<std::string> *StateSerializer::vector(const char *key)
 {
-  return &this->vector;
+  return &this->mVec[key];
 }
 
 bool StateSerializer::write()
@@ -47,39 +47,76 @@ bool StateSerializer::write(SaveFile saveFile)
       return false;
 
     /**
-     * Save the size of the vector as the first size_t byte
-     * We use this later to read data into the vector
+     * mVec
+     * Write the size of the map
      */
-    size_t vSize = this->vector.size();
-    out.write(reinterpret_cast<const char *>(&vSize), sizeof(vSize)); // Occupie sizeof(size_t), write the size as a const char *
+    size_t mvSize = this->mVec.size();
+    out.write(reinterpret_cast<const char *>(&mvSize), sizeof(mvSize));
 
-    /**
-     * Iterate over the vector and write it.
-     */
-    for (size_t i = 0; i < vSize; i++)
+    for (auto &pair : this->mVec)
     {
-      const std::string &row = this->vector[i];
-      size_t rSize = row.size();
-      out.write(reinterpret_cast<const char *>(&rSize), sizeof(rSize)); // Occupie sizeof(size_t), write the size as a const char *
-      out.write(row.c_str(), rSize);                                    // Occupie size, write the actual string data as const char *
+      /**
+       * Write the key of the map
+       */
+      size_t fmvSize = pair.first.size();
+      out.write(reinterpret_cast<const char *>(&fmvSize), sizeof(fmvSize));
+      out.write(pair.first.c_str(), fmvSize);
+
+      /**
+       * Write the size of the vector
+       */
+      size_t smvSize = pair.second.size();
+      out.write(reinterpret_cast<const char *>(&smvSize), sizeof(smvSize));
+
+      for (size_t i = 0; i < smvSize; i++)
+      {
+        /**
+         * Write the value of the vector.
+         */
+        const std::string &row = pair.second[i];
+        size_t smvrSize = row.size();
+        out.write(reinterpret_cast<const char *>(&smvrSize), sizeof(smvrSize));
+        out.write(row.c_str(), smvrSize);
+      }
     }
 
     /**
-     * Save the size of the map as the first size_t byte
-     * We use this later to read data into the size
+     * Write the size of the map
      */
-    size_t mSize = this->map.size();
-    out.write(reinterpret_cast<const char *>(&mSize), sizeof(mSize));
+    size_t mmSize = this->mMap.size();
+    out.write(reinterpret_cast<const char *>(&mmSize), sizeof(mmSize));
 
-    for (auto &pair : this->map)
+    for (auto &pair : this->mMap)
     {
-      size_t fSize = pair.first.size();
-      out.write(reinterpret_cast<const char *>(&fSize), sizeof(fSize));
-      out.write(pair.first.c_str(), fSize);
+      /**
+       * Write the key of the map
+       */
+      size_t fmmSize = pair.first.size();
+      out.write(reinterpret_cast<const char *>(&fmmSize), sizeof(fmmSize));
+      out.write(pair.first.c_str(), fmmSize);
 
-      size_t sSize = pair.second.size();
-      out.write(reinterpret_cast<const char *>(&sSize), sizeof(sSize));
-      out.write(pair.second.c_str(), sSize);
+      /**
+       * Write the size of the value
+       */
+      size_t smmSize = pair.second.size();
+      out.write(reinterpret_cast<const char *>(&smmSize), sizeof(smmSize));
+
+      for (auto &spair : pair.second)
+      {
+        /**
+         * Write the key of the value
+         */
+        size_t sfmmSize = spair.first.size();
+        out.write(reinterpret_cast<const char *>(&sfmmSize), sizeof(sfmmSize));
+        out.write(spair.first.c_str(), sfmmSize);
+
+        /**
+         * Write the value of the value
+         */
+        size_t ssmmSize = spair.second.size();
+        out.write(reinterpret_cast<const char *>(&ssmmSize), sizeof(ssmmSize));
+        out.write(spair.second.c_str(), ssmmSize);
+      }
     }
 
     out.close();
@@ -106,58 +143,96 @@ bool StateSerializer::read(SaveFile saveFile)
       return false;
 
     /**
-     * Read the first bytes of size size_t. This is the length of the vector.
+     * mVec
+     * Read the size of the map
      */
-    size_t vSize;
-    in.read(reinterpret_cast<char *>(&vSize), sizeof(vSize));
-
+    size_t mvSize;
+    in.read(reinterpret_cast<char *>(&mvSize), sizeof(mvSize));
     if (!in)
       return false;
 
-    // Resize the vector to fit all elements
-    this->vector.resize(vSize);
-
-    /**
-     * Iterate over the length of the vector and read it's
-     * contents into memory.
-     */
-    for (size_t i = 0; i < vSize; i++)
+    for (size_t i = 0; i < mvSize; i++)
     {
-      std::string &row = this->vector[i];
-      size_t rSize;
-      in.read(reinterpret_cast<char *>(&rSize), sizeof(rSize));
-      if (!in)
-        return false;
-      row.resize(rSize);
-      in.read(&row[0], rSize);
+      /**
+       * Read the size of key of the map
+       */
+      std::string key;
+      size_t fmvSize;
+      in.read(reinterpret_cast<char *>(&fmvSize), sizeof(fmvSize));
+      key.resize(fmvSize);
+      in.read(&key[0], fmvSize);
+
+      /**
+       * Read the size of the vector
+       */
+      size_t smvSize;
+      in.read(reinterpret_cast<char *>(&smvSize), sizeof(smvSize));
+
+      std::vector<std::string> value;
+      value.resize(smvSize);
+
+      for (size_t j = 0; j < smvSize; j++)
+      {
+        /**
+         * Read the value of the vector
+         */
+        std::string &row = value[j];
+        size_t smvrSize;
+        in.read(reinterpret_cast<char *>(&smvrSize), sizeof(smvrSize));
+        value[j].resize(smvrSize);
+        in.read(&row[0], smvrSize);
+      }
+
+      mVec[key] = value;
     }
 
     /**
-     * Read the size of the map as the first size_t byte
-     * We use this later to read data into the size
+     * Read the size of the map
      */
-    size_t mSize;
-    in.read(reinterpret_cast<char *>(&mSize), sizeof(mSize));
+    size_t mmSize;
+    in.read(reinterpret_cast<char *>(&mmSize), sizeof(mmSize));
 
-    for (size_t i = 0; i < mSize; i++)
+    for (size_t i = 0; i < mmSize; i++)
     {
-      std::string first;
-      size_t fSize;
-      in.read(reinterpret_cast<char *>(&fSize), sizeof(fSize));
-      if (!in)
-        return false;
-      first.resize(fSize);
-      in.read(&first[0], fSize);
 
-      std::string last;
-      size_t sSize;
-      in.read(reinterpret_cast<char *>(&sSize), sizeof(sSize));
-      if (!in)
-        return false;
-      last.resize(sSize);
-      in.read(&last[0], sSize);
+      /**
+       * Read the key of the map
+       */
+      std::string key;
+      size_t fmmSize;
+      in.read(reinterpret_cast<char *>(&fmmSize), sizeof(fmmSize));
+      key.resize(fmmSize);
+      in.read(&key[0], fmmSize);
 
-      this->map[first] = last;
+      /**
+       * Read the size of the value
+       */
+      size_t smmSize;
+      in.read(reinterpret_cast<char *>(&smmSize), sizeof(smmSize));
+
+      std::map<std::string, std::string> value;
+
+      for (size_t j = 0; j < smmSize; j++)
+      {
+        /**
+         * Write the key of the value
+         */
+        std::string vKey;
+        size_t sfmmSize;
+        in.read(reinterpret_cast<char *>(&sfmmSize), sizeof(sfmmSize));
+        vKey.resize(sfmmSize);
+        in.read(&vKey[0], sfmmSize);
+
+        std::string vVal;
+        size_t ssmmSize;
+        in.read(reinterpret_cast<char *>(&ssmmSize), sizeof(ssmmSize));
+        vVal.resize(ssmmSize);
+        in.read(&vVal[0], ssmmSize);
+
+        value[vKey] = vVal;
+      }
+
+      this->mMap[key] = value;
     }
 
     in.close();
