@@ -8,15 +8,14 @@ void Start::onDraw(float deltaTime)
 
   ImVec2 windowSize = this->getWindowDimensions();
 
+  ImGui::SetNextWindowSize(ImVec2{windowSize.x, windowSize.y}); // Causes a FOUG kind of issue
   ImGui::SetNextWindowPos(ImVec2{0, 0});
-  ImGui::SetNextWindowSize(windowSize);
   ImGui::Begin("New Project", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings);
 
   ImGui::PopStyleVar(2);
   ImGui::PopStyleColor(1);
 
   ImGui::Image((ImTextureID)this->banner, ImVec2{windowSize.x / 2, windowSize.y});
-
   ImGui::SameLine();
 
   float closeButtonSize = 20;
@@ -68,17 +67,13 @@ void Start::onDraw(float deltaTime)
 
   for (RecentProject &recent : this->projectManager->recentProjects)
   {
-    std::string recentProject = recent.name + " " + recent.directory;
-    ImGui::TextLink(recentProject.c_str());
+    if (ImGui::TextLink(recent.name.c_str()))
+    {
+      this->projectManager->deserialize(recent.filepath);
+      this->quit();
+    }
     ImGui::Spacing();
   }
-  // ImGui::TextLink("/home/joshua/Desktop/ProjectA");
-  // ImGui::Spacing();
-  // ImGui::TextLink("/home/joshua/Desktop/ProjectB");
-  // ImGui::Spacing();
-  // ImGui::TextLink("/home/joshua/Desktop/ProjectC");
-  // ImGui::Spacing();
-  // ImGui::TextLink("/home/joshua/Projects/Spy");
 
   ImGui::EndChild();
 
@@ -90,41 +85,35 @@ void Start::CreateNewProject()
   ProjectData *projectData = this->projectManager->getData();
 
   if (ImGui::TextLink("Create a new project"))
-    ImGui::OpenPopup("Create Project");
+    ImGui::OpenPopup("NewProject");
 
   ImVec2 center = ImGui::GetMainViewport()->GetCenter();
   ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-  if (ImGui::BeginPopupModal("Create Project", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
+  if (ImGui::BeginPopupModal("NewProject", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar))
   {
-    ImGui::Text("Project Name:");
-    Utility::InputText("##ProjectName", &projectData->name);
+    ImGui::Text("%s", "New Project");
+    ImGui::Spacing();
+    ImGui::SetNextItemWidth(300);
+    Utility::InputText("Name", &projectData->name);
 
     ImGui::Spacing();
     ImGui::Spacing();
-
-    ImGui::Text("Project Directory:");
-    if (ImGui::Button("Select folder"))
+    ImGui::Spacing();
+    ImGui::SameLine(ImGui::GetWindowSize().x - ImGui::GetStyle().ItemSpacing.x - 106);
+    ImGui::BeginDisabled(projectData->name.empty());
+    if (ImGui::Button("Save"))
     {
-      auto callback = [projectData](std::string path)
+      auto callback = [this, projectData](std::string path)
       {
-        if (path.empty() || !Utility::isDirectoryEmpty(path))
+        if (path.empty())
           return;
-        projectData->directory = path;
+        projectData->filepath = path;
+        this->projectManager->serialize(true);
+        this->quit();
       };
 
-      this->AsyncTask(callback, NativeFileDialog::SelectFolder, this->getWindow());
-    }
-
-    ImGui::SameLine();
-    Utility::EllipsizeTextBegin(projectData->directory, 100);
-    ImGui::Spacing();
-    ImGui::Spacing();
-
-    ImGui::BeginDisabled(!this->projectManager->isReady());
-    if (ImGui::Button("OK"))
-    {
-      this->createProjectInDirectory();
-      ImGui::CloseCurrentPopup();
+      NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", this->projectManager->fileExtension.c_str()}};
+      this->AsyncTask(callback, NativeFileDialog::SaveFile, this->getWindow(), filters, 1);
     }
     ImGui::EndDisabled();
 
@@ -139,32 +128,20 @@ void Start::CreateNewProject()
 
 void Start::SelectProjectDirectory()
 {
-  if (ImGui::TextLink("Select a project directory"))
+  if (ImGui::TextLink("Select a project"))
   {
     auto callback = [this](std::string path)
     {
       if (path.empty())
         return;
-      this->loadProjectFromDirectory(path);
+      this->projectManager->deserialize(path);
+      this->quit();
     };
 
-    this->AsyncTask(callback, NativeFileDialog::SelectFolder, this->getWindow());
+    NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", "sprig"}};
+    this->AsyncTask(callback, NativeFileDialog::SelectFile, this->getWindow(), filters, 1);
   }
   ImGui::SameLine();
-  std::string helpText = std::string("The selected project directory must \nbe a valid ") + this->projectManager->getProjectFileName() + " file.";
+  std::string helpText = std::string("The selected project directory must \nbe a valid .") + this->projectManager->getFileExtension() + " file.";
   Utility::HelpMarker(helpText.c_str());
-}
-
-void Start::loadProjectFromDirectory(std::string path)
-{
-  this->projectManager->deserialize(path);
-  this->quit();
-  return;
-}
-
-void Start::createProjectInDirectory()
-{
-  this->projectManager->serialize(true);
-  this->quit();
-  return;
 }

@@ -8,6 +8,8 @@
 class Viewport : public Scene
 {
 private:
+  Application *application;
+
   SDL_Texture *texture = nullptr;
 
   const char *title = "Viewport";

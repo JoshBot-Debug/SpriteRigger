@@ -3,7 +3,7 @@
 
 void ToolsScene::onInitialize()
 {
-  Registry *registry = this->application->getRegistry();
+  Registry *registry = this->app->getRegistry();
 
   Entity *bone1 = registry->createEntity("Bone");
   bone1->add<PropertiesComponent>("Bone 1", 1);
@@ -31,7 +31,7 @@ void ToolsScene::onUpdate(float deltaTime)
 
 void ToolsScene::onDraw(float deltaTime)
 {
-  Registry *registry = this->application->getRegistry();
+  Registry *registry = this->app->getRegistry();
 
   ImGuiWindowClass winClass;
   winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;

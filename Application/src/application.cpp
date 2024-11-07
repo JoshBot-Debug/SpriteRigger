@@ -48,6 +48,11 @@ void Application::quit()
   this->isRunning = false;
 }
 
+bool Application::isWindowClosing(SDL_Event *event)
+{
+  return event->type == SDL_EVENT_QUIT || (event->type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event->window.windowID == SDL_GetWindowID(this->window));
+}
+
 void Application::setVSync(int vsync)
 {
   if (!SDL_SetRenderVSync(renderer, vsync))
@@ -138,12 +143,6 @@ void Application::open()
       ImGui_ImplSDL3_ProcessEvent(&event);
       this->input.onEvent(&event);
 
-      if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window)))
-      {
-        this->isRunning = false;
-        break;
-      }
-
       if (SDL_GetWindowFlags(this->window) & SDL_WINDOW_MINIMIZED)
       {
         SDL_Delay(10);
@@ -151,6 +150,12 @@ void Application::open()
       }
 
       this->onInput(&event, deltaTime);
+
+      if (this->isWindowClosing(&event))
+      {
+        this->isRunning = false;
+        break;
+      }
     }
 
     this->onUpdate(deltaTime);

@@ -1,12 +1,16 @@
 #pragma once
 
-#include "application.h"
+#include "app.h"
 #include "Scene/scene.h"
+#include "ProjectManager/projectManager.h"
 
 class HeaderPanelScene : public Scene
 {
+private:
+  App *app;
+
 public:
-  HeaderPanelScene(Application *application) : Scene(application) {}
+  HeaderPanelScene(App *app) : app(app) {}
   ~HeaderPanelScene() {}
 
   void onDraw(float deltaTime) override;

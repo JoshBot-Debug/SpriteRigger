@@ -1,7 +1,7 @@
 #include <string>
+#include <filesystem>
 
 #include "Scene/scene.h"
-
 #include "headerPanelScene.h"
 
 void HeaderPanelScene::onDraw(float deltaTime)
@@ -52,11 +52,14 @@ void HeaderPanelScene::File_Open()
 {
   if (ImGui::MenuItem("Open", "Ctrl+O"))
   {
-    auto callback = [this](std::string path)
+    ProjectManager *projectManager = this->app->getProjectManager();
+    auto callback = [this, projectManager](std::string filepath)
     {
-      printf("Open file: %s\n", path.c_str());
+      projectManager->deserialize(filepath);
+      this->app->quit();
     };
-    this->application->AsyncTask(callback, NativeFileDialog::SelectFile, this->application->getWindow(), nullptr, 0);
+    NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", projectManager->fileExtension.c_str()}};
+    this->app->AsyncTask(callback, NativeFileDialog::SelectFile, this->app->getWindow(), filters, 1);
   }
 }
 
@@ -64,9 +67,15 @@ void HeaderPanelScene::File_OpenRecent()
 {
   if (ImGui::BeginMenu("Open Recent"))
   {
-    ImGui::MenuItem("fish_hat.c");
-    ImGui::MenuItem("fish_hat.inl");
-    ImGui::MenuItem("fish_hat.h");
+    ProjectManager *projectManager = this->app->getProjectManager();
+    for (RecentProject &recent : projectManager->recentProjects)
+    {
+      if (ImGui::MenuItem(recent.name.c_str()))
+      {
+        projectManager->deserialize(recent.filepath);
+        this->app->quit();
+      }
+    }
     ImGui::EndMenu();
   }
 }
@@ -88,7 +97,7 @@ void HeaderPanelScene::File_SaveAs()
       printf("Save to: %s\n", path.c_str());
     };
 
-    this->application->AsyncTask(callback, NativeFileDialog::SaveFile, this->application->getWindow(), nullptr, 0);
+    this->app->AsyncTask(callback, NativeFileDialog::SaveFile, this->app->getWindow(), nullptr, 0);
   }
 }
 
@@ -98,13 +107,13 @@ void HeaderPanelScene::File_Options()
   {
     if (ImGui::BeginMenu("Theme"))
     {
-      Theme currentTheme = this->application->getTheme();
+      Theme currentTheme = this->app->getTheme();
 
       if (ImGui::MenuItem("Light", nullptr, currentTheme == Theme::LIGHT) && currentTheme != Theme::LIGHT)
-        this->application->setTheme(Theme::LIGHT);
+        this->app->setTheme(Theme::LIGHT);
 
       if (ImGui::MenuItem("Dark", nullptr, currentTheme == Theme::DARK) && currentTheme != Theme::DARK)
-        this->application->setTheme(Theme::DARK);
+        this->app->setTheme(Theme::DARK);
 
       ImGui::EndMenu();
     }
@@ -116,7 +125,9 @@ void HeaderPanelScene::File_Options()
 void HeaderPanelScene::File_Quit()
 {
   if (ImGui::MenuItem("Quit", "Alt+F4"))
-    this->application->quit();
+  {
+    this->app->quit();
+  }
 }
 
 void HeaderPanelScene::Edit_Menu()

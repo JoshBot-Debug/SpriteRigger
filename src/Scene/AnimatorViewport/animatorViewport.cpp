@@ -10,8 +10,8 @@ void AnimatorViewport::onInitialize()
 
 void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
 {
-  Mouse *mouse = this->application->getInput()->getMouse();
-  Registry *registry = this->application->getRegistry();
+  Mouse *mouse = this->app->getInput()->getMouse();
+  Registry *registry = this->app->getRegistry();
 
   Vec2 viewportMouse = this->getMousePosition(mouse->position);
 
@@ -51,7 +51,7 @@ void AnimatorViewport::onUpdate(float deltaTime)
 
 void AnimatorViewport::onDrawViewport(float deltaTime)
 {
-  Registry *registry = this->application->getRegistry();
+  Registry *registry = this->app->getRegistry();
 
   std::vector<std::pair<int, int>> bones;
 
@@ -66,8 +66,8 @@ void AnimatorViewport::onDrawViewport(float deltaTime)
   {
     auto [mesh, properties, transform, color] = registry->collect<MeshComponent, PropertiesComponent, TransformComponent, ColorComponent>(entityId);
     SDL_FRect rect = {transform->position.x, transform->position.y, mesh->size.x, mesh->size.y};
-    SDL_SetRenderDrawColor(this->application->getRenderer(), color->color.x, color->color.y, color->color.z, SDL_ALPHA_OPAQUE);
-    SDL_RenderFillRect(this->application->getRenderer(), &rect);
+    SDL_SetRenderDrawColor(this->app->getRenderer(), color->color.x, color->color.y, color->color.z, SDL_ALPHA_OPAQUE);
+    SDL_RenderFillRect(this->app->getRenderer(), &rect);
   }
 }
 

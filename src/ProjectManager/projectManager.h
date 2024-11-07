@@ -13,31 +13,32 @@ struct RecentProject
 {
   std::string id;
   std::string name;
-  std::string directory;
+  std::string filepath;
 
   RecentProject() = default;
-  RecentProject(std::string id, std::string name, std::string directory) : id(id), name(name), directory(directory) {}
+  RecentProject(std::string id, std::string name, std::string filepath) : id(id), name(name), filepath(filepath) {}
 };
 
 struct ProjectData
 {
   std::string id;
   std::string name;
-  std::string directory;
+  std::string filepath;
 };
 
 class ProjectManager
 {
-private:
 public:
-  std::string projectFileName;
+  bool isRunning = true;
+
   ProjectData data;
+  std::string fileExtension;
 
   int maxRecentProjects;
   std::string recentFileName;
   std::vector<RecentProject> recentProjects;
 
-  ProjectManager(std::string projectFileName, std::string recentFileName, int maxRecentProjects = 5);
+  ProjectManager(std::string fileExtension, std::string recentFileName = "recent", int maxRecentProjects = 5);
 
   /**
    * Checks if the project has everything required to initialize
@@ -64,18 +65,19 @@ public:
   /**
    * Deserialize the project and load it into memory
    */
-  void deserialize(const std::string &path);
+  void deserialize(const std::string &filepath);
 
   /**
-   * Returns the project's filename
+   * Returns the project's file extension
    */
-  const char *getProjectFileName();
+  const char *getFileExtension();
 
   /**
    * Generates a random UID, which is unique for all intensive purposes
    */
   std::string generateUID();
 
-
   void updateRecentProjects();
+
+  void quit();
 };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "imgui.h"
-#include "application.h"
+#include "app.h"
 #include "Scene/scene.h"
 #include "Entity/components.h"
 #include "Assets/assets.h"
@@ -9,10 +9,11 @@
 class AssetsScene : public Scene
 {
 private:
+  App *app;
   Assets assets;
   
 public:
-  AssetsScene(Application *application) : Scene(application) {}
+  AssetsScene(App *app) : app(app) {}
   ~AssetsScene() {}
 
   void onInitialize() override;

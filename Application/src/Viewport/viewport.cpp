@@ -1,8 +1,9 @@
 #include "viewport.h"
 
-Viewport::Viewport(Application *application) : Scene(application)
+Viewport::Viewport(Application *application)
 {
   this->texture = SDL_CreateTexture(application->getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+  this->application = application;
 }
 
 Viewport::~Viewport()

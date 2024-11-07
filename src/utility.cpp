@@ -25,24 +25,32 @@ namespace Utility
     }
   }
 
-  void EllipsizeTextBegin(std::string text, float maxWidth)
+  void ellipsize(std::string &text, float maxWidth, Ellipsize type)
   {
     ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
 
     if (textSize.x <= maxWidth)
-      return ImGui::Text("%s", text.c_str());
+      return;
 
     const char *ellipsis = "...";
     float availableWidth = maxWidth - ImGui::CalcTextSize(ellipsis).x;
 
-    size_t maxLength = text.length() - 1;
-    while (ImGui::CalcTextSize(text.substr(maxLength).c_str()).x < availableWidth)
-      --maxLength;
+    size_t length = text.length() - 1;
 
-    std::string truncatedText = ellipsis + text.substr(maxLength);
-    ImGui::Text("%s", truncatedText.c_str());
+    if (type == Ellipsize::START)
+    {
+      while (ImGui::CalcTextSize(text.substr(length).c_str()).x < availableWidth)
+        --length;
+
+      text = ellipsis + text.substr(length);
+      return;
+    }
+
+    while (ImGui::CalcTextSize(text.substr(0, length).c_str()).x > availableWidth)
+      --length;
+
+    text = text.substr(0, length) + ellipsis;
   }
-
 
   struct UserData
   {
@@ -56,7 +64,7 @@ namespace Utility
     UserData *userData = (UserData *)data->UserData;
     if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
     {
-      std::string *str = userData->string;      
+      std::string *str = userData->string;
       IM_ASSERT(data->Buf == str->c_str());
       str->resize(data->BufTextLen);
       data->Buf = (char *)str->c_str();

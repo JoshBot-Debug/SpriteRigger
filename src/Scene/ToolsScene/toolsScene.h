@@ -1,14 +1,17 @@
 #pragma once
 
 #include "imgui.h"
-#include "application.h"
+#include "app.h"
 #include "Scene/scene.h"
 #include "Entity/components.h"
 
 class ToolsScene : public Scene
 {
+private:
+  App *app;
+
 public:
-  ToolsScene(Application *application) : Scene(application) {}
+  ToolsScene(App *app) : app(app) {}
   ~ToolsScene() {}
 
   void onInitialize() override;

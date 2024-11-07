@@ -12,10 +12,9 @@ static const ImWchar GlyphRange[] = {
 
 int main(int argc, char *argv[])
 {
-  ProjectManager projectManager("SpriteRigger.project", "SpriteRigger.recent");
+  ProjectManager projectManager("sprig");
 
   Start *start = new Start(&projectManager);
-
   start->setWindowTitle("Sprite Rigger");
   start->setVSync(1);
   start->setWindowDimensions({720, 480});
@@ -31,16 +30,20 @@ int main(int argc, char *argv[])
   if (!projectManager.isReady())
     return 0;
 
-  App *app = new App(&projectManager);
-  app->setWindowTitle("Sprite Rigger");
-  app->setVSync(1);
-  app->setWindowDimensions({1080, 720});
-  app->setBackgroundColor({30, 30, 30, 255});
-  app->addFont("Roboto-Regular:18", "assets/fonts/Roboto/Roboto-Regular.ttf", 18);
-  app->addFont("Roboto-Regular:24", "assets/fonts/Roboto/Roboto-Regular.ttf", 24);
-  app->addFont("MaterialIcons:18", "assets/fonts/MaterialIcons/MaterialIcons.ttf", 18, GlyphRange);
-  app->setTheme(Theme::DARK);
-  app->open();
-
+  while (projectManager.isRunning)
+  {
+    App *app = new App(&projectManager);
+    app->setWindowTitle((projectManager.data.name + " - Sprite Rigger").c_str());
+    app->setVSync(1);
+    app->setWindowDimensions({1080, 720});
+    app->setBackgroundColor({30, 30, 30, 255});
+    app->addFont("Roboto-Regular:18", "assets/fonts/Roboto/Roboto-Regular.ttf", 18);
+    app->addFont("Roboto-Regular:24", "assets/fonts/Roboto/Roboto-Regular.ttf", 24);
+    app->addFont("MaterialIcons:18", "assets/fonts/MaterialIcons/MaterialIcons.ttf", 18, GlyphRange);
+    app->setTheme(Theme::DARK);
+    app->open();
+    
+    delete app;
+  }
   return 0;
 }

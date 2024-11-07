@@ -47,7 +47,7 @@ void AssetsScene::DrawMenu()
 
         NativeFileDialog::Filters filters[1] = {{"Images", "png,jpg,jpeg"}};
 
-        this->application->AsyncTask(callback, NativeFileDialog::SelectFiles, this->application->getWindow(), filters, 1);
+        this->app->AsyncTask(callback, NativeFileDialog::SelectFiles, this->app->getWindow(), filters, 1);
       }
       ImGui::EndMenu();
     }

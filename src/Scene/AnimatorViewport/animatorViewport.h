@@ -1,7 +1,8 @@
 #pragma once
 
 #include "imgui.h"
-#include "application.h"
+
+#include "app.h"
 #include "Viewport/viewport.h"
 #include "Entity/components.h"
 
@@ -9,9 +10,10 @@ class AnimatorViewport : public Viewport
 {
 private:
   FPS fps;
+  App *app;
 
 public:
-  AnimatorViewport(Application *application) : Viewport(application) {}
+  AnimatorViewport(App *app) : Viewport(app), app(app) {}
   ~AnimatorViewport() {}
 
   void onInitialize() override;

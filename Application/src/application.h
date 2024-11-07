@@ -19,7 +19,7 @@
 #include "Input/input.h"
 #include "common.h"
 
-const SDL_WindowFlags APPLICATION_WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
+const SDL_WindowFlags APPLICATION_WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 
 enum class Theme
 {
@@ -69,6 +69,8 @@ public:
   {
     return &this->input;
   };
+
+  bool isWindowClosing(SDL_Event *event);
 
   /**
    * Enable or disable vertical synchronization (vsync).

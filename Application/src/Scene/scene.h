@@ -5,8 +5,6 @@
 class Scene
 {
 public:
-  Application *application;
-  Scene(Application *application) : application(application) {};
   virtual ~Scene() = default;
 
   /**

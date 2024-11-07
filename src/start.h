@@ -13,6 +13,7 @@ class Start : public Application
 private:
   ProjectManager *projectManager;
   SDL_Texture *banner;
+  
 
 public:
   Start(ProjectManager *projectManager) : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS), projectManager(projectManager)
@@ -28,7 +29,4 @@ public:
 
   void SelectProjectDirectory();
   void CreateNewProject();
-
-  void loadProjectFromDirectory(std::string path);
-  void createProjectInDirectory();
 };
