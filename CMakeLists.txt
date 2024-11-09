@@ -31,8 +31,6 @@ target_include_directories(SpriteRigger PRIVATE
 file(GLOB_RECURSE SHARED_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.o)
 target_sources(SpriteRigger PRIVATE ${SHARED_LIB})
 
-
-
 # Collect all bin files (.a files)
 file(GLOB_RECURSE STATIC_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.a)
 
@@ -55,3 +53,17 @@ set_target_properties(SpriteRigger PROPERTIES
   CXX_STANDARD_REQUIRED ON
   CXX_EXTENSIONS OFF
 )
+
+# Enable the best optimization settings
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -flto -funroll-loops -fomit-frame-pointer")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-flto")
+set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-flto")
+
+# Disable debug flags
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g0")
+
+# Strip symbols for production builds
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
+
+# Enable fast math
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math")

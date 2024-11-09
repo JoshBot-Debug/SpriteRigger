@@ -122,21 +122,20 @@ ImFont *Application::getFont(const char *name)
 
 void Application::open()
 {
-  SDL_ShowWindow(this->window);
-  SDL_SetWindowPosition(this->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+  bool hidden = true;
 
   Uint64 lastTime = SDL_GetTicks();
   SDL_Event event;
-  FPS applicationFPS;
+  FPS fps;
 
   this->onInitialize();
   ImGuiIO &io = ImGui::GetIO();
 
   while (this->isRunning)
   {
-    applicationFPS.at(0);
+    fps.at(0);
 
-    float deltaTime = applicationFPS.getDeltaTime();
+    float deltaTime = fps.getDeltaTime();
 
     while (SDL_PollEvent(&event) != 0)
     {
@@ -176,6 +175,13 @@ void Application::open()
 
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
     SDL_RenderPresent(renderer);
+
+    if (hidden)
+    {
+      SDL_ShowWindow(this->window);
+      SDL_SetWindowPosition(this->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+      hidden = false;
+    }
   }
 
   this->onCleanUp();

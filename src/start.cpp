@@ -19,7 +19,7 @@ void Start::onDraw(float deltaTime)
 
   ImVec2 windowSize = this->getWindowDimensions();
 
-  ImGui::SetNextWindowSize(ImVec2{windowSize.x, windowSize.y}); // Causes a FOUG kind of issue
+  ImGui::SetNextWindowSize(windowSize);
   ImGui::SetNextWindowPos(ImVec2{0, 0});
   ImGui::Begin("New Project", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings);
 
@@ -50,7 +50,7 @@ void Start::onDraw(float deltaTime)
   ImGui::BeginChild("Centered Child", containerSize, ImGuiChildFlags_None);
 
   ImGui::PushFont(this->getFont("Roboto-Regular:24"));
-  ImGui::Text("Projects");
+  ImGui::Text("Sprite Rigger");
   ImGui::PopFont();
 
   ImGui::Spacing();
@@ -59,7 +59,7 @@ void Start::onDraw(float deltaTime)
   ImGui::Spacing();
   ImGui::Spacing();
 
-  ImGui::SeparatorText("Project folder");
+  ImGui::SeparatorText("Project");
 
   ImGui::Spacing();
   ImGui::Spacing();
