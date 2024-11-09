@@ -1,4 +1,15 @@
 #include "start.h"
+#include "Project/project.h"
+
+Start::Start(Project *project) : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS), project(project)
+{
+  this->project->setApplication(this);
+  this->recentProjects = this->project->recent.vector("recent");
+
+  SDL_IOStream *stream = SDL_IOFromConstMem(BANNER_IMAGE_BUFFER, BANNER_IMAGE_BUFFER_SIZE);
+  SDL_Surface *surface = IMG_Load_IO(stream, true);
+  this->banner = SDL_CreateTextureFromSurface(this->renderer, surface);
+};
 
 void Start::onDraw(float deltaTime)
 {
@@ -27,7 +38,7 @@ void Start::onDraw(float deltaTime)
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10);
   ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0, 0});
   if (ImGui::Button("\ue5cd", ImVec2{closeButtonSize, closeButtonSize}))
-    this->quit();
+    this->project->quit();
   ImGui::PopStyleVar(2);
   ImGui::PopStyleColor(3);
   ImGui::PopFont();
@@ -53,9 +64,12 @@ void Start::onDraw(float deltaTime)
   ImGui::Spacing();
   ImGui::Spacing();
 
-  this->CreateNewProject();
+  if (ImGui::TextLink("Create a new project"))
+    this->project->openNew();
+
   ImGui::Spacing();
-  this->SelectProjectDirectory();
+  if (ImGui::TextLink("Select a project"))
+    this->project->open();
 
   ImGui::Spacing();
   ImGui::Spacing();
@@ -65,83 +79,20 @@ void Start::onDraw(float deltaTime)
   ImGui::Spacing();
   ImGui::Spacing();
 
-  for (RecentProject &recent : this->projectManager->recentProjects)
+  for (std::string recent : *this->recentProjects)
   {
-    if (ImGui::TextLink(recent.name.c_str()))
-    {
-      this->projectManager->deserialize(recent.filepath);
-      this->quit();
-    }
+    std::filesystem::path filePath = recent;
+
+    if (ImGui::TextLink(Utility::ellipsize(filePath.stem().string() + " - " + Utility::ellipsize(recent, 200, Utility::Ellipsize::START), 230).c_str()))
+      this->project->restart(SaveFile{recent});
+
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal | ImGuiHoveredFlags_NoSharedDelay))
+      ImGui::SetTooltip("%s", recent.c_str());
+
     ImGui::Spacing();
   }
 
   ImGui::EndChild();
 
   ImGui::End();
-}
-
-void Start::CreateNewProject()
-{
-  ProjectData *projectData = this->projectManager->getData();
-
-  if (ImGui::TextLink("Create a new project"))
-    ImGui::OpenPopup("NewProject");
-
-  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-  ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-  if (ImGui::BeginPopupModal("NewProject", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar))
-  {
-    ImGui::Text("%s", "New Project");
-    ImGui::Spacing();
-    ImGui::SetNextItemWidth(300);
-    Utility::InputText("Name", &projectData->name);
-
-    ImGui::Spacing();
-    ImGui::Spacing();
-    ImGui::Spacing();
-    ImGui::SameLine(ImGui::GetWindowSize().x - ImGui::GetStyle().ItemSpacing.x - 106);
-    ImGui::BeginDisabled(projectData->name.empty());
-    if (ImGui::Button("Save"))
-    {
-      auto callback = [this, projectData](std::string path)
-      {
-        if (path.empty())
-          return;
-        projectData->filepath = path;
-        this->projectManager->serialize(true);
-        this->quit();
-      };
-
-      NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", this->projectManager->fileExtension.c_str()}};
-      this->AsyncTask(callback, NativeFileDialog::SaveFile, this->getWindow(), filters, 1);
-    }
-    ImGui::EndDisabled();
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Cancel"))
-      ImGui::CloseCurrentPopup();
-
-    ImGui::EndPopup();
-  }
-}
-
-void Start::SelectProjectDirectory()
-{
-  if (ImGui::TextLink("Select a project"))
-  {
-    auto callback = [this](std::string path)
-    {
-      if (path.empty())
-        return;
-      this->projectManager->deserialize(path);
-      this->quit();
-    };
-
-    NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", "sprig"}};
-    this->AsyncTask(callback, NativeFileDialog::SelectFile, this->getWindow(), filters, 1);
-  }
-  ImGui::SameLine();
-  std::string helpText = std::string("The selected project directory must \nbe a valid .") + this->projectManager->getFileExtension() + " file.";
-  Utility::HelpMarker(helpText.c_str());
 }

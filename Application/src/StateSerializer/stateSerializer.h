@@ -11,7 +11,13 @@ struct SaveFile
   std::string directory;
 
   SaveFile() {};
-  SaveFile(std::string name, std::string extension, std::string directory) : name(name), extension(extension), directory() {};
+  SaveFile(std::string name, std::string extension, std::string directory) : name(name), extension(extension), directory(directory) {};
+  SaveFile(std::string filePath);
+
+  void set(std::string name, std::string extension, std::string directory);
+  void set(std::string filePath);
+
+  operator std::string() const;
 };
 
 class StateSerializer
@@ -27,16 +33,24 @@ public:
   StateSerializer(SaveFile saveFile);
   ~StateSerializer() = default;
 
+  void setSaveFile(SaveFile saveFile);
   void setSaveFileName(std::string name);
   void setSaveFileExtension(std::string extension);
   void setSaveFileDirectory(std::string directory);
 
-  std::map<std::string, std::string> *map(const char * key);
-  std::vector<std::string> *vector(const char * key);
+  SaveFile *getSaveFile();
+  std::string *getSaveFileName();
+  std::string *getSaveFileExtension();
+  std::string *getSaveFileDirectory();
+
+  std::map<std::string, std::string> *map(const char *key);
+  std::vector<std::string> *vector(const char *key);
 
   bool write();
   bool write(SaveFile saveFile);
+  bool write(std::string filePath);
 
   bool read();
   bool read(SaveFile saveFile);
+  bool read(std::string filePath);
 };

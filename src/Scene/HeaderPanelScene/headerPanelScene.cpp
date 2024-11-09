@@ -3,6 +3,8 @@
 
 #include "Scene/scene.h"
 #include "headerPanelScene.h"
+#include "Project/project.h"
+#include "utility.h"
 
 void HeaderPanelScene::onDraw(float deltaTime)
 {
@@ -44,38 +46,28 @@ void HeaderPanelScene::File_Menu()
 void HeaderPanelScene::File_New()
 {
   if (ImGui::MenuItem("New"))
-  {
-  }
+    this->app->getProject()->openNew();
 }
 
 void HeaderPanelScene::File_Open()
 {
   if (ImGui::MenuItem("Open", "Ctrl+O"))
-  {
-    ProjectManager *projectManager = this->app->getProjectManager();
-    auto callback = [this, projectManager](std::string filepath)
-    {
-      projectManager->deserialize(filepath);
-      this->app->quit();
-    };
-    NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", projectManager->fileExtension.c_str()}};
-    this->app->AsyncTask(callback, NativeFileDialog::SelectFile, this->app->getWindow(), filters, 1);
-  }
+    this->app->getProject()->open();
 }
 
 void HeaderPanelScene::File_OpenRecent()
 {
   if (ImGui::BeginMenu("Open Recent"))
   {
-    ProjectManager *projectManager = this->app->getProjectManager();
-    for (RecentProject &recent : projectManager->recentProjects)
+    for (std::string recent : *this->recentProjects)
     {
-      if (ImGui::MenuItem(recent.name.c_str()))
-      {
-        projectManager->deserialize(recent.filepath);
-        this->app->quit();
-      }
+      std::filesystem::path filePath = recent;
+      if (ImGui::MenuItem(Utility::ellipsize((filePath.stem().string() + " - " + recent), 300, Utility::Ellipsize::START).c_str()))
+        this->app->getProject()->restart(SaveFile{recent});
+
+      ImGui::Spacing();
     }
+
     ImGui::EndMenu();
   }
 }
@@ -83,22 +75,14 @@ void HeaderPanelScene::File_OpenRecent()
 void HeaderPanelScene::File_Save()
 {
   if (ImGui::MenuItem("Save", "Ctrl+S"))
-  {
-  }
+    this->app->getProject()->save();
 }
 
 void HeaderPanelScene::File_SaveAs()
 {
 
   if (ImGui::MenuItem("Save As.."))
-  {
-    auto callback = [](std::string path)
-    {
-      printf("Save to: %s\n", path.c_str());
-    };
-
-    this->app->AsyncTask(callback, NativeFileDialog::SaveFile, this->app->getWindow(), nullptr, 0);
-  }
+    this->app->getProject()->saveAs();
 }
 
 void HeaderPanelScene::File_Options()
@@ -125,9 +109,7 @@ void HeaderPanelScene::File_Options()
 void HeaderPanelScene::File_Quit()
 {
   if (ImGui::MenuItem("Quit", "Alt+F4"))
-  {
-    this->app->quit();
-  }
+    this->app->getProject()->quit();
 }
 
 void HeaderPanelScene::Edit_Menu()

@@ -1,6 +1,7 @@
 #include "SDL3/SDL.h"
 #include "start.h"
 #include "app.h"
+#include "Project/project.h"
 
 #include "StateSerializer/stateSerializer.h"
 
@@ -14,15 +15,11 @@ static const ImWchar GlyphRange[] = {
 
 int main(int argc, char *argv[])
 {
-  StateSerializer state;
+  Project project;
+  project.recent.setSaveFile((std::filesystem::current_path() / "SpriteRigger.recent").string());
+  project.recent.read();
 
-  state.setSaveFileName("MyFile");
-  state.setSaveFileExtension("exten");
-  state.setSaveFileDirectory(std::filesystem::current_path());
-
-  ProjectManager projectManager("sprig");
-
-  Start *start = new Start(&projectManager);
+  Start *start = new Start(&project);
   start->setWindowTitle("Sprite Rigger");
   start->setVSync(1);
   start->setWindowDimensions({720, 480});
@@ -35,13 +32,11 @@ int main(int argc, char *argv[])
 
   delete start;
 
-  if (!projectManager.isReady())
-    return 0;
-
-  while (projectManager.isRunning)
+  while (project.isRunning())
   {
-    App *app = new App(&projectManager);
-    app->setWindowTitle((projectManager.data.name + " - Sprite Rigger").c_str());
+    auto fileName = *project.state.getSaveFileName();
+    App *app = new App(&project);
+    app->setWindowTitle((fileName + " - Sprite Rigger").c_str());
     app->setVSync(1);
     app->setWindowDimensions({1080, 720});
     app->setBackgroundColor({30, 30, 30, 255});

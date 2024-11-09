@@ -2,15 +2,19 @@
 
 #include "app.h"
 #include "Scene/scene.h"
-#include "ProjectManager/projectManager.h"
+#include "Project/project.h"
 
 class HeaderPanelScene : public Scene
 {
 private:
   App *app;
+  std::vector<std::string> *recentProjects;
 
 public:
-  HeaderPanelScene(App *app) : app(app) {}
+  HeaderPanelScene(App *app) : app(app)
+  {
+    this->recentProjects = this->app->getProject()->recent.vector("recent");
+  }
   ~HeaderPanelScene() {}
 
   void onDraw(float deltaTime) override;

@@ -47,8 +47,6 @@ void ToolsScene::onDraw(float deltaTime)
   }
 
   ImGui::End();
-
-  ImGui::ShowDemoWindow();
 }
 
 void ToolsScene::onCleanUp()

@@ -1,12 +1,8 @@
 #pragma once
 
 #include "application.h"
-// #include "Scene/HeaderPanelScene/headerPanelScene.h"
-// #include "Scene/ToolsScene/toolsScene.h"
-// #include "Scene/AssetsScene/assetsScene.h"
-// #include "Scene/AnimatorViewport/animatorViewport.h"
-#include "ProjectManager/projectManager.h"
 
+class Project;
 class HeaderPanelScene;
 class AnimatorViewport;
 class ToolsScene;
@@ -15,7 +11,7 @@ class AssetsScene;
 class App : public Application
 {
 private:
-  ProjectManager *projectManager;
+  Project *project;
 
   HeaderPanelScene *headerPanelScene;
   AnimatorViewport *animatorViewport;
@@ -23,7 +19,7 @@ private:
   AssetsScene *assetsScene;
 
 public:
-  App(ProjectManager *projectManager);
+  App(Project *project);
   ~App();
 
   void onInitialize() override;
@@ -32,7 +28,9 @@ public:
   void onDraw(float deltaTime) override;
   void onCleanUp() override;
 
-  ProjectManager *getProjectManager() {
-    return this->projectManager;
+  Project *getProject() {
+    return this->project;
   }
+
+  void addProjectToRecentFiles(int maxRecentFiles);
 };

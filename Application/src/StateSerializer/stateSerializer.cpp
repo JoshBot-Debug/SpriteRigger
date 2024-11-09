@@ -4,7 +4,40 @@
 #include <iostream>
 #include <fstream>
 
+SaveFile::SaveFile(std::string filePath)
+{
+  std::filesystem::path path = filePath;
+  this->name = path.stem().string();
+  this->extension = path.extension().string();
+  this->directory = path.parent_path().string();
+}
+
+void SaveFile::set(std::string name, std::string extension, std::string directory)
+{
+  this->name = name;
+  this->extension = extension;
+  this->directory = directory;
+}
+
+void SaveFile::set(std::string filePath)
+{
+  std::filesystem::path path = filePath;
+  this->name = path.stem().string();
+  this->extension = path.extension().string();
+  this->directory = path.parent_path().string();
+}
+
+SaveFile::operator std::string() const
+{
+  return std::filesystem::path(this->directory) / (this->name + this->extension);
+}
+
 StateSerializer::StateSerializer(SaveFile saveFile) : saveFile(saveFile) {}
+
+void StateSerializer::setSaveFile(SaveFile saveFile)
+{
+  this->saveFile = saveFile;
+}
 
 void StateSerializer::setSaveFileName(std::string name)
 {
@@ -21,6 +54,26 @@ void StateSerializer::setSaveFileDirectory(std::string directory)
   this->saveFile.directory = directory;
 }
 
+SaveFile *StateSerializer::getSaveFile()
+{
+  return &this->saveFile;
+}
+
+std::string *StateSerializer::getSaveFileName()
+{
+  return &this->saveFile.name;
+}
+
+std::string *StateSerializer::getSaveFileExtension()
+{
+  return &this->saveFile.extension;
+}
+
+std::string *StateSerializer::getSaveFileDirectory()
+{
+  return &this->saveFile.directory;
+}
+
 std::map<std::string, std::string> *StateSerializer::map(const char *key)
 {
   return &this->mMap[key];
@@ -34,6 +87,12 @@ std::vector<std::string> *StateSerializer::vector(const char *key)
 bool StateSerializer::write()
 {
   return this->write(this->saveFile);
+}
+
+bool StateSerializer::write(std::string filePath)
+{
+  SaveFile saveFile(filePath);
+  return this->write(saveFile);
 }
 
 bool StateSerializer::write(SaveFile saveFile)
@@ -129,6 +188,12 @@ bool StateSerializer::write(SaveFile saveFile)
 bool StateSerializer::read()
 {
   return this->read(this->saveFile);
+}
+
+bool StateSerializer::read(std::string filePath)
+{
+  SaveFile saveFile(filePath);
+  return this->read(saveFile);
 }
 
 bool StateSerializer::read(SaveFile saveFile)

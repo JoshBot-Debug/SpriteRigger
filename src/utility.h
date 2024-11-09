@@ -16,7 +16,9 @@ namespace Utility
 
   void HelpMarker(const char *desc);
 
-  void ellipsize(std::string &text, float maxWidth, Ellipsize type = Ellipsize::END);
+  std::string ellipsize(const std::string &text, float maxWidth, Ellipsize type = Ellipsize::END);
 
   bool InputText(const char *label, std::string *str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void *user_data = nullptr);
+
+  std::string TruncateText(const std::string &p_text, float p_truncated_width);
 }

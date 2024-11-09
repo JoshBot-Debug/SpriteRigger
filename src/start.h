@@ -1,32 +1,25 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <filesystem>
 
 #include "utility.h"
 #include "application.h"
 #include "bannerImage.h"
-#include "ProjectManager/projectManager.h"
+
+class Project;
 
 class Start : public Application
 {
 private:
-  ProjectManager *projectManager;
+  Project *project;
   SDL_Texture *banner;
-  
+  std::vector<std::string> *recentProjects;
 
 public:
-  Start(ProjectManager *projectManager) : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS), projectManager(projectManager)
-  {
-    SDL_IOStream *stream = SDL_IOFromConstMem(BANNER_IMAGE_BUFFER, BANNER_IMAGE_BUFFER_SIZE);
-    SDL_Surface *surface = IMG_Load_IO(stream, true);
-    this->banner = SDL_CreateTextureFromSurface(this->renderer, surface);
-  };
-
+  Start(Project *project);
   ~Start() = default;
 
   void onDraw(float deltaTime) override;
-
-  void SelectProjectDirectory();
-  void CreateNewProject();
 };

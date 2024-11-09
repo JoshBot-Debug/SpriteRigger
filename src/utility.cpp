@@ -25,33 +25,6 @@ namespace Utility
     }
   }
 
-  void ellipsize(std::string &text, float maxWidth, Ellipsize type)
-  {
-    ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
-
-    if (textSize.x <= maxWidth)
-      return;
-
-    const char *ellipsis = "...";
-    float availableWidth = maxWidth - ImGui::CalcTextSize(ellipsis).x;
-
-    size_t length = text.length() - 1;
-
-    if (type == Ellipsize::START)
-    {
-      while (ImGui::CalcTextSize(text.substr(length).c_str()).x < availableWidth)
-        --length;
-
-      text = ellipsis + text.substr(length);
-      return;
-    }
-
-    while (ImGui::CalcTextSize(text.substr(0, length).c_str()).x > availableWidth)
-      --length;
-
-    text = text.substr(0, length) + ellipsis;
-  }
-
   struct UserData
   {
     void *data;
@@ -88,5 +61,69 @@ namespace Utility
     userData.data = data;
 
     return ImGui::InputText(label, (char *)str->c_str(), str->capacity() + 1, flags, InputTextCallback, &userData);
+  }
+
+  std::string ellipsize(const std::string &text, float maxWidth, Ellipsize type)
+  {
+    std::string truncatedText = text;
+
+    ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+
+    if (textSize.x <= maxWidth)
+      return truncatedText;
+
+    constexpr const char *ellipsis = "...";
+    float availableWidth = maxWidth - ImGui::CalcTextSize(ellipsis).x;
+
+    size_t length = text.length() - 1;
+
+    if (type == Ellipsize::START)
+    {
+      while (ImGui::CalcTextSize(text.substr(length).c_str()).x < availableWidth)
+        --length;
+
+      truncatedText = ellipsis + text.substr(length);
+    }
+
+    if (type == Ellipsize::END)
+    {
+      while (ImGui::CalcTextSize(text.substr(0, length).c_str()).x > availableWidth)
+        --length;
+
+      truncatedText = text.substr(0, length) + ellipsis;
+    }
+    return truncatedText;
+  }
+
+  std::string TruncateText(const std::string &p_text, float p_truncated_width)
+  {
+    std::string truncated_text = p_text;
+
+    const float text_width =
+        ImGui::CalcTextSize(p_text.c_str(), nullptr, true).x;
+
+    if (text_width > p_truncated_width)
+    {
+      constexpr const char *ELLIPSIS = " ...";
+      const float ellipsis_size = ImGui::CalcTextSize(ELLIPSIS).x;
+
+      int visible_chars = 0;
+      for (size_t i = 0; i < p_text.size(); i++)
+      {
+        const float current_width = ImGui::CalcTextSize(
+                                        p_text.substr(0, i).c_str(), nullptr, true)
+                                        .x;
+        if (current_width + ellipsis_size > p_truncated_width)
+        {
+          break;
+        }
+
+        visible_chars = i;
+      }
+
+      truncated_text = (p_text.substr(0, visible_chars) + ELLIPSIS).c_str();
+    }
+
+    return truncated_text;
   }
 }
