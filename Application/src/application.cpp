@@ -139,14 +139,13 @@ void Application::open()
 
     while (SDL_PollEvent(&event) != 0)
     {
-      ImGui_ImplSDL3_ProcessEvent(&event);
-      this->input.onEvent(&event);
-
       if (SDL_GetWindowFlags(this->window) & SDL_WINDOW_MINIMIZED)
       {
         SDL_Delay(10);
         continue;
       }
+
+      ImGui_ImplSDL3_ProcessEvent(&event);
 
       this->onInput(&event, deltaTime);
 

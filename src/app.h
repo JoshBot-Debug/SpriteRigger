@@ -12,6 +12,7 @@ class App : public Application
 {
 private:
   Project *project;
+  Input input;
 
   HeaderPanelScene *headerPanelScene;
   AnimatorViewport *animatorViewport;
@@ -19,6 +20,7 @@ private:
   AssetsScene *assetsScene;
 
 public:
+
   App(Project *project);
   ~App();
 
@@ -28,7 +30,10 @@ public:
   void onDraw(float deltaTime) override;
   void onCleanUp() override;
 
-  Project *getProject() {
+  Mouse *getMouseInput();
+
+  Project *getProject()
+  {
     return this->project;
   }
 

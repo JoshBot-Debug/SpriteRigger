@@ -33,7 +33,6 @@ protected:
   SDL_Window *window = nullptr;     // Pointer to the SDL window.
   SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
   Registry registry;
-  Input input;
 
 private:
   bool isRunning = true;
@@ -63,11 +62,6 @@ public:
   Registry *getRegistry()
   {
     return &this->registry;
-  };
-
-  Input *getInput()
-  {
-    return &this->input;
   };
 
   bool isWindowClosing(SDL_Event *event);

@@ -43,6 +43,7 @@ void App::onInput(SDL_Event *event, float deltaTime)
   if (this->isWindowClosing(event))
     this->getProject()->quit();
 
+  this->input.onEvent(event);
   this->headerPanelScene->onInput(event, deltaTime);
   this->hierarchyScene->onInput(event, deltaTime);
   this->assetsScene->onInput(event, deltaTime);
@@ -78,6 +79,11 @@ void App::onCleanUp()
 
   // TODO freeing the registry will eventually happen elsewhere
   this->registry.free<MeshComponent, PropertiesComponent, TransformComponent, ColorComponent>();
+}
+
+Mouse *App::getMouseInput()
+{
+  return this->input.getMouse();
 }
 
 void App::addProjectToRecentFiles(int maxRecentFiles)

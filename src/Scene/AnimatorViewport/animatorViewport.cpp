@@ -4,17 +4,22 @@
 void AnimatorViewport::onInitialize()
 {
   this->setTitle("Animator");
-  // this->setWindowFlags(ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
   this->setBackgroundColor(Vec4{180, 180, 180, 180});
 }
 
-void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
+void AnimatorViewport::onInput(SDL_Event *event, float deltaTime) {}
+
+void AnimatorViewport::onUpdate(float deltaTime)
 {
-  Mouse *mouse = this->app->getInput()->getMouse();
   Registry *registry = this->app->getRegistry();
+  Mouse *mouse = this->app->getMouseInput();
 
   Vec2 viewportMouse = this->getMousePosition(mouse->position);
 
+  /**
+   * This logic here should be moved to a PositionSystem class.
+   * Eventually I will add a ResizeSystem, RotateSystem, PositionSystem, etc.
+   */
   for (auto entity : registry->entities())
   {
     if (entity->is("Bone"))
@@ -40,13 +45,9 @@ void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
         mouse->release(entity->getId());
 
       if (mouse->isGrabbing(entity->getId()))
-        transform->position = viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset;
+        transform->position = Vec2::lerp(transform->position, viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset, deltaTime * 20);
     }
   }
-}
-
-void AnimatorViewport::onUpdate(float deltaTime)
-{
 }
 
 void AnimatorViewport::onDrawViewport(float deltaTime)
