@@ -17,8 +17,8 @@ void AnimatorViewport::onUpdate(float deltaTime)
   Vec2 viewportMouse = this->getMousePosition(mouse->position);
 
   /**
-   * This logic here should be moved to a PositionSystem class.
-   * Eventually I will add a ResizeSystem, RotateSystem, PositionSystem, etc.
+   * This logic here should be moved to a TransformSystem class.
+   * Eventually I will add a ResizeSystem, TransformSystem, etc.
    */
   for (auto entity : registry->entities())
   {
@@ -56,6 +56,13 @@ void AnimatorViewport::onDrawViewport(float deltaTime)
 
   std::vector<std::pair<int, int>> bones;
 
+  /**
+   * This logic here should be moved to a RenderSystem class.
+   * We'll need to account for 
+   *  - zIndex
+   *  - Layers
+   *  - etc...
+   */
   for (auto entity : registry->entities())
     if (entity->is("Bone"))
       bones.emplace_back(entity->getId(), entity->get<PropertiesComponent>()->zIndex);

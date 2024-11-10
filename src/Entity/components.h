@@ -4,6 +4,11 @@
 struct GrabPayload
 {
   Vec2 offset{0, 0};
+
+  /**
+   * The zIndex of the mesh you are grabbing.
+   * If the zIndex is higher, than the one below it, grab the higher mesh.
+   */
   int zIndex = 0;
 
   GrabPayload(Vec2 offset, int zIndex) : offset(offset), zIndex(zIndex) {}
