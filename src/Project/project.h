@@ -36,80 +36,34 @@ public:
   Project() = default;
   ~Project() = default;
 
-  bool isRunning()
-  {
-    return this->running;
-  }
+  /**
+   * Is the application project still running.
+   * Used to identify if the app should reastart if
+   * it was closed.
+   */
+  bool isRunning();
 
-  void setApplication(Application *app)
-  {
-    this->app = app;
-  }
+  /**
+   * Set the application.
+   */
+  void setApplication(Application *app);
 
-  Application *getApplication()
-  {
-    return this->app;
-  }
+  /**
+   * Used to restart the app with the selected save file.
+   */
+  void restart(SaveFile saveFile);
 
-  void restart(SaveFile saveFile)
-  {
-    this->state.setSaveFile(saveFile);
-    this->state.read();
-    this->app->quit();
-  }
+  /**
+   * Quit the app and the project.
+   * This function will close the app
+   */
+  void quit();
 
-  void quit()
-  {
-    this->running = false;
-    this->app->quit();
-  }
+  void save();
 
-  void save()
-  {
-    this->state.write();
-  }
+  void saveAs();
 
-  void saveAs()
-  {
-    auto callback = [this](std::string path)
-    {
-      if (path.empty())
-        return;
-      SaveFile saveFile(path);
-      this->state.write(saveFile);
-      this->state.setSaveFile(saveFile);
-      this->getApplication()->setWindowTitle((saveFile.name + " - Sprite Rigger").c_str());
-    };
+  void open();
 
-    NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", SAVE_FILE_EXTENSION}};
-    this->app->AsyncTask(callback, NativeFileDialog::SaveFile, this->app->getWindow(), filters, 1);
-  }
-
-  void open()
-  {
-    auto callback = [this](std::string path)
-    {
-      if (path.empty())
-        return;
-      this->restart(SaveFile{path});
-    };
-
-    NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", SAVE_FILE_EXTENSION}};
-    this->app->AsyncTask(callback, NativeFileDialog::SelectFile, this->app->getWindow(), filters, 1);
-  }
-
-  void openNew()
-  {
-    auto callback = [this](std::string path)
-    {
-      if (path.empty())
-        return;
-      SaveFile saveFile(path);
-      this->state.write(saveFile);
-      this->restart(saveFile);
-    };
-
-    NativeFileDialog::Filters filters[1] = {{"Sprite Rigger", SAVE_FILE_EXTENSION}};
-    this->app->AsyncTask(callback, NativeFileDialog::SaveFile, this->app->getWindow(), filters, 1);
-  }
+  void openNew();
 };

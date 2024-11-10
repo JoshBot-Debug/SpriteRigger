@@ -1,12 +1,12 @@
 # Application Development Plan: Pivot Animator-like Tool
 
-- [ ] Project Manager needs to be a library in Application.
-- [ ] Project Manager will save data in a map that takes in a key and the value is string.
-- [ ] This map will be written to disk and read.
-- [ ] Recent files will basically be the same thing.
-- [ ] i.e. We will have two StateSerializers once for app state, and one for recent files,
-- [ ]      this is because recent files need to be saved at the application root, where as project state will be saved in the project directory.
-- [ ] Expected usage
+- [x] State Serializer needs to be a library in Application.
+- [x] State Serializer will save data in a map that takes in a key and the value is string.
+- [x] This map will be written to disk and read.
+- [x] Recent files will basically be the same thing.
+- [x] i.e. We will have two StateSerializers once for app state, and one for recent files,
+- [x]      this is because recent files need to be saved at the application root, where as project state will be saved in the project directory.
+- [x] Expected usage
   - StateSerializer *state = new StateSerializer();
   - state->setSaveFileName("Akari");
   - state->setSaveFileExtension("sprig" / "recent");

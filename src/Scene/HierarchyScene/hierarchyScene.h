@@ -5,14 +5,14 @@
 #include "Scene/scene.h"
 #include "Entity/components.h"
 
-class ToolsScene : public Scene
+class HierarchyScene : public Scene
 {
 private:
   App *app;
 
 public:
-  ToolsScene(App *app) : app(app) {}
-  ~ToolsScene() {}
+  HierarchyScene(App *app) : app(app) {}
+  ~HierarchyScene() {}
 
   void onInitialize() override;
   void onInput(SDL_Event *event, float deltaTime) override;

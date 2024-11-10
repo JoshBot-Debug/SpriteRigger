@@ -9,7 +9,7 @@
 #include <imgui_internal.h>
 
 #include "Scene/HeaderPanelScene/headerPanelScene.h"
-#include "Scene/ToolsScene/toolsScene.h"
+#include "Scene/HierarchyScene/hierarchyScene.h"
 #include "Scene/AssetsScene/assetsScene.h"
 #include "Scene/AnimatorViewport/animatorViewport.h"
 #include "Project/project.h"
@@ -20,7 +20,7 @@ App::App(Project *project) : project(project)
   this->project->setApplication(this);
 
   this->headerPanelScene = new HeaderPanelScene(this);
-  this->toolsScene = new ToolsScene(this);
+  this->hierarchyScene = new HierarchyScene(this);
   this->assetsScene = new AssetsScene(this);
   this->animatorViewport = new AnimatorViewport(this);
 }
@@ -33,7 +33,7 @@ App::~App()
 void App::onInitialize()
 {
   this->headerPanelScene->onInitialize();
-  this->toolsScene->onInitialize();
+  this->hierarchyScene->onInitialize();
   this->assetsScene->onInitialize();
   this->animatorViewport->onInitialize();
 }
@@ -44,7 +44,7 @@ void App::onInput(SDL_Event *event, float deltaTime)
     this->getProject()->quit();
 
   this->headerPanelScene->onInput(event, deltaTime);
-  this->toolsScene->onInput(event, deltaTime);
+  this->hierarchyScene->onInput(event, deltaTime);
   this->assetsScene->onInput(event, deltaTime);
   this->animatorViewport->onInput(event, deltaTime);
 }
@@ -52,7 +52,7 @@ void App::onInput(SDL_Event *event, float deltaTime)
 void App::onUpdate(float deltaTime)
 {
   this->headerPanelScene->onUpdate(deltaTime);
-  this->toolsScene->onUpdate(deltaTime);
+  this->hierarchyScene->onUpdate(deltaTime);
   this->assetsScene->onUpdate(deltaTime);
   this->animatorViewport->onUpdate(deltaTime);
 }
@@ -60,7 +60,7 @@ void App::onUpdate(float deltaTime)
 void App::onDraw(float deltaTime)
 {
   this->headerPanelScene->onDraw(deltaTime);
-  this->toolsScene->onDraw(deltaTime);
+  this->hierarchyScene->onDraw(deltaTime);
   this->assetsScene->onDraw(deltaTime);
 
   ImGuiWindowClass winClass;
@@ -72,7 +72,7 @@ void App::onDraw(float deltaTime)
 void App::onCleanUp()
 {
   this->headerPanelScene->onCleanUp();
-  this->toolsScene->onCleanUp();
+  this->hierarchyScene->onCleanUp();
   this->assetsScene->onCleanUp();
   this->animatorViewport->onCleanUp();
 
