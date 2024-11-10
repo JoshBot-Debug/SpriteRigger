@@ -4,14 +4,16 @@
 #include "app.h"
 #include "Scene/scene.h"
 #include "Entity/components.h"
+#include "Controller/boneController.h"
 
 class HierarchyScene : public Scene
 {
 private:
   App *app;
+  BoneController boneController;
 
 public:
-  HierarchyScene(App *app) : app(app) {}
+  HierarchyScene(App *app) : app(app), boneController(this->app->getRegistry()) {}
   ~HierarchyScene() {}
 
   void onInitialize() override;
