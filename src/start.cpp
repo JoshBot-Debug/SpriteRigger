@@ -83,7 +83,7 @@ void Start::onDraw(float deltaTime)
   {
     std::filesystem::path filePath = recent;
 
-    if (ImGui::TextLink(Utility::ellipsize(filePath.stem().string() + " - " + Utility::ellipsize(recent, 200, Utility::Ellipsize::START), 230).c_str()))
+    if (ImGui::TextLink(Utility::ellipsize(filePath.stem().string() + " - " + recent, 230).c_str()))
       this->project->restart(SaveFile{recent});
 
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal | ImGuiHoveredFlags_NoSharedDelay))
