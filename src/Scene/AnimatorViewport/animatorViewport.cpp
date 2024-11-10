@@ -45,7 +45,7 @@ void AnimatorViewport::onUpdate(float deltaTime)
         mouse->release(entity->getId());
 
       if (mouse->isGrabbing(entity->getId()))
-        transform->position = Vec2::lerp(transform->position, viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset, deltaTime * 20);
+        transform->position = Vec2::lerp(transform->position, viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset, deltaTime * 30);
     }
   }
 }

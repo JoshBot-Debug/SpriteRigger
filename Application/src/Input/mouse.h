@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDL3/SDL.h"
 #include <any>
 #include "common.h"
 
@@ -31,13 +32,7 @@ public:
    *
    * @returns bool. True if GrabId was set, False if something else is being grabbed.
    */
-  bool grab(GrabId id)
-  {
-    if (this->grabId != -1)
-      return false;
-    this->grabId = id;
-    return true;
-  }
+  bool grab(GrabId id);
 
   /**
    * Grabs control of the mouse input.
