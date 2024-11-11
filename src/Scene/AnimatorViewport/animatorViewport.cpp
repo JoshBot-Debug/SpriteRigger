@@ -35,9 +35,12 @@ void AnimatorViewport::onUpdate(float deltaTime)
 
       if (mouse->state == MouseState::PRESS_LEFT)
       {
+
         if (!mousePosition.intersects(transform->position, bone->size))
           continue;
 
+        // Need to make this a little more generic
+        // Need to handle focused entity here as well.
         mouse->press(entity->getId(), transform->position, bone->zIndex);
       }
 
