@@ -18,7 +18,11 @@ void ArmatureManager::createArmature()
 
   Entity *boneEntity = this->registry->createEntity("Bone");
   boneEntity->add<CTransform>();
-  boneEntity->add<CBone>(("Root Bone " + std::to_string(this->boneCount)).c_str(), armatureEntity->getId());
+  CBone *bone = boneEntity->add<CBone>(("Root Bone " + std::to_string(this->boneCount)).c_str(), armatureEntity->getId());
+  if (boneCount == 1)
+    bone->color.y = 0;
+  if (boneCount == 2)
+    bone->color.x = 0;
 
   armature->bones.push_back(boneEntity->getId());
 }

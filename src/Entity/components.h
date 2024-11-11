@@ -39,6 +39,11 @@ struct CBone
   int zIndex;
 
   /**
+   * If the bone is focused
+   */
+  bool focused;
+
+  /**
    * The entity id of the armature and parent
    * If the parent is -1, it's the root bone
    */
@@ -59,7 +64,12 @@ struct CBone
    */
   Vec2 position, size;
 
-  CBone(const char *name, EntityID armature) : zIndex(1), armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}) {}
-  CBone(const char *name, EntityID armature, EntityID parent) : zIndex(1), armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}) {}
-  CBone(const char *name, EntityID armature, EntityID parent, Vec2 position) : zIndex(1), armature(armature), parent(-1), name(name), position(position), size(Vec2{20, 100}) {}
+  /**
+   * The color of the bone
+   */
+  Vec3 color;
+
+  CBone(const char *name, EntityID armature) : zIndex(1), armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
+  CBone(const char *name, EntityID armature, EntityID parent) : zIndex(1), armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
+  CBone(const char *name, EntityID armature, EntityID parent, Vec2 position) : zIndex(1), armature(armature), parent(-1), name(name), position(position), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
 };

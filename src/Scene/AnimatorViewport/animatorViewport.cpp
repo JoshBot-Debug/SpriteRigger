@@ -21,7 +21,7 @@ void AnimatorViewport::onUpdate(float deltaTime)
 {
   Registry *registry = this->app->getRegistry();
   Mouse *mouse = this->app->getMouseInput();
-  Vec2 viewportMouse = this->getMousePosition(mouse->position);
+  Vec2 mousePosition = this->getMousePosition(mouse->position);
 
   /**
    * This logic here should be moved to a TransformSystem class.
@@ -35,24 +35,16 @@ void AnimatorViewport::onUpdate(float deltaTime)
 
       if (mouse->state == MouseState::PRESS_LEFT)
       {
-        if (!viewportMouse.intersects(transform->position, bone->size))
+        if (!mousePosition.intersects(transform->position, bone->size))
           continue;
 
-        auto payload = mouse->getGrabPayload<GrabPayload>();
-
-        if (payload && payload->zIndex < bone->zIndex)
-          mouse->release();
-
-        mouse->grab<GrabPayload>(entity->getId(),
-                                 viewportMouse - transform->position,
-                                 bone->zIndex);
+        mouse->press(entity->getId(), transform->position, bone->zIndex);
       }
 
-      if (mouse->state == MouseState::RELEASED)
-        mouse->release(entity->getId());
+      auto [entityId, offset] = mouse->drag();
 
-      if (mouse->isGrabbing(entity->getId()))
-        transform->position = Vec2::lerp(transform->position, viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset, deltaTime * 20);
+      if (entity->getId() == entityId)
+        transform->position = Vec2::lerp(transform->position, offset, deltaTime * 20);
     }
   }
 }
@@ -81,7 +73,7 @@ void AnimatorViewport::onDrawViewport(float deltaTime)
   {
     auto [transform, bone] = registry->collect<CTransform, CBone>(entityId);
     SDL_FRect rect = {transform->position.x, transform->position.y, bone->size.x, bone->size.y};
-    SDL_SetRenderDrawColor(this->app->getRenderer(), 255, 255, 255, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(this->app->getRenderer(), bone->color.x, bone->color.y, bone->color.z, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(this->app->getRenderer(), &rect);
   }
 }

@@ -1,10 +1,7 @@
 #pragma once
 
-#include "SDL3/SDL.h"
-#include <any>
+#include "ECS/entity.h"
 #include "common.h"
-
-using GrabId = int;
 
 enum class MouseState
 {
@@ -18,92 +15,64 @@ enum class MouseState
 class Mouse
 {
 private:
-  GrabId grabId = -1;   ///< Identifier for the currently grabbed input. -1 denotes not grabbing anything.
-  std::any grabPayload; ///< payload passed into grab, can be retrieved anytime before releasing.
+  /**
+   * The ID of the entity currently being dragged.
+   * A value of -1 indicates no entity is being dragged.
+   */
+  EntityID dragEntity = -1;
+
+  /**
+   * The position of the entity being dragged at the time the drag started.
+   */
+  Vec2 dragEntityPosition{-1, -1};
+
+  /**
+   * The z-index of the entity being dragged.
+   * A value of -1 indicates no z-index has been set.
+   */
+  int dragEntityZIndex = -1;
+
+  /**
+   * The position of the mouse when the drag started, used to calculate movement offset.
+   */
+  Vec2 dragStart{-1, -1};
+
+  /**
+   * Resets the drag state, clearing any dragged entity and resetting
+   * the drag-related attributes to their default values.
+   */
+  void resetDrag();
 
 public:
-  Vec2 position{0, 0};                     ///< Current position of the mouse.
-  MouseState state = MouseState::RELEASED; ///< Current state of the mouse.
+  /**
+   * The current position of the mouse.
+   * Initialized to {-1, -1} to indicate no valid position.
+   */
+  Vec2 position{-1, -1};
 
   /**
-   * Grabs control of the mouse input.
-   *
-   * @param id The identifier for the grab; must be unique.
-   *
-   * @returns bool. True if GrabId was set, False if something else is being grabbed.
+   * The current state of the mouse (e.g., pressed, released, etc.).
    */
-  bool grab(GrabId id);
+  MouseState state = MouseState::RELEASED;
 
   /**
-   * Grabs control of the mouse input.
+   * Starts a drag operation for a specified entity.
    *
-   * More often then not, when you grab an item you may want to capture
-   * some information, like the mouseOffset, the zIndex of the mesh, etc.
-   * You can pass that information to grab and retrieve it later.
-   *
-   * NOTE: When the grab is released, that object will be released from memory.
-   *
-   * @param id The identifier for the grab; must be unique.
-   *
-   * @returns bool. True if GrabId was set, False if something else is being grabbed.
+   * @param entity The ID of the entity being dragged.
+   * @param position The initial entity position when the drag started.
+   * @param zIndex Optional z-index to control the stacking order of the dragged entity.
    */
-  template <typename T, typename... Args>
-  bool grab(GrabId id, Args &&...args)
-  {
-    if (this->grabId != -1)
-      return false;
-
-    this->grabId = id;
-    this->grabPayload = new T(std::forward<Args>(args)...);
-    return true;
-  }
+  void press(EntityID entity, Vec2 offset, int zIndex = -1);
 
   /**
-   * Releases control of the mouse input grab for a specific identifier.
-   *
-   * This function will release the grab associated with the given id,
-   * allowing other inputs to take control.
-   *
-   * @param id The identifier of the grab to release. Or blank to release whatever is there
-   *
-   * @return True if the specified id was release,
-   *         false otherwise.
+   * @return A tuple containing the dragged entity ID and the current drag offset.
    */
-  bool release(GrabId id = -1);
+  std::tuple<EntityID, Vec2> drag();
 
   /**
-   * Checks if the mouse is currently grabbed by a specific identifier.
+   * Sets the current state of the mouse (pressed, released, etc.).
    *
-   * @param id The identifier to check. Or blank to check if anything is being grabbed
-   * @return True if the specified id is currently grabbing the mouse,
-   *         false otherwise.
+   * @param state The desired mouse state.
    */
-  bool isGrabbing(GrabId id = -1);
-
-  /**
-   * Retrieves the current grab identifier.
-   *
-   * @return The identifier of the current grab, or -1 if no grab is active.
-   */
-  GrabId getGrabId();
-
-  /**
-   * Retrieves a reference to the grab payload
-   *
-   * @return The payload casted back to the object specified.
-   *         However, if the cast fails or there is no payload, it returns nullptr
-   */
-  template <typename T>
-  T *getGrabPayload()
-  {
-    try
-    {
-      return std::any_cast<T *>(this->grabPayload);
-    }
-    catch (const std::exception &e)
-    {
-      // Failed to cast do nothing.
-    }
-    return nullptr;
-  }
+  void setState(MouseState state);
 };

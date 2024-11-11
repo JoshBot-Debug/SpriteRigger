@@ -1,30 +1,51 @@
 #include "mouse.h"
 
-bool Mouse::grab(GrabId id)
+const std::tuple<EntityID, Vec2> DRAG_NONE = {-1, Vec2{-1, -1}};
+
+void Mouse::resetDrag()
 {
-  if (this->grabId != -1)
-    return false;
-  this->grabId = id;
-  return true;
+  this->dragEntity = -1;
+  this->dragEntityZIndex = -1;
+  this->dragEntityPosition = Vec2{-1, -1};
+  this->dragStart = Vec2{-1, -1};
 }
 
-bool Mouse::release(GrabId id)
+void Mouse::press(EntityID entity, Vec2 position, int zIndex)
 {
-  if (id != -1 && this->grabId != id)
-    return false;
-  this->grabId = -1;
-  this->grabPayload.reset();
-  return true;
+  if (this->dragEntity != -1)
+    if (this->dragEntityZIndex < zIndex)
+      return;
+
+  this->dragEntityZIndex = zIndex;
+  this->dragEntityZIndex = entity;
+  this->dragEntityPosition = position;
+  this->dragStart = this->position;
 }
 
-bool Mouse::isGrabbing(GrabId id)
+void Mouse::setState(MouseState state)
 {
-  if (id == -1)
-    return this->grabId != -1;
-  return this->grabId == id;
+  this->state = state;
+
+  switch (state)
+  {
+  case MouseState::PRESS_RIGHT:
+    this->resetDrag();
+    break;
+  case MouseState::PRESS_MIDDLE:
+    this->resetDrag();
+    break;
+  case MouseState::RELEASED:
+    this->resetDrag();
+    break;
+  default:
+    break;
+  }
 }
 
-GrabId Mouse::getGrabId()
+std::tuple<EntityID, Vec2> Mouse::drag()
 {
-  return this->grabId;
+  if (this->state != MouseState::MOVING)
+    return DRAG_NONE;
+
+  return std::tuple<EntityID, Vec2>({this->dragEntity, this->dragEntityPosition + this->position - this->dragStart});
 }
