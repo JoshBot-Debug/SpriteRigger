@@ -77,6 +77,82 @@ struct Vec2
   }
 };
 
+struct Vec3
+{
+  float x, y, z;
+
+  Vec3() : x(0), y(0), z(0) {}
+
+  Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+  void set(float x, float y, float z)
+  {
+    this->x = x;
+    this->y = y;
+    this->z = z;
+  }
+
+  bool intersects(const Vec3 &position, const Vec3 &size) const
+  {
+    return (x >= position.x && x <= position.x + size.x) &&
+           (y >= position.y && y <= position.y + size.y) &&
+           (z >= position.z && z <= position.z + size.z);
+  }
+
+  static Vec3 lerp(const Vec3 &start, const Vec3 &end, float t)
+  {
+    return Vec3{
+        start.x + t * (end.x - start.x),
+        start.y + t * (end.y - start.y),
+        start.z + t * (end.z - start.z),
+    };
+  }
+
+  friend Vec3 operator+(const Vec3 &lhs, const Vec3 &rhs)
+  {
+    return Vec3{
+        lhs.x + rhs.x,
+        lhs.y + rhs.y,
+        lhs.z + rhs.z,
+    };
+  }
+
+  friend Vec3 operator-(const Vec3 &lhs, const Vec3 &rhs)
+  {
+    return Vec3{
+        lhs.x - rhs.x,
+        lhs.y - rhs.y,
+        lhs.z - rhs.z,
+    };
+  }
+
+  Vec3 &operator+=(const Vec3 &rhs)
+  {
+    x += rhs.x;
+    y += rhs.y;
+    z += rhs.z;
+    return *this;
+  }
+
+  Vec3 &operator-=(const Vec3 &rhs)
+  {
+    x -= rhs.x;
+    y -= rhs.y;
+    z -= rhs.z;
+    return *this;
+  }
+
+  friend bool operator==(const Vec3 &lhs, const Vec3 &rhs)
+  {
+    return (lhs.x == rhs.x) && (lhs.y == rhs.y) && (lhs.z == rhs.z);
+  }
+
+  friend bool operator!=(const Vec3 &lhs, const Vec3 &rhs)
+  {
+    return !(lhs == rhs);
+  }
+};
+
 struct Vec4
 {
   float x, y, z, w;

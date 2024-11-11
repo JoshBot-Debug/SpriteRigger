@@ -9,8 +9,6 @@ void HierarchyScene::onUpdate(float deltaTime) {}
 
 void HierarchyScene::onDraw(float deltaTime)
 {
-  Registry *registry = this->app->getRegistry();
-
   ImGuiWindowClass winClass;
   winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
   ImGui::SetNextWindowClass(&winClass);
@@ -19,9 +17,9 @@ void HierarchyScene::onDraw(float deltaTime)
 
   if (ImGui::BeginPopupContextWindow("Tools Context"))
   {
-    if (ImGui::MenuItem("Add bone"))
+    if (ImGui::MenuItem("Create armature"))
     {
-      this->boneController.addBone();
+      this->armatureSystem.createArmature();
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();

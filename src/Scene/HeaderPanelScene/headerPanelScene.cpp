@@ -80,7 +80,6 @@ void HeaderPanelScene::File_Save()
 
 void HeaderPanelScene::File_SaveAs()
 {
-
   if (ImGui::MenuItem("Save As.."))
     this->app->getProject()->saveAs();
 }

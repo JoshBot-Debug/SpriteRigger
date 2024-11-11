@@ -1,6 +1,14 @@
 #include "animatorViewport.h"
 #include "string.h"
 
+struct GrabPayload
+{
+  Vec2 offset{0, 0};
+  int zIndex = 0;
+
+  GrabPayload(Vec2 offset, int zIndex) : offset(offset), zIndex(zIndex) {}
+};
+
 void AnimatorViewport::onInitialize()
 {
   this->setTitle("Animator");
@@ -13,7 +21,6 @@ void AnimatorViewport::onUpdate(float deltaTime)
 {
   Registry *registry = this->app->getRegistry();
   Mouse *mouse = this->app->getMouseInput();
-
   Vec2 viewportMouse = this->getMousePosition(mouse->position);
 
   /**
@@ -24,28 +31,28 @@ void AnimatorViewport::onUpdate(float deltaTime)
   {
     if (entity->is("Bone"))
     {
-      auto [mesh, properties, transform] = entity->collect<MeshComponent, PropertiesComponent, TransformComponent>();
+      auto [transform, bone] = entity->collect<CTransform, CBone>();
 
       if (mouse->state == MouseState::PRESS_LEFT)
       {
-        if (!viewportMouse.intersects(transform->position, mesh->size))
+        if (!viewportMouse.intersects(transform->position, bone->size))
           continue;
 
         auto payload = mouse->getGrabPayload<GrabPayload>();
 
-        if (payload && payload->zIndex < properties->zIndex)
+        if (payload && payload->zIndex < bone->zIndex)
           mouse->release();
 
         mouse->grab<GrabPayload>(entity->getId(),
                                  viewportMouse - transform->position,
-                                 properties->zIndex);
+                                 bone->zIndex);
       }
 
       if (mouse->state == MouseState::RELEASED)
         mouse->release(entity->getId());
 
       if (mouse->isGrabbing(entity->getId()))
-        transform->position = Vec2::lerp(transform->position, viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset, deltaTime * 30);
+        transform->position = Vec2::lerp(transform->position, viewportMouse - mouse->getGrabPayload<GrabPayload>()->offset, deltaTime * 20);
     }
   }
 }
@@ -58,23 +65,23 @@ void AnimatorViewport::onDrawViewport(float deltaTime)
 
   /**
    * This logic here should be moved to a RenderSystem class.
-   * We'll need to account for 
+   * We'll need to account for
    *  - zIndex
    *  - Layers
    *  - etc...
    */
   for (auto entity : registry->entities())
     if (entity->is("Bone"))
-      bones.emplace_back(entity->getId(), entity->get<PropertiesComponent>()->zIndex);
+      bones.emplace_back(entity->getId(), entity->get<CBone>()->zIndex);
 
   std::sort(bones.begin(), bones.end(), [](const std::pair<int, int> &a, const std::pair<int, int> &b)
             { return a.second < b.second; });
 
   for (auto [entityId, zIndex] : bones)
   {
-    auto [mesh, properties, transform, color] = registry->collect<MeshComponent, PropertiesComponent, TransformComponent, ColorComponent>(entityId);
-    SDL_FRect rect = {transform->position.x, transform->position.y, mesh->size.x, mesh->size.y};
-    SDL_SetRenderDrawColor(this->app->getRenderer(), color->color.x, color->color.y, color->color.z, SDL_ALPHA_OPAQUE);
+    auto [transform, bone] = registry->collect<CTransform, CBone>(entityId);
+    SDL_FRect rect = {transform->position.x, transform->position.y, bone->size.x, bone->size.y};
+    SDL_SetRenderDrawColor(this->app->getRenderer(), 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(this->app->getRenderer(), &rect);
   }
 }

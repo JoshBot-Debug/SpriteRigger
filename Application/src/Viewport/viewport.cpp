@@ -1,4 +1,5 @@
 #include "viewport.h"
+#include <algorithm>
 
 Viewport::Viewport(Application *application)
 {
@@ -74,14 +75,8 @@ void Viewport::onDraw(float deltaTime)
 
 Vec2 Viewport::getMousePosition(Vec2 position)
 {
-  Vec2 relative{
-      position.x - this->position.x,
-      position.y - this->position.y,
+  return Vec2{
+      std::clamp(position.x - this->position.x, 0.0f, this->size.x),
+      std::clamp(position.y - this->position.y, 0.0f, this->size.y),
   };
-
-  if (relative.x < 0 || relative.x > this->size.x ||
-      relative.y < 0 || relative.y > this->size.y)
-    return Vec2{-1, -1};
-
-  return relative;
 }

@@ -4,37 +4,39 @@
 #include <vector>
 #include <stdio.h>
 
-#include "Entity/components.h"
-
 #include <imgui_internal.h>
 
-#include "Scene/HeaderPanelScene/headerPanelScene.h"
-#include "Scene/HierarchyScene/hierarchyScene.h"
-#include "Scene/AssetsScene/assetsScene.h"
-#include "Scene/AnimatorViewport/animatorViewport.h"
 #include "Project/project.h"
+#include "Entity/components.h"
+#include "Scene/AssetsScene/assetsScene.h"
+#include "Scene/HierarchyScene/hierarchyScene.h"
+#include "Scene/HeaderPanelScene/headerPanelScene.h"
+#include "Scene/AnimatorViewport/animatorViewport.h"
 
 App::App(Project *project) : project(project)
 {
   this->addProjectToRecentFiles(5);
   this->project->setApplication(this);
 
-  this->headerPanelScene = new HeaderPanelScene(this);
-  this->hierarchyScene = new HierarchyScene(this);
   this->assetsScene = new AssetsScene(this);
+  this->hierarchyScene = new HierarchyScene(this);
+  this->headerPanelScene = new HeaderPanelScene(this);
   this->animatorViewport = new AnimatorViewport(this);
 }
 
 App::~App()
 {
+  delete this->assetsScene;
+  delete this->hierarchyScene;
+  delete this->animatorViewport;
   delete this->headerPanelScene;
 }
 
 void App::onInitialize()
 {
-  this->headerPanelScene->onInitialize();
-  this->hierarchyScene->onInitialize();
   this->assetsScene->onInitialize();
+  this->hierarchyScene->onInitialize();
+  this->headerPanelScene->onInitialize();
   this->animatorViewport->onInitialize();
 }
 
@@ -44,25 +46,25 @@ void App::onInput(SDL_Event *event, float deltaTime)
     this->getProject()->quit();
 
   this->input.onEvent(event);
-  this->headerPanelScene->onInput(event, deltaTime);
-  this->hierarchyScene->onInput(event, deltaTime);
   this->assetsScene->onInput(event, deltaTime);
+  this->hierarchyScene->onInput(event, deltaTime);
+  this->headerPanelScene->onInput(event, deltaTime);
   this->animatorViewport->onInput(event, deltaTime);
 }
 
 void App::onUpdate(float deltaTime)
 {
-  this->headerPanelScene->onUpdate(deltaTime);
-  this->hierarchyScene->onUpdate(deltaTime);
   this->assetsScene->onUpdate(deltaTime);
+  this->hierarchyScene->onUpdate(deltaTime);
+  this->headerPanelScene->onUpdate(deltaTime);
   this->animatorViewport->onUpdate(deltaTime);
 }
 
 void App::onDraw(float deltaTime)
 {
-  this->headerPanelScene->onDraw(deltaTime);
-  this->hierarchyScene->onDraw(deltaTime);
   this->assetsScene->onDraw(deltaTime);
+  this->hierarchyScene->onDraw(deltaTime);
+  this->headerPanelScene->onDraw(deltaTime);
 
   ImGuiWindowClass winClass;
   winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
@@ -72,13 +74,13 @@ void App::onDraw(float deltaTime)
 
 void App::onCleanUp()
 {
-  this->headerPanelScene->onCleanUp();
-  this->hierarchyScene->onCleanUp();
   this->assetsScene->onCleanUp();
+  this->hierarchyScene->onCleanUp();
+  this->headerPanelScene->onCleanUp();
   this->animatorViewport->onCleanUp();
 
   // TODO freeing the registry will eventually happen elsewhere
-  this->registry.free<MeshComponent, PropertiesComponent, TransformComponent, ColorComponent>();
+  this->registry.free<CTransform, CBone, CArmature>();
 }
 
 Mouse *App::getMouseInput()
