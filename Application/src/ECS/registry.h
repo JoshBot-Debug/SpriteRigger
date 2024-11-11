@@ -11,7 +11,7 @@ const int ALL = 0;
 
 class Entity;
 
-using EntityId = int;
+using EntityID = int;
 
 /**
  * Registry is a container for managing entities and their associated components.
@@ -21,9 +21,9 @@ using EntityId = int;
 class Registry
 {
 private:
-  EntityId nEID = ALL;                                         ///< The next available entity ID.
+  EntityID nEID = ALL;                                         ///< The next available entity ID.
   std::vector<Entity *> entt;                                  ///< List of all entities in the registry.
-  std::unordered_map<EntityId, std::vector<std::any>> storage; ///< Storage of components indexed by entity ID.
+  std::unordered_map<EntityID, std::vector<std::any>> storage; ///< Storage of components indexed by entity ID.
 
 public:
   Registry() = default;
@@ -45,7 +45,7 @@ public:
    * @return A pointer to the newly created component.
    */
   template <typename T, typename... Args>
-  T *add(EntityId entity, Args &&...args)
+  T *add(EntityID entity, Args &&...args)
   {
     T *component = new T(std::forward<Args>(args)...);
     this->storage[entity].push_back((std::any)component);
@@ -59,7 +59,7 @@ public:
    * @return True if the entity has the component, false otherwise.
    */
   template <typename T>
-  bool has(EntityId entity)
+  bool has(EntityID entity)
   {
     return (this->storage.find(entity) != this->storage.end());
   }
@@ -71,7 +71,7 @@ public:
    * @return A tuple containing pointers to the components.
    */
   template <typename... T>
-  std::tuple<T *...> collect(EntityId entity)
+  std::tuple<T *...> collect(EntityID entity)
   {
     return std::make_tuple(get<T>(entity)...);
   }
@@ -83,7 +83,7 @@ public:
    * @return A pointer to the component, or nullptr if not found.
    */
   template <typename T>
-  T *get(EntityId entity)
+  T *get(EntityID entity)
   {
     for (auto &component : this->storage[entity])
       try
@@ -146,7 +146,7 @@ public:
    * @param entity The entity ID from which to free the component.
    */
   template <typename T>
-  void free(EntityId entity)
+  void free(EntityID entity)
   {
     if (this->storage.find(entity) == this->storage.end())
       return;

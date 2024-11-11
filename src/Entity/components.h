@@ -14,45 +14,40 @@ struct CTransform
 struct CArmature
 {
   /**
-   * @id
-   * Unique identifier for the armature.
-   *
-   * @zIndex
    * The zIndex of the armature, used to determine what armature to select when trying to grab.
    */
-  int id, zIndex;
+  int zIndex;
 
   /**
    * Display name of the armature.
    */
-  std::string name;
+  const char *name;
 
   /**
    * All the bones that belong to this armature.
    */
-  std::vector<Entity *> bones;
+  std::vector<EntityID> bones;
 
-  CArmature(int id, std::string name) : id(id), zIndex(1), name(name) {}
+  CArmature(const char *name) : zIndex(1), name(name) {}
 };
 
 struct CBone
 {
   /**
-   * @id
-   * Unique identifier for the bone.
-   *
-   * @parent
-   * Id of the bone to which this bone is attached to. If not parent, this is the root bone
-   *
-   * @zIndex
    * The zIndex of the bone, used to determine what bone to select when trying to grab.
    */
-  int id, parent, zIndex;
+  int zIndex;
+
+  /**
+   * The entity id of the armature and parent
+   * If the parent is -1, it's the root bone
+   */
+  EntityID armature, parent;
 
   /**
    * Display name of the bone.
    */
-  std::string name;
+  const char *name;
 
   /**
    * @position
@@ -64,7 +59,7 @@ struct CBone
    */
   Vec2 position, size;
 
-  CBone(int id, std::string name) : id(id), parent(0), zIndex(1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}) {}
-  CBone(int id, std::string name, int parent) : id(id), parent(parent), zIndex(1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}) {}
-  CBone(int id, std::string name, int parent, Vec2 position) : id(id), parent(0), zIndex(1), name(name), position(position), size(Vec2{20, 100}) {}
+  CBone(const char *name, EntityID armature) : zIndex(1), armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}) {}
+  CBone(const char *name, EntityID armature, EntityID parent) : zIndex(1), armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}) {}
+  CBone(const char *name, EntityID armature, EntityID parent, Vec2 position) : zIndex(1), armature(armature), parent(-1), name(name), position(position), size(Vec2{20, 100}) {}
 };

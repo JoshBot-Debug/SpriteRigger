@@ -4,7 +4,7 @@
 
 #include "registry.h"
 
-using EntityId = int;
+using EntityID = int;
 
 /**
  * Entity represents an object within the ECS.
@@ -14,7 +14,7 @@ using EntityId = int;
 class Entity
 {
 private:
-  EntityId id;        ///< Unique identifier for the entity.
+  EntityID id;        ///< Unique identifier for the entity.
   const char *name;   ///< Name of the entity.
   Registry *registry; ///< Pointer to the Registry managing this entity.
 
@@ -33,7 +33,7 @@ public:
    *
    * @return The entity's ID.
    */
-  EntityId getId()
+  EntityID getId()
   {
     return this->id;
   }
@@ -119,11 +119,11 @@ public:
   };
 
   /**
-   * Implicit conversion operator to convert Entity to EntityId.
+   * Implicit conversion operator to convert Entity to EntityID.
    *
    * @return The entity's ID.
    */
-  operator EntityId() const
+  operator EntityID() const
   {
     return this->id;
   }

@@ -3,16 +3,16 @@
 #include "ECS/registry.h"
 #include "ECS/entity.h"
 
-class ArmatureSystem
+class ArmatureManager
 {
 private:
   Registry *registry;
-  int armatureId = 0;
-  int boneId = 0;
+  int armatureCount = 0;
+  int boneCount = 0;
 
 public:
-  ArmatureSystem(Registry *registry);
-  ~ArmatureSystem();
+  ArmatureManager(Registry *registry);
+  ~ArmatureManager();
 
   void createArmature();
 };
