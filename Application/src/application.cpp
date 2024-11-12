@@ -1,5 +1,4 @@
 #include <stdexcept>
-
 #include "application.h"
 
 Application::Application(SDL_WindowFlags flags)
