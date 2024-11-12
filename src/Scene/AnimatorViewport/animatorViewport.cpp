@@ -44,10 +44,10 @@ void AnimatorViewport::onUpdate(float deltaTime)
 
       MouseEntityState state = mouse->getMouseEntityState(entity->getId());
 
-      bone->color.z = state.isFocused ? 0 : 255;
+      bone->color.b = state.isFocused ? 0 : 255;
 
       if (state.isDragging)
-        transform->position = Utility::lerp(transform->position, state.position, deltaTime * 20);
+        transform->position = glm::mix(transform->position, state.position, deltaTime * 20);
     }
   }
 }
@@ -62,7 +62,7 @@ void AnimatorViewport::onDrawViewport(float deltaTime)
     {
       auto [transform, bone] = entity->collect<CTransform, CBone>();
       SDL_FRect rect = {transform->position.x, transform->position.y, bone->size.x, bone->size.y};
-      SDL_SetRenderDrawColor(this->app->getRenderer(), bone->color.x, bone->color.y, bone->color.z, SDL_ALPHA_OPAQUE);
+      SDL_SetRenderDrawColor(this->app->getRenderer(), bone->color.r, bone->color.g, bone->color.b, SDL_ALPHA_OPAQUE);
       SDL_RenderFillRect(this->app->getRenderer(), &rect);
     }
   }

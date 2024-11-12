@@ -158,7 +158,7 @@ void Application::open()
 
     this->onUpdate(deltaTime);
 
-    SDL_SetRenderDrawColor(this->renderer, this->backgroundColor.x, this->backgroundColor.y, this->backgroundColor.z, this->backgroundColor.w);
+    SDL_SetRenderDrawColor(this->renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
     SDL_RenderClear(renderer);
 
     ImGui_ImplSDLRenderer3_NewFrame();

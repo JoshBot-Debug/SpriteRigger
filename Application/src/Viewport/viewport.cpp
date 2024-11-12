@@ -62,7 +62,7 @@ void Viewport::onDraw(float deltaTime)
 
   SDL_SetRenderTarget(renderer, this->texture);
 
-  SDL_SetRenderDrawColor(renderer, this->backgroundColor.x, this->backgroundColor.y, this->backgroundColor.z, this->backgroundColor.w);
+  SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
   SDL_RenderClear(renderer);
 
   this->onDrawViewport(deltaTime);

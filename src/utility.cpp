@@ -78,11 +78,4 @@ namespace Utility
     return (point.x >= position.x && point.x <= position.x + size.x) &&
            (point.y >= position.y && point.y <= position.y + size.y);
   }
-
-  glm::vec2 lerp(const glm::vec2 &start, const glm::vec2 &end, float t)
-  {
-    return {
-        start.x + t * (end.x - start.x),
-        start.y + t * (end.y - start.y)};
-  }
 }
