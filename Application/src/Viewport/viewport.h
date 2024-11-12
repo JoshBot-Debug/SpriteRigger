@@ -16,13 +16,13 @@ private:
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
 
-  Vec4 backgroundColor = Vec4{0, 0, 0, 255};
+  glm::vec4 backgroundColor = glm::vec4{0, 0, 0, 255};
 
   // Viewport width and height
-  Vec2 size{1080, 720};
+  glm::vec2 size{1080, 720};
 
   // Viewport position
-  Vec2 position{0, 0};
+  glm::vec2 position{0, 0};
 
   /**
    * Frees the texture and any other resources.
@@ -34,7 +34,7 @@ private:
    *
    * @param size This new width and height of the viewport
    */
-  void resize(Vec2 size);
+  void resize(glm::vec2 size);
 
 public:
   Viewport(Application *application);
@@ -72,14 +72,14 @@ public:
    *
    * @param size This new width and height of the viewport
    */
-  void setDimensions(Vec2 size);
+  void setDimensions(glm::vec2 size);
 
   /**
    * Sets the background color of the viewport.
    *
    * @param backgroundColor a Vec4 that sets that backgound color.
    */
-  void setBackgroundColor(Vec4 backgroundColor);
+  void setBackgroundColor(glm::vec4 backgroundColor);
 
   /**
    * Do not override this method, the implimentation is done in the viewport.
@@ -95,10 +95,10 @@ public:
   /**
    * Get the size of the viewport
    */
-  Vec2 getSize();
+  glm::vec2 getSize();
 
   /**
    * Get the position of the viewport
    */
-  Vec2 getPosition();
+  glm::vec2 getPosition();
 };

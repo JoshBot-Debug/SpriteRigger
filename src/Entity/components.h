@@ -3,12 +3,12 @@
 
 struct CTransform
 {
-  Vec2 position;
-  Vec2 rotation;
-  Vec2 scale;
+  glm::vec2 position;
+  glm::vec2 rotation;
+  glm::vec2 scale;
 
-  CTransform() : position(Vec2{0, 0}), rotation(Vec2{0, 0}), scale(Vec2{1, 1}) {}
-  CTransform(Vec2 position, Vec2 rotation, Vec2 scale) : position(position), rotation(rotation), scale(scale) {}
+  CTransform() : position(glm::vec2{0, 0}), rotation(glm::vec2{0, 0}), scale(glm::vec2{1, 1}) {}
+  CTransform(glm::vec2 position, glm::vec2 rotation, glm::vec2 scale) : position(position), rotation(rotation), scale(scale) {}
 };
 
 struct CArmature
@@ -52,14 +52,14 @@ struct CBone
    * @size
    * The dimensions of the bone
    */
-  Vec2 position, size;
+  glm::vec2 position, size;
 
   /**
    * The color of the bone
    */
-  Vec3 color;
+  glm::vec3 color;
 
-  CBone(std::string name, EntityID armature) : armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
-  CBone(std::string name, EntityID armature, EntityID parent) : armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
-  CBone(std::string name, EntityID armature, EntityID parent, Vec2 position) : armature(armature), parent(-1), name(name), position(position), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
+  CBone(std::string name, EntityID armature) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255,255,255}) {}
+  CBone(std::string name, EntityID armature, EntityID parent) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255,255,255}) {}
+  CBone(std::string name, EntityID armature, EntityID parent, glm::vec2 position) : armature(armature), parent(-1), name(name), position(position), size(glm::vec2{20, 100}), color(glm::vec3{255,255,255}) {}
 };

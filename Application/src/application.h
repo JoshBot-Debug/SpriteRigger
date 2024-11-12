@@ -3,6 +3,7 @@
 #include <future>
 #include <cstdint>
 #include <map>
+#include <glm/glm.hpp>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
@@ -17,7 +18,6 @@
 
 #include "NativeFileDialog/dialog.h"
 #include "Input/input.h"
-#include "common.h"
 
 const SDL_WindowFlags APPLICATION_WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 
@@ -37,7 +37,7 @@ protected:
 private:
   bool isRunning = true;
   Theme theme = Theme::LIGHT;                      // Theme of the app.
-  Vec4 backgroundColor = Vec4{255, 255, 255, 255}; // Background color of the window.
+  glm::vec4 backgroundColor = glm::vec4{255, 255, 255, 255}; // Background color of the window.
   std::map<std::string, ImFont *> fonts;
 
 public:
@@ -81,12 +81,12 @@ public:
    *
    * @param size This new width and height of the viewport
    */
-  void setWindowDimensions(Vec2 size);
+  void setWindowDimensions(glm::vec2 size);
 
   /**
    * Returns the window dimensions
    */
-  Vec2 getWindowDimensions();
+  glm::vec2 getWindowDimensions();
 
   /**
    * Set the title of the SDL window.
@@ -101,7 +101,7 @@ public:
    *
    * @param backgroundColor a Vec4 that sets that backgound color.
    */
-  void setBackgroundColor(Vec4 backgroundColor);
+  void setBackgroundColor(glm::vec4 backgroundColor);
 
   /**
    * @brief Sets the application's theme.

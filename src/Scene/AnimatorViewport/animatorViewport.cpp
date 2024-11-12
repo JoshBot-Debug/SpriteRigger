@@ -4,16 +4,16 @@
 
 struct GrabPayload
 {
-  Vec2 offset{0, 0};
+  glm::vec2 offset{0, 0};
   int zIndex = 0;
 
-  GrabPayload(Vec2 offset, int zIndex) : offset(offset), zIndex(zIndex) {}
+  GrabPayload(glm::vec2 offset, int zIndex) : offset(offset), zIndex(zIndex) {}
 };
 
 void AnimatorViewport::onInitialize()
 {
   this->setTitle("Animator");
-  this->setBackgroundColor(Vec4{180, 180, 180, 180});
+  this->setBackgroundColor(glm::vec4{180, 180, 180, 180});
 }
 
 void AnimatorViewport::onInput(SDL_Event *event, float deltaTime) {}
@@ -24,7 +24,8 @@ void AnimatorViewport::onUpdate(float deltaTime)
   Mouse *mouse = this->app->getMouseInput();
 
   if (mouse->state == MouseState::PRESS_LEFT)
-    if (mouse->position.intersects(this->getPosition(), this->getSize()))
+    // if (mouse->position.intersects(this->getPosition(), this->getSize()))
+    if (Utility::intersects(mouse->position, this->getPosition(), this->getSize()))
       mouse->unfocus();
 
   /**
@@ -38,7 +39,7 @@ void AnimatorViewport::onUpdate(float deltaTime)
       auto [transform, bone] = entity->collect<CTransform, CBone>();
 
       if (mouse->state == MouseState::PRESS_LEFT)
-        if ((mouse->position - this->getPosition()).intersects(transform->position, bone->size))
+        if (Utility::intersects((mouse->position - this->getPosition()), transform->position, bone->size))
           mouse->press(entity->getId(), transform->position);
 
       MouseEntityState state = mouse->getMouseEntityState(entity->getId());
@@ -46,7 +47,7 @@ void AnimatorViewport::onUpdate(float deltaTime)
       bone->color.z = state.isFocused ? 0 : 255;
 
       if (state.isDragging)
-        transform->position = Vec2::lerp(transform->position, state.position, deltaTime * 20);
+        transform->position = Utility::lerp(transform->position, state.position, deltaTime * 20);
     }
   }
 }

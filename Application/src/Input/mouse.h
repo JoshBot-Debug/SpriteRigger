@@ -1,7 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include "ECS/entity.h"
-#include "common.h"
 
 enum class MouseState
 {
@@ -14,7 +14,7 @@ enum class MouseState
 
 struct MouseEntityState
 {
-  Vec2 position;
+  glm::vec2 position;
   bool isDragging;
   bool isFocused;
 };
@@ -31,12 +31,12 @@ private:
   /**
    * The position of the entity being dragged at the time the drag started.
    */
-  Vec2 entityPosition{0, 0};
+  glm::vec2 entityPosition{0, 0};
 
   /**
    * The position of the mouse when the drag started, used to calculate movement offset.
    */
-  Vec2 dragStart{0, 0};
+  glm::vec2 dragStart{0, 0};
 
   /**
    * To indicate if the user is dragging
@@ -52,7 +52,7 @@ public:
   /**
    * The current position of the mouse.
    */
-  Vec2 position{0, 0};
+  glm::vec2 position{0, 0};
 
   /**
    * The current state of the mouse (e.g., pressed, released, etc.).
@@ -65,7 +65,7 @@ public:
    * @param entity The ID of the entity being dragged.
    * @param position The initial entity position when the drag started.
    */
-  void press(EntityID entity, Vec2 offset);
+  void press(EntityID entity, glm::vec2 offset);
 
   /**
    * Unfocuses from the specified entity. If left blank, will unfocus from the entity in focus.

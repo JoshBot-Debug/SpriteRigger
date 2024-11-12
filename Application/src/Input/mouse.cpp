@@ -1,7 +1,7 @@
 #include "mouse.h"
 #include <string>
 
-void Mouse::press(EntityID entity, Vec2 position)
+void Mouse::press(EntityID entity, glm::vec2 position)
 {
   this->entity = entity;
   this->entityPosition = position;

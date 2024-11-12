@@ -22,12 +22,12 @@ void Viewport::setWindowFlags(ImGuiWindowFlags flags)
   this->flags = flags;
 }
 
-void Viewport::setDimensions(Vec2 size)
+void Viewport::setDimensions(glm::vec2 size)
 {
   this->size = size;
 }
 
-void Viewport::resize(Vec2 size)
+void Viewport::resize(glm::vec2 size)
 {
   SDL_DestroyTexture(this->texture);
 
@@ -35,7 +35,7 @@ void Viewport::resize(Vec2 size)
   this->texture = SDL_CreateTexture(this->application->getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
 }
 
-void Viewport::setBackgroundColor(Vec4 setBackgroundColor)
+void Viewport::setBackgroundColor(glm::vec4 setBackgroundColor)
 {
   this->backgroundColor = setBackgroundColor;
 }
@@ -53,32 +53,33 @@ void Viewport::onDraw(float deltaTime)
   ImGui::Begin(this->title, nullptr, this->flags);
 
   ImVec2 size = ImGui::GetContentRegionAvail();
-  this->position = ImGui::GetWindowPos();
+  ImVec2 position = ImGui::GetWindowPos();
+  this->position.x = position.x;
+  this->position.y = position.y;
 
-  if (this->size != size)
-    this->resize(size);
+  if (this->size.x != size.x || this->size.y != size.y)
+    this->resize({size.x, size.y});
 
   SDL_SetRenderTarget(renderer, this->texture);
 
-  auto [r, g, b, a] = this->backgroundColor;
-  SDL_SetRenderDrawColor(renderer, r, g, b, a);
+  SDL_SetRenderDrawColor(renderer, this->backgroundColor.x, this->backgroundColor.y, this->backgroundColor.z, this->backgroundColor.w);
   SDL_RenderClear(renderer);
 
   this->onDrawViewport(deltaTime);
 
   SDL_SetRenderTarget(renderer, nullptr);
 
-  ImGui::Image((ImTextureID)this->texture, ImVec2(this->size));
+  ImGui::Image((ImTextureID)this->texture, ImVec2{this->size.x, this->size.y});
   ImGui::End();
   ImGui::PopStyleVar();
 }
 
-Vec2 Viewport::getSize()
+glm::vec2 Viewport::getSize()
 {
   return this->size;
 }
 
-Vec2 Viewport::getPosition()
+glm::vec2 Viewport::getPosition()
 {
   return this->position;
 }

@@ -1,8 +1,6 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-
-#include "common.h"
 #include "mouse.h"
 
 class Input

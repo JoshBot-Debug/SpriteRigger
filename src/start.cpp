@@ -17,9 +17,9 @@ void Start::onDraw(float deltaTime)
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
   ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(50, 50, 50, 255));
 
-  ImVec2 windowSize = this->getWindowDimensions();
+  glm::vec2 windowSize = this->getWindowDimensions();
 
-  ImGui::SetNextWindowSize(windowSize);
+  ImGui::SetNextWindowSize(ImVec2{windowSize.x, windowSize.y});
   ImGui::SetNextWindowPos(ImVec2{0, 0});
   ImGui::Begin("New Project", nullptr, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings);
 

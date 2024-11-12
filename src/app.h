@@ -1,6 +1,7 @@
 #pragma once
 
 #include "application.h"
+#include "utility.h"
 
 class Project;
 class HeaderPanelScene;

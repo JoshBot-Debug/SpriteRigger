@@ -59,17 +59,17 @@ void Application::setVSync(int vsync)
     throw std::runtime_error(SDL_GetError());
 }
 
-void Application::setWindowDimensions(Vec2 size)
+void Application::setWindowDimensions(glm::vec2 size)
 {
   if (!SDL_SetWindowSize(this->window, size.x, size.y))
     throw std::runtime_error(SDL_GetError());
 }
 
-Vec2 Application::getWindowDimensions()
+glm::vec2 Application::getWindowDimensions()
 {
   int gWindowWidth, gWindowHeight;
   SDL_GetWindowSize(this->window, &gWindowWidth, &gWindowHeight);
-  return Vec2{(float)gWindowWidth, (float)gWindowHeight};
+  return glm::vec2{(float)gWindowWidth, (float)gWindowHeight};
 }
 
 void Application::setWindowTitle(const char *title)
@@ -78,7 +78,7 @@ void Application::setWindowTitle(const char *title)
     throw std::runtime_error(SDL_GetError());
 }
 
-void Application::setBackgroundColor(Vec4 backgroundColor)
+void Application::setBackgroundColor(glm::vec4 backgroundColor)
 {
   this->backgroundColor = backgroundColor;
 }
@@ -158,8 +158,7 @@ void Application::open()
 
     this->onUpdate(deltaTime);
 
-    auto [r, g, b, a] = this->backgroundColor;
-    SDL_SetRenderDrawColor(this->renderer, r, g, b, a);
+    SDL_SetRenderDrawColor(this->renderer, this->backgroundColor.x, this->backgroundColor.y, this->backgroundColor.z, this->backgroundColor.w);
     SDL_RenderClear(renderer);
 
     ImGui_ImplSDLRenderer3_NewFrame();
