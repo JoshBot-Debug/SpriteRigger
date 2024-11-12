@@ -1,25 +1,21 @@
 #include "mouse.h"
+#include <string>
 
-const std::tuple<EntityID, Vec2> DRAG_NONE = {-1, Vec2{-1, -1}};
-
-void Mouse::resetDrag()
+void Mouse::press(EntityID entity, Vec2 position)
 {
-  this->dragEntity = -1;
-  this->dragEntityZIndex = -1;
-  this->dragEntityPosition = Vec2{-1, -1};
-  this->dragStart = Vec2{-1, -1};
+  this->entity = entity;
+  this->entityPosition = position;
+  this->dragStart = this->position;
+  this->isFocused = true;
+  this->isDragging = true;
 }
 
-void Mouse::press(EntityID entity, Vec2 position, int zIndex)
+void Mouse::unfocus(EntityID entity)
 {
-  if (this->dragEntity != -1)
-    if (this->dragEntityZIndex < zIndex)
-      return;
-
-  this->dragEntityZIndex = zIndex;
-  this->dragEntityZIndex = entity;
-  this->dragEntityPosition = position;
-  this->dragStart = this->position;
+  if (entity == -1)
+    this->isFocused = false;
+  if (entity == this->entity)
+    this->isFocused = false;
 }
 
 void Mouse::setState(MouseState state)
@@ -28,24 +24,19 @@ void Mouse::setState(MouseState state)
 
   switch (state)
   {
-  case MouseState::PRESS_RIGHT:
-    this->resetDrag();
-    break;
-  case MouseState::PRESS_MIDDLE:
-    this->resetDrag();
-    break;
-  case MouseState::RELEASED:
-    this->resetDrag();
+  case MouseState::MOVING:
     break;
   default:
+    this->isDragging = false;
     break;
   }
 }
 
-std::tuple<EntityID, Vec2> Mouse::drag()
+MouseEntityState Mouse::getMouseEntityState(EntityID entity)
 {
-  if (this->state != MouseState::MOVING)
-    return DRAG_NONE;
-
-  return std::tuple<EntityID, Vec2>({this->dragEntity, this->dragEntityPosition + this->position - this->dragStart});
+  MouseEntityState state;
+  state.position = this->entityPosition + this->position - this->dragStart;
+  state.isDragging = this->entity == entity && this->isDragging;
+  state.isFocused = this->entity == entity && this->isFocused;
+  return state;
 }

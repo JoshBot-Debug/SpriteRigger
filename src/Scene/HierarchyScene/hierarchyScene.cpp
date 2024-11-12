@@ -9,6 +9,8 @@ void HierarchyScene::onUpdate(float deltaTime) {}
 
 void HierarchyScene::onDraw(float deltaTime)
 {
+  Registry *registry = this->app->getRegistry();
+
   ImGuiWindowClass winClass;
   winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
   ImGui::SetNextWindowClass(&winClass);
@@ -19,10 +21,23 @@ void HierarchyScene::onDraw(float deltaTime)
   {
     if (ImGui::MenuItem("Create armature"))
     {
-      this->armatureManager.createArmature();
+      this->armatureController.createArmature();
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
+  }
+
+  for (auto armature : registry->get<CArmature>())
+  {
+    if (ImGui::TreeNode(armature->name.c_str()))
+    {
+      for (auto entityID : armature->bones)
+      {
+        CBone *bone = registry->get<CBone>(entityID);
+        ImGui::Text("%s", bone->name.c_str());
+      }
+      ImGui::TreePop();
+    }
   }
 
   ImGui::End();

@@ -73,10 +73,12 @@ void Viewport::onDraw(float deltaTime)
   ImGui::PopStyleVar();
 }
 
-Vec2 Viewport::getMousePosition(Vec2 position)
+Vec2 Viewport::getSize()
 {
-  return Vec2{
-      std::clamp(position.x - this->position.x, 0.0f, this->size.x),
-      std::clamp(position.y - this->position.y, 0.0f, this->size.y),
-  };
+  return this->size;
+}
+
+Vec2 Viewport::getPosition()
+{
+  return this->position;
 }

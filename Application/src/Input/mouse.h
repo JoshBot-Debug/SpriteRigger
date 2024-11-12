@@ -12,6 +12,13 @@ enum class MouseState
   MOVING,
 };
 
+struct MouseEntityState
+{
+  Vec2 position;
+  bool isDragging;
+  bool isFocused;
+};
+
 class Mouse
 {
 private:
@@ -19,36 +26,33 @@ private:
    * The ID of the entity currently being dragged.
    * A value of -1 indicates no entity is being dragged.
    */
-  EntityID dragEntity = -1;
+  EntityID entity = -1;
 
   /**
    * The position of the entity being dragged at the time the drag started.
    */
-  Vec2 dragEntityPosition{-1, -1};
-
-  /**
-   * The z-index of the entity being dragged.
-   * A value of -1 indicates no z-index has been set.
-   */
-  int dragEntityZIndex = -1;
+  Vec2 entityPosition{0, 0};
 
   /**
    * The position of the mouse when the drag started, used to calculate movement offset.
    */
-  Vec2 dragStart{-1, -1};
+  Vec2 dragStart{0, 0};
 
   /**
-   * Resets the drag state, clearing any dragged entity and resetting
-   * the drag-related attributes to their default values.
+   * To indicate if the user is dragging
    */
-  void resetDrag();
+  bool isDragging = false;
+
+  /**
+   * To indicate if the entity is focused
+   */
+  bool isFocused = false;
 
 public:
   /**
    * The current position of the mouse.
-   * Initialized to {-1, -1} to indicate no valid position.
    */
-  Vec2 position{-1, -1};
+  Vec2 position{0, 0};
 
   /**
    * The current state of the mouse (e.g., pressed, released, etc.).
@@ -56,18 +60,17 @@ public:
   MouseState state = MouseState::RELEASED;
 
   /**
-   * Starts a drag operation for a specified entity.
+   * Focuses on the specified entity.
    *
    * @param entity The ID of the entity being dragged.
    * @param position The initial entity position when the drag started.
-   * @param zIndex Optional z-index to control the stacking order of the dragged entity.
    */
-  void press(EntityID entity, Vec2 offset, int zIndex = -1);
+  void press(EntityID entity, Vec2 offset);
 
   /**
-   * @return A tuple containing the dragged entity ID and the current drag offset.
+   * Unfocuses from the specified entity. If left blank, will unfocus from the entity in focus.
    */
-  std::tuple<EntityID, Vec2> drag();
+  void unfocus(EntityID entity = -1);
 
   /**
    * Sets the current state of the mouse (pressed, released, etc.).
@@ -75,4 +78,9 @@ public:
    * @param state The desired mouse state.
    */
   void setState(MouseState state);
+
+  /**
+   * Gets the entity's mouse state.
+   */
+  MouseEntityState getMouseEntityState(EntityID entity);
 };

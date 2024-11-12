@@ -14,30 +14,20 @@ struct CTransform
 struct CArmature
 {
   /**
-   * The zIndex of the armature, used to determine what armature to select when trying to grab.
-   */
-  int zIndex;
-
-  /**
    * Display name of the armature.
    */
-  const char *name;
+  std::string name;
 
   /**
    * All the bones that belong to this armature.
    */
   std::vector<EntityID> bones;
 
-  CArmature(const char *name) : zIndex(1), name(name) {}
+  CArmature(std::string name) : name(name) {}
 };
 
 struct CBone
 {
-  /**
-   * The zIndex of the bone, used to determine what bone to select when trying to grab.
-   */
-  int zIndex;
-
   /**
    * If the bone is focused
    */
@@ -52,7 +42,7 @@ struct CBone
   /**
    * Display name of the bone.
    */
-  const char *name;
+  std::string name;
 
   /**
    * @position
@@ -69,7 +59,7 @@ struct CBone
    */
   Vec3 color;
 
-  CBone(const char *name, EntityID armature) : zIndex(1), armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
-  CBone(const char *name, EntityID armature, EntityID parent) : zIndex(1), armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
-  CBone(const char *name, EntityID armature, EntityID parent, Vec2 position) : zIndex(1), armature(armature), parent(-1), name(name), position(position), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
+  CBone(std::string name, EntityID armature) : armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
+  CBone(std::string name, EntityID armature, EntityID parent) : armature(armature), parent(-1), name(name), position(Vec2{0, 0}), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
+  CBone(std::string name, EntityID armature, EntityID parent, Vec2 position) : armature(armature), parent(-1), name(name), position(position), size(Vec2{20, 100}), color(Vec3{255,255,255}) {}
 };

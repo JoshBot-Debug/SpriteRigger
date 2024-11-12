@@ -82,14 +82,6 @@ public:
   void setBackgroundColor(Vec4 backgroundColor);
 
   /**
-   * Takes in the global mouse position and returns its position relative to this viewport.
-   *
-   * @param gPosition The global mouse position.
-   * @return The position of the mouse relative to the viewport.
-   */
-  Vec2 getMousePosition(Vec2 position);
-
-  /**
    * Do not override this method, the implimentation is done in the viewport.
    * Instead use onDrawViewport()
    */
@@ -99,4 +91,14 @@ public:
    * Use this in place of onDraw();
    */
   virtual void onDrawViewport(float deltaTime) = 0;
+
+  /**
+   * Get the size of the viewport
+   */
+  Vec2 getSize();
+
+  /**
+   * Get the position of the viewport
+   */
+  Vec2 getPosition();
 };
