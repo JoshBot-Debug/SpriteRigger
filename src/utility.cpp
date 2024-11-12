@@ -81,7 +81,7 @@ namespace Utility
 
   glm::vec2 lerp(const glm::vec2 &start, const glm::vec2 &end, float t)
   {
-    return glm::vec2{
+    return {
         start.x + t * (end.x - start.x),
         start.y + t * (end.y - start.y)};
   }

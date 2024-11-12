@@ -69,7 +69,7 @@ glm::vec2 Application::getWindowDimensions()
 {
   int gWindowWidth, gWindowHeight;
   SDL_GetWindowSize(this->window, &gWindowWidth, &gWindowHeight);
-  return glm::vec2{(float)gWindowWidth, (float)gWindowHeight};
+  return {(float)gWindowWidth, (float)gWindowHeight};
 }
 
 void Application::setWindowTitle(const char *title)
