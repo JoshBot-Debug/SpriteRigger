@@ -13,7 +13,7 @@ struct GrabPayload
 void AnimatorViewport::onInitialize()
 {
   this->setTitle("Animator");
-  this->setBackgroundColor(glm::vec4{180, 180, 180, 180});
+  this->setBackgroundColor(glm::vec4{0.7f, 0.7f, 0.7f, 1.0f});
 }
 
 void AnimatorViewport::onInput(SDL_Event *event, float deltaTime) {}
@@ -24,7 +24,6 @@ void AnimatorViewport::onUpdate(float deltaTime)
   Mouse *mouse = this->app->getMouseInput();
 
   if (mouse->state == MouseState::PRESS_LEFT)
-    // if (mouse->position.intersects(this->getPosition(), this->getSize()))
     if (Utility::intersects(mouse->position, this->getPosition(), this->getSize()))
       mouse->unfocus();
 
@@ -61,9 +60,7 @@ void AnimatorViewport::onDrawViewport(float deltaTime)
     if (entity->is("Bone"))
     {
       auto [transform, bone] = entity->collect<CTransform, CBone>();
-      SDL_FRect rect = {transform->position.x, transform->position.y, bone->size.x, bone->size.y};
-      SDL_SetRenderDrawColor(this->app->getRenderer(), bone->color.r, bone->color.g, bone->color.b, SDL_ALPHA_OPAQUE);
-      SDL_RenderFillRect(this->app->getRenderer(), &rect);
+      // Draw the bone with OpenGL
     }
   }
 }

@@ -14,7 +14,7 @@ class Start : public Application
 {
 private:
   Project *project;
-  SDL_Texture *banner;
+  GLuint banner;
   std::vector<std::string> *recentProjects;
 
 public:

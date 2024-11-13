@@ -3,14 +3,11 @@
 
 Viewport::Viewport(Application *application)
 {
-  this->texture = SDL_CreateTexture(application->getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
   this->application = application;
+  this->createFrameBuffer();
 }
 
-Viewport::~Viewport()
-{
-  this->free();
-}
+Viewport::~Viewport() {}
 
 void Viewport::setTitle(const char *title)
 {
@@ -29,10 +26,33 @@ void Viewport::setDimensions(glm::vec2 size)
 
 void Viewport::resize(glm::vec2 size)
 {
-  SDL_DestroyTexture(this->texture);
-
   this->setDimensions(size);
-  this->texture = SDL_CreateTexture(this->application->getRenderer(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
+
+  // TODO Mostly need to resize the texture here.
+  // glBindTexture(GL_TEXTURE_2D, this->texture);
+  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+}
+
+void Viewport::createFrameBuffer()
+{
+  // Create & bind the frame buffer
+  glGenFramebuffers(1, &this->framebuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
+
+  // Create a texture to render to & bind it
+  glGenTextures(1, &this->texture);
+  glBindTexture(GL_TEXTURE_2D, this->texture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->size.x, this->size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  // Attach the texture to the framebuffer
+  // The texture will now serve as the output for any rendering done to this framebuffer 
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->texture, 0);
+
+  // Unbind texture & framebuffer
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Viewport::setBackgroundColor(glm::vec4 setBackgroundColor)
@@ -40,15 +60,8 @@ void Viewport::setBackgroundColor(glm::vec4 setBackgroundColor)
   this->backgroundColor = setBackgroundColor;
 }
 
-void Viewport::free()
-{
-  SDL_DestroyTexture(this->texture);
-}
-
 void Viewport::onDraw(float deltaTime)
 {
-  SDL_Renderer *renderer = this->application->getRenderer();
-
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
   ImGui::Begin(this->title, nullptr, this->flags);
 
@@ -60,16 +73,18 @@ void Viewport::onDraw(float deltaTime)
   if (this->size.x != size.x || this->size.y != size.y)
     this->resize({size.x, size.y});
 
-  SDL_SetRenderTarget(renderer, this->texture);
+  glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
 
-  SDL_SetRenderDrawColor(renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
-  SDL_RenderClear(renderer);
+  glViewport(position.x, position.y, size.x, size.y);
+  glClearColor(this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   this->onDrawViewport(deltaTime);
 
-  SDL_SetRenderTarget(renderer, nullptr);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  ImGui::Image((ImTextureID)this->texture, ImVec2{this->size.x, this->size.y});
+  ImGui::Image((ImTextureID)this->texture, ImVec2(this->size.x, this->size.y));
+
   ImGui::End();
   ImGui::PopStyleVar();
 }

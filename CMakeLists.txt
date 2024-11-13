@@ -4,6 +4,7 @@ project(SpriteRigger)
 # Find SDL3 package
 find_package(SDL3 REQUIRED)
 find_package(SDL3_image REQUIRED)
+find_package(OpenGL REQUIRED)
 
 # Collect all source files (.cpp files)
 file(GLOB_RECURSE SOURCES_FILES
@@ -27,17 +28,20 @@ target_include_directories(SpriteRigger PRIVATE
   ${CMAKE_SOURCE_DIR}/Application/include/nfd
 )
 
+# Avoid shared libs, use static linking instead
 # Collect all bin files (.o files)
-file(GLOB_RECURSE SHARED_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.o)
-target_sources(SpriteRigger PRIVATE ${SHARED_LIB})
+# file(GLOB_RECURSE SHARED_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.o)
+# target_sources(SpriteRigger PRIVATE ${SHARED_LIB})
 
 # Collect all bin files (.a files)
 file(GLOB_RECURSE STATIC_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.a)
 
 # Link libraries
 target_link_libraries(SpriteRigger PRIVATE
-  SDL3::SDL3
-  SDL3_image::SDL3_image
+  SDL3
+  SDL3_image
+  OpenGL
+  GLEW
   ${STATIC_LIB}
 
   # Libs for nfd

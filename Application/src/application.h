@@ -4,13 +4,15 @@
 #include <cstdint>
 #include <map>
 #include <glm/glm.hpp>
+#include <GL/glew.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
+#include <SDL3/SDL_opengl.h>
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
-#include "imgui_impl_sdlrenderer3.h"
+#include "imgui_impl_opengl3.h"
 
 #include "ECS/registry.h"
 #include "ECS/entity.h"
@@ -19,7 +21,7 @@
 #include "NativeFileDialog/dialog.h"
 #include "Input/input.h"
 
-const SDL_WindowFlags APPLICATION_WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
+const SDL_WindowFlags APPLICATION_WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 
 enum class Theme
 {
@@ -30,14 +32,14 @@ enum class Theme
 class Application
 {
 protected:
-  SDL_Window *window = nullptr;     // Pointer to the SDL window.
-  SDL_Renderer *renderer = nullptr; // Pointer to the SDL renderer used for drawing.
   Registry registry;
+  SDL_Window *window = nullptr;
+  SDL_GLContext glContext;
 
 private:
   bool isRunning = true;
-  Theme theme = Theme::LIGHT;                      // Theme of the app.
-  glm::vec4 backgroundColor = glm::vec4{255, 255, 255, 255}; // Background color of the window.
+  Theme theme = Theme::LIGHT;
+  glm::vec4 backgroundColor = glm::vec4{255, 255, 255, 255};
   std::map<std::string, ImFont *> fonts;
 
 public:
@@ -52,11 +54,6 @@ public:
   SDL_Window *getWindow()
   {
     return this->window;
-  };
-
-  SDL_Renderer *getRenderer()
-  {
-    return this->renderer;
   };
 
   Registry *getRegistry()

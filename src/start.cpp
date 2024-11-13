@@ -8,7 +8,20 @@ Start::Start(Project *project) : Application(APPLICATION_WINDOW_FLAGS | SDL_WIND
 
   SDL_IOStream *stream = SDL_IOFromConstMem(BANNER_IMAGE_BUFFER, BANNER_IMAGE_BUFFER_SIZE);
   SDL_Surface *surface = IMG_Load_IO(stream, true);
-  this->banner = SDL_CreateTextureFromSurface(this->renderer, surface);
+
+  glGenTextures(1, &this->banner);
+  glBindTexture(GL_TEXTURE_2D, this->banner);
+
+  // Flip the image if it was loaded upside down (SDL convention)
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+
+  // Set texture parameters (e.g., filtering and wrapping)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  SDL_DestroySurface(surface);
 };
 
 void Start::onDraw(float deltaTime)

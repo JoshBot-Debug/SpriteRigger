@@ -10,13 +10,15 @@ class Viewport : public Scene
 private:
   Application *application;
 
-  SDL_Texture *texture = nullptr;
+  unsigned int texture;
+  unsigned int framebuffer;
 
   const char *title = "Viewport";
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
 
-  glm::vec4 backgroundColor = glm::vec4{0, 0, 0, 255};
+  // Viewport clear color
+  glm::vec4 backgroundColor = glm::vec4{0, 0, 0, 1.0f};
 
   // Viewport width and height
   glm::vec2 size{1080, 720};
@@ -25,16 +27,16 @@ private:
   glm::vec2 position{0, 0};
 
   /**
-   * Frees the texture and any other resources.
-   */
-  void free();
-
-  /**
    * Resizes the viewport and updates the texture accordingly.
    *
    * @param size This new width and height of the viewport
    */
   void resize(glm::vec2 size);
+
+  /**
+   * Create the framebuffer and the texture to render to.
+   */
+  void createFrameBuffer();
 
 public:
   Viewport(Application *application);

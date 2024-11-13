@@ -9,13 +9,25 @@ Application::Application(SDL_WindowFlags flags)
   if (NFD_Init() != NFD_OKAY)
     throw std::runtime_error(NFD_GetError());
 
+  const char *glslVersion = "#version 130";
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
   this->window = SDL_CreateWindow("Application", 1080, 720, flags);
   if (this->window == NULL)
     throw std::runtime_error(SDL_GetError());
 
-  this->renderer = SDL_CreateRenderer(this->window, nullptr);
-  if (this->renderer == NULL)
-    throw std::runtime_error(SDL_GetError());
+  this->glContext = SDL_GL_CreateContext(window);
+  SDL_GL_MakeCurrent(window, this->glContext);
+
+  if (glewInit() != GLEW_OK)
+    throw std::runtime_error("Failed to initialize GLEW!");
 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
@@ -25,21 +37,20 @@ Application::Application(SDL_WindowFlags flags)
 
   ImGui::StyleColorsLight();
 
-  ImGui_ImplSDL3_InitForSDLRenderer(this->window, this->renderer);
-  ImGui_ImplSDLRenderer3_Init(this->renderer);
+  ImGui_ImplSDL3_InitForOpenGL(window, this->glContext);
+  ImGui_ImplOpenGL3_Init(glslVersion);
 }
 
 Application::~Application()
 {
-  ImGui_ImplSDLRenderer3_Shutdown();
+  ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplSDL3_Shutdown();
   ImGui::DestroyContext();
 
-  NFD_Quit();
-  SDL_DestroyRenderer(this->renderer);
+  SDL_GL_DestroyContext(this->glContext);
   SDL_DestroyWindow(this->window);
-  SDL_QuitSubSystem(APPLICATION_WINDOW_FLAGS);
   SDL_Quit();
+  NFD_Quit();
 }
 
 void Application::quit()
@@ -54,7 +65,7 @@ bool Application::isWindowClosing(SDL_Event *event)
 
 void Application::setVSync(int vsync)
 {
-  if (!SDL_SetRenderVSync(renderer, vsync))
+  if (!SDL_GL_SetSwapInterval(vsync))
     throw std::runtime_error(SDL_GetError());
 }
 
@@ -157,10 +168,11 @@ void Application::open()
 
     this->onUpdate(deltaTime);
 
-    SDL_SetRenderDrawColor(this->renderer, this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
-    SDL_RenderClear(renderer);
+    glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+    glClearColor(this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    ImGui_ImplSDLRenderer3_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
@@ -170,14 +182,14 @@ void Application::open()
 
     ImGui::Render();
 
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
-    SDL_RenderPresent(renderer);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    SDL_GL_SwapWindow(window);
 
     if (hidden)
     {
+      hidden = false;
       SDL_ShowWindow(this->window);
       SDL_SetWindowPosition(this->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-      hidden = false;
     }
   }
 
