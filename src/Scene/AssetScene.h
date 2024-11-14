@@ -4,17 +4,17 @@
 #include "App.h"
 #include "Scene/Scene.h"
 #include "Component/Component.h"
-#include "Assets/Assets.h"
+#include "Asset/Asset.h"
 
-class AssetsScene : public Scene
+class AssetScene : public Scene
 {
 private:
   App *app;
-  Assets assets;
+  Asset asset;
   
 public:
-  AssetsScene(App *app) : app(app) {}
-  ~AssetsScene() {}
+  AssetScene(App *app) : app(app) {}
+  ~AssetScene() {}
 
   void onInitialize() override;
   void onInput(SDL_Event *event, float deltaTime) override;

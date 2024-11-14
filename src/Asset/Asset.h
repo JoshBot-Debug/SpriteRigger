@@ -4,12 +4,12 @@
 #include <vector>
 #include <string>
 
-class Assets
+class Asset
 {
 private:
 public:
-  Assets() = default;
-  ~Assets() = default;
+  Asset() = default;
+  ~Asset() = default;
 
   void importAssets(std::vector<std::string> paths);
 };

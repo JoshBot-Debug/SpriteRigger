@@ -7,7 +7,7 @@ class Project;
 class HeaderPanelScene;
 class AnimatorViewport;
 class HierarchyScene;
-class AssetsScene;
+class AssetScene;
 
 class App : public Application
 {
@@ -18,10 +18,9 @@ private:
   HeaderPanelScene *headerPanelScene;
   AnimatorViewport *animatorViewport;
   HierarchyScene *hierarchyScene;
-  AssetsScene *assetsScene;
+  AssetScene *assetScene;
 
 public:
-
   App(Project *project);
   ~App();
 

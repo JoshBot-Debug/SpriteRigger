@@ -8,7 +8,7 @@
 
 #include "Project/Project.h"
 #include "Component/Component.h"
-#include "Scene/AssetsScene.h"
+#include "Scene/AssetScene.h"
 #include "Scene/HierarchyScene.h"
 #include "Scene/HeaderPanelScene.h"
 #include "Scene/AnimatorViewport.h"
@@ -18,7 +18,7 @@ App::App(Project *project) : project(project)
   this->addProjectToRecentFiles(5);
   this->project->setApplication(this);
 
-  this->assetsScene = new AssetsScene(this);
+  this->assetScene = new AssetScene(this);
   this->hierarchyScene = new HierarchyScene(this);
   this->headerPanelScene = new HeaderPanelScene(this);
   this->animatorViewport = new AnimatorViewport(this);
@@ -26,7 +26,7 @@ App::App(Project *project) : project(project)
 
 App::~App()
 {
-  delete this->assetsScene;
+  delete this->assetScene;
   delete this->hierarchyScene;
   delete this->animatorViewport;
   delete this->headerPanelScene;
@@ -34,7 +34,7 @@ App::~App()
 
 void App::onInitialize()
 {
-  this->assetsScene->onInitialize();
+  this->assetScene->onInitialize();
   this->hierarchyScene->onInitialize();
   this->headerPanelScene->onInitialize();
   this->animatorViewport->onInitialize();
@@ -46,7 +46,7 @@ void App::onInput(SDL_Event *event, float deltaTime)
     this->getProject()->quit();
 
   this->input.onEvent(event);
-  this->assetsScene->onInput(event, deltaTime);
+  this->assetScene->onInput(event, deltaTime);
   this->hierarchyScene->onInput(event, deltaTime);
   this->headerPanelScene->onInput(event, deltaTime);
   this->animatorViewport->onInput(event, deltaTime);
@@ -54,7 +54,7 @@ void App::onInput(SDL_Event *event, float deltaTime)
 
 void App::onUpdate(float deltaTime)
 {
-  this->assetsScene->onUpdate(deltaTime);
+  this->assetScene->onUpdate(deltaTime);
   this->hierarchyScene->onUpdate(deltaTime);
   this->headerPanelScene->onUpdate(deltaTime);
   this->animatorViewport->onUpdate(deltaTime);
@@ -62,7 +62,7 @@ void App::onUpdate(float deltaTime)
 
 void App::onDraw(float deltaTime)
 {
-  this->assetsScene->onDraw(deltaTime);
+  this->assetScene->onDraw(deltaTime);
   this->hierarchyScene->onDraw(deltaTime);
   this->headerPanelScene->onDraw(deltaTime);
 
@@ -74,7 +74,7 @@ void App::onDraw(float deltaTime)
 
 void App::onCleanUp()
 {
-  this->assetsScene->onCleanUp();
+  this->assetScene->onCleanUp();
   this->hierarchyScene->onCleanUp();
   this->headerPanelScene->onCleanUp();
   this->animatorViewport->onCleanUp();
