@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Viewport/viewport.h"
-#include "ECS/registry.h"
-#include "Input/mouse.h"
+#include "Viewport/Viewport.h"
+#include "ECS/Registry.h"
+#include "Input/Mouse.h"
 
 class ColorSystem
 { 

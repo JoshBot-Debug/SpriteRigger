@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 #include "RenderSystem.h"
 
-#include "Component/components.h"
+#include "Component/Component.h"
 
 const float rectangle[] = {
     -0.5f, -0.5f, 1.0f, 1.0f, 1.0f,
@@ -43,13 +43,13 @@ RenderSystem::RenderSystem()
   glBindVertexArray(0);
 }
 
-std::string RenderSystem::parseShader(const char *filepath)
-{
-}
+// std::string RenderSystem::parseShader(const char *filepath)
+// {
+// }
 
-unsigned int RenderSystem::createShader(std::string shader)
-{
-}
+// unsigned int RenderSystem::createShader(std::string shader)
+// {
+// }
 
 void RenderSystem::draw(float deltaTime, Registry *registry)
 {
@@ -59,9 +59,20 @@ void RenderSystem::draw(float deltaTime, Registry *registry)
     {
       const auto [bone, transform] = entity->collect<CBone, CTransform>();
 
-      glBindVertexArray(this->vao);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (const void *)0);
-      glBindVertexArray(0);
+      // glBindVertexArray(this->vao);
+      // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (const void *)0);
+      // glBindVertexArray(0);
     }
   }
 }
+
+// onInstance
+// Create a buffer for each instance
+// unsigned int instanceVBO;
+// glGenBuffers(1, &instanceVBO);
+// glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+// glBufferData(GL_ARRAY_BUFFER, sizeof(rectangle), &rectangle, GL_STATIC_DRAW);
+// setup shader locations
+// glVertexAttribPointer(1 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * sizeof(glm::vec4)));
+// glEnableVertexAttribArray(1 + i);
+// glVertexAttribDivisor(1 + i, 1); // Tell OpenGL to advance to the next instance

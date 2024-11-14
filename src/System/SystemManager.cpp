@@ -1,5 +1,5 @@
 #include "SystemManager.h"
-#include "utility.h"
+#include "Utility.h"
 
 SystemManager::SystemManager()
 {

@@ -1,17 +1,17 @@
 #pragma once
 
 #include <string>
-#include "ECS/registry.h"
-#include "ECS/entity.h"
+#include "ECS/Registry.h"
+#include "ECS/Entity.h"
 
 class RenderSystem
 {
 private:
   unsigned int vao;
   
-  std::string parseShader(const char *filepath);
+  // std::string parseShader(const char *filepath);
 
-  unsigned int createShader(std::string shader);
+  // unsigned int createShader(std::string shader);
 
 public:
   RenderSystem();

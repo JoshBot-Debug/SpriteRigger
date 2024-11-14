@@ -1,6 +1,6 @@
 #include "TransformSystem.h"
-#include "utility.h"
-#include "Component/components.h"
+#include "Utility.h"
+#include "Component/Component.h"
 
 void TransformSystem::update(float deltaTime, Viewport *viewport, Registry *registry, Mouse *mouse)
 {
