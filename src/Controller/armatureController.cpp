@@ -1,5 +1,5 @@
 #include "armatureController.h"
-#include "Entity/components.h"
+#include "Component/components.h"
 
 ArmatureController::ArmatureController(Registry *registry) : registry(registry) {}
 

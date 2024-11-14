@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "app.h"
 #include "Scene/scene.h"
-#include "Entity/components.h"
+#include "Component/components.h"
 #include "Assets/assets.h"
 
 class AssetsScene : public Scene

@@ -4,21 +4,22 @@
 
 #include "app.h"
 #include "Viewport/viewport.h"
-#include "Entity/components.h"
+#include "Component/components.h"
+
+class SystemManager;
 
 class AnimatorViewport : public Viewport
 {
 private:
   FPS fps;
   App *app;
+  SystemManager *system;
 
 public:
-  AnimatorViewport(App *app) : Viewport(app), app(app) {}
-  ~AnimatorViewport() {}
+  AnimatorViewport(App *app);
+  ~AnimatorViewport();
 
   void onInitialize() override;
-  void onInput(SDL_Event *event, float deltaTime) override;
   void onUpdate(float deltaTime) override;
   void onDrawViewport(float deltaTime) override;
-  void onCleanUp() override;
 };

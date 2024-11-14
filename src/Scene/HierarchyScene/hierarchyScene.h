@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "app.h"
 #include "Scene/scene.h"
-#include "Entity/components.h"
+#include "Component/components.h"
 #include "Controller/armatureController.h"
 
 class HierarchyScene : public Scene

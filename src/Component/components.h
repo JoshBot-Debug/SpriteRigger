@@ -50,7 +50,11 @@ struct CBone
    * Used to return the bone to it's original position after animation.
    *
    * @size
-   * The dimensions of the bone
+   * The size of the bone, this is basically the collision box.
+   * The mesh may not intersect with the mouse but if the mouse is in
+   * the collision box, we know we are making contact.
+   * Checking the verticies to calculate if we are colliding is not possible since
+   * the data is stored in a buffer on the GPU. We do not want to store that data on the cpu.
    */
   glm::vec2 position, size;
 
@@ -59,7 +63,7 @@ struct CBone
    */
   glm::vec3 color;
 
-  CBone(std::string name, EntityID armature) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255,255,255}) {}
-  CBone(std::string name, EntityID armature, EntityID parent) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255,255,255}) {}
-  CBone(std::string name, EntityID armature, EntityID parent, glm::vec2 position) : armature(armature), parent(-1), name(name), position(position), size(glm::vec2{20, 100}), color(glm::vec3{255,255,255}) {}
+  CBone(std::string name, EntityID armature) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
+  CBone(std::string name, EntityID armature, EntityID parent) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
+  CBone(std::string name, EntityID armature, EntityID parent, glm::vec2 position) : armature(armature), parent(-1), name(name), position(position), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
 };

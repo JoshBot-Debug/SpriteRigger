@@ -97,3 +97,114 @@
 - **Beta Testing**: Conduct a beta testing phase with a larger user group.
 - **Polishing**: Fix any final bugs and polish the user experience.
 - **Launch**: Prepare for a public release, including marketing and distribution.
+
+
+// Define position and color for each vertex
+glm::vec2 position(0.0f, 0.0f);  // Bottom-left corner at (0, 0)
+glm::vec3 color(1.0f, 0.0f, 0.0f); // Red color
+
+float width = 1.0f;  // Width of the rectangle
+float height = 1.0f; // Height of the rectangle
+
+// Define the rectangle vertices (positions and colors)
+unsigned int vertices[] = {
+    // Positions               // Colors
+    position.x,               position.y,              color.r, color.g, color.b, // Bottom-left corner
+    position.x + width,       position.y,              color.r, color.g, color.b, // Bottom-right corner
+    position.x + width,       position.y + height,     color.r, color.g, color.b, // Top-right corner
+    position.x,               position.y + height,     color.r, color.g, color.b  // Top-left corner
+};
+
+unsigned int indices[] = {
+    0, 1, 2,  // First triangle (bottom-left, bottom-right, top-right)
+    0, 2, 3   // Second triangle (bottom-left, top-right, top-left)
+};
+
+
+
+unsigned int VAO, VBO, EBO;
+
+// Generate and bind the VAO
+glGenVertexArrays(1, &VAO);
+glBindVertexArray(VAO);
+// The VAO is now bound and it is recording
+
+// Generate and bind the VBO
+glGenBuffers(1, &VBO);
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+// Generate and bind the EBO (Element Buffer Object)
+glGenBuffers(1, &EBO);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+// Define the position attribute (location 0) in our shader
+(shader location, count, type, isNormalized, size, position)
+glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
+glEnableVertexAttribArray(0);
+
+// Define the color attribute (location 1)
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+glEnableVertexAttribArray(1);
+
+// Unbind the VAO
+// This will automaticall unbind the VBO & EBO, since it was recorded
+// Using a VAO means you only need to bind the VAO before drawing, it will bind all the VBO's and EBO's that was recorded
+// That's why they say it holds state.
+glBindVertexArray(0);
+
+
+// RENDER TIME
+// Bind the VAO (this automatically binds the VBO and EBO)
+glBindVertexArray(VAO);
+
+// Draw the rectangle using the EBO by calling glDrawElements (Hence it draws the EBO that's currently bound)
+glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+// Unbind the VAO
+glBindVertexArray(0);
+
+
+* The size of the bone, this is basically the collision box.
+* The mesh may not intersect with the mouse but if the mouse is in
+* the collision box, we know we are making contact.
+* Checking the verticies to calculate if we are colliding is not possible since
+* the data is stored in a buffer on the GPU. We do not want to store that data on the cpu.
+
+// Updating transform
+// Update when the verticies are the same, recreate only if they changed. (if a vertice was removed or added, etc)
+glBufferSubData is used to update the vertex array buffer on the GPU.
+Instancing and Uniforms are more efficient for many updates.
+Instancing for updating many instance transforms,
+Uniforms for updating every transform, ideal for camera movement, etc.
+
+
+// Updating using instancing double buffer, single buffer is using only one buffer
+
+// Create two instance buffers (double buffering)
+GLuint instanceVBO1, instanceVBO2;
+glGenBuffers(1, &instanceVBO1);
+glGenBuffers(1, &instanceVBO2);
+
+// Create a flag to toggle between the buffers each frame
+GLuint currentInstanceVBO = instanceVBO1;  // Start with instanceVBO1
+
+// Every frame, swap between the buffers
+if (currentInstanceVBO == instanceVBO1)
+    currentInstanceVBO = instanceVBO2;
+else
+    currentInstanceVBO = instanceVBO1;
+
+// Map the current instance buffer to CPU memory
+glBindBuffer(GL_ARRAY_BUFFER, currentInstanceVBO);
+InstanceData* mappedData = (InstanceData*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+
+// Update the data directly on the GPU
+mappedData[0].position = entity1.transform.position;
+mappedData[1].position = entity2.transform.position;
+mappedData[0].color = entity1.color;
+mappedData[1].color = entity2.color;
+
+// Unmap the buffer to apply changes
+glUnmapBuffer(GL_ARRAY_BUFFER);

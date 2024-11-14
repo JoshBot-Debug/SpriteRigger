@@ -7,7 +7,7 @@
 #include <imgui_internal.h>
 
 #include "Project/project.h"
-#include "Entity/components.h"
+#include "Component/components.h"
 #include "Scene/AssetsScene/assetsScene.h"
 #include "Scene/HierarchyScene/hierarchyScene.h"
 #include "Scene/HeaderPanelScene/headerPanelScene.h"
