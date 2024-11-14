@@ -20,6 +20,7 @@ public:
   ~AnimatorViewport();
 
   void onInitialize() override;
+  void onInput(SDL_Event *event, float deltaTime) override;
   void onUpdate(float deltaTime) override;
   void onDrawViewport(float deltaTime) override;
 };

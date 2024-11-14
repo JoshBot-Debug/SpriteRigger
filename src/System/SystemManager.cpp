@@ -22,3 +22,11 @@ void SystemManager::draw(float deltaTime, Registry *registry)
 {
   this->render->draw(deltaTime, registry);
 }
+
+void SystemManager::input(SDL_Event *event, float deltaTime)
+{
+  if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+  {
+    this->render->input();
+  }
+}

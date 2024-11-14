@@ -21,4 +21,5 @@ public:
   void update(float deltaTime, Viewport *viewport, Registry *registry, Mouse *mouse);
 
   void draw(float deltaTime, Registry *registry);
+  void input(SDL_Event *event, float deltaTime);
 };

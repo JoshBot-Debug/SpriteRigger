@@ -27,6 +27,11 @@ void AnimatorViewport::onInitialize()
   this->setBackgroundColor(glm::vec4{0.7f, 0.7f, 0.7f, 1.0f});
 }
 
+void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
+{
+  this->system->input(event, deltaTime);
+}
+
 void AnimatorViewport::onUpdate(float deltaTime)
 {
   Registry *registry = this->app->getRegistry();
