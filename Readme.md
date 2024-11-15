@@ -1,3 +1,6 @@
+# TODO
+Move all managers to App.h, ShaderManager, Model (create/load a model)
+
 # Application Development Plan: Pivot Animator-like Tool
 
 - [x] State Serializer needs to be a library in Application.

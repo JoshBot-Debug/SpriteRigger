@@ -28,7 +28,8 @@ void Viewport::resize(glm::vec2 size)
 {
   this->setDimensions(size);
 
-  // TODO Mostly need to resize the texture here.
+  // TODO Mostly need to resize the texture here & the viewport somewhere.
+  // glViewport(0, 0, size.x, size.y);
   // glBindTexture(GL_TEXTURE_2D, this->texture);
   // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 }
@@ -47,7 +48,7 @@ void Viewport::createFrameBuffer()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   // Attach the texture to the framebuffer
-  // The texture will now serve as the output for any rendering done to this framebuffer 
+  // The texture will now serve as the output for any rendering done to this framebuffer
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->texture, 0);
 
   // Unbind texture & framebuffer
@@ -75,7 +76,6 @@ void Viewport::onDraw(float deltaTime)
 
   glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
 
-  glViewport(position.x, position.y, size.x, size.y);
   glClearColor(this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

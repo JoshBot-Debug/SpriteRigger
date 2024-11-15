@@ -6,19 +6,17 @@
 
 #include "ECS/Registry.h"
 #include "ECS/Entity.h"
+#include "ShaderManager/ShaderProgram.h"
 
 class RenderSystem
 {
 private:
-  unsigned int shader;
   unsigned int vao;
 
   unsigned int instanceVBO;
-  std::vector<glm::vec3> instanceTransforms;
+  std::vector<glm::vec3> instances;
 
-  // std::string parseShader(const char *filepath);
-
-  // unsigned int createShader(std::string shader);
+  ShaderProgram shaders;
 
 public:
   RenderSystem();
@@ -29,7 +27,4 @@ public:
   void input();
 
   void createBoneInstance(glm::vec3 transform);
-
-  unsigned int loadShader(const char *filepath, GLenum shaderType);
-  unsigned int createShaderProgram(const char* vertexPath, const char* fragmentPath);
 };

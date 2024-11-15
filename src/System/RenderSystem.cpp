@@ -1,10 +1,12 @@
+#include "RenderSystem.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 
 #include <GL/glew.h>
-#include "RenderSystem.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Component/Component.h"
 #include "Bone/Bone.h"
@@ -50,10 +52,19 @@ RenderSystem::RenderSystem()
   // Unbind vertex array
   glBindVertexArray(0);
 
-  this->createBoneInstance({0.0f, 0.0f, 45.0f});
+  this->createBoneInstance({0.0f, 0.0f, 0.0f});
 
-  // Load the shader program
-  this->shader = this->createShaderProgram("src/Shader/vertex.glsl", "src/Shader/fragment.glsl");
+  this->shaders.compile("src/Shader/vertex.glsl", GL_VERTEX_SHADER);
+  this->shaders.compile("src/Shader/fragment.glsl", GL_FRAGMENT_SHADER);
+  this->shaders.createProgram();
+  this->shaders.bind();
+
+  glm::mat4 projection = glm::ortho(0.0f, 772.0f, 0.0f, 467.0f, -1.0f, 1.0f);
+  glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 0.0f));
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+  glm::mat4 mvp = projection * view * model;
+
+  this->shaders.addUniformMatrix4fv(mvp, "mvp");
 }
 
 // std::string RenderSystem::parseShader(const char *filepath)
@@ -66,7 +77,6 @@ RenderSystem::RenderSystem()
 
 void RenderSystem::draw(float deltaTime, Registry *registry)
 {
-  glUseProgram(this->shader);
 
   // for (auto entity : registry->entities())
   // {
@@ -74,101 +84,34 @@ void RenderSystem::draw(float deltaTime, Registry *registry)
   //   {
   //     const auto [bone, transform] = entity->collect<CBone, CTransform>();
   //     glBindVertexArray(this->vao);
-  //     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, this->instanceTransforms.size());
-  //     glBindVertexArray(0);
+  //     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, this->instances.size());
   //   }
   // }
+
   glBindVertexArray(this->vao);
-  glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, this->instanceTransforms.size());
-  glBindVertexArray(0);
+  glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, this->instances.size());
 }
 
+// TMP Method, will be removed and a button will be added in the GUI
 void RenderSystem::input()
 {
-  this->shader = this->createShaderProgram("src/Shader/vertex.glsl", "src/Shader/fragment.glsl");
+  this->shaders.recompile();
+  this->shaders.createProgram();
+  this->shaders.bind();
+
+  // This is the camera, probably, we'll need to to keep that outside as well.
+  glm::mat4 projection = glm::ortho(0.0f, 772.0f, 0.0f, 467.0f, -1.0f, 1.0f);
+  glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 10.0f, 0.0f));
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+  glm::mat4 mvp = projection * view * model;
+  this->shaders.addUniformMatrix4fv(mvp, "mvp");
 }
 
 void RenderSystem::createBoneInstance(glm::vec3 transform)
 {
-  this->instanceTransforms.push_back(transform);
+  this->instances.push_back(transform);
   glBindBuffer(GL_ARRAY_BUFFER, this->instanceVBO);
-  glBufferData(GL_ARRAY_BUFFER, this->instanceTransforms.size() * 3 * sizeof(float), this->instanceTransforms.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, this->instances.size() * 3 * sizeof(float), this->instances.data(), GL_DYNAMIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-unsigned int RenderSystem::loadShader(const char *filepath, GLenum shaderType)
-{
-  std::ifstream shaderFile(filepath);
-  if (!shaderFile.is_open())
-  {
-    std::cerr << "ERROR: Failed to open shader file: " << filepath << std::endl;
-    return 0;
-  }
-
-  // Read the file content into a stringstream
-  std::stringstream shaderStream;
-  shaderStream << shaderFile.rdbuf();
-  shaderFile.close();
-  std::string shaderCode = shaderStream.str();
-  const char *shaderCodeCStr = shaderCode.c_str();
-
-  // Create the shader object
-  unsigned int shader = glCreateShader(shaderType);
-  glShaderSource(shader, 1, &shaderCodeCStr, nullptr);
-  glCompileShader(shader);
-
-  // Check for compilation errors
-  int success;
-  glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-  if (!success)
-  {
-    int logLength;
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
-    char *infoLog = new char[logLength];
-    glGetShaderInfoLog(shader, logLength, &logLength, infoLog);
-    std::cerr << "ERROR: Shader compilation failed (" << filepath << "):\n"
-              << infoLog << std::endl;
-    delete[] infoLog;
-    glDeleteShader(shader); // Clean up
-    return 0;
-  }
-
-  return shader;
-}
-
-unsigned int RenderSystem::createShaderProgram(const char *vertexPath, const char *fragmentPath)
-{
-  // Load vertex and fragment shaders
-  unsigned int vertexShader = this->loadShader(vertexPath, GL_VERTEX_SHADER);
-  unsigned int fragmentShader = this->loadShader(fragmentPath, GL_FRAGMENT_SHADER);
-
-  // Create shader program and attach the shaders
-  unsigned int shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-
-  // Link the shader program
-  glLinkProgram(shaderProgram);
-
-  // Check for linking errors
-  int success;
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success)
-  {
-    int logLength;
-    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &logLength);
-    char *infoLog = new char[logLength];
-    glGetProgramInfoLog(shaderProgram, logLength, &logLength, infoLog);
-    std::cerr << "ERROR: Shader program linking failed:\n"
-              << infoLog << std::endl;
-    delete[] infoLog;
-    glDeleteProgram(shaderProgram); // Clean up
-    return 0;
-  }
-
-  // Clean up: shaders are no longer needed after being linked into a program
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
-
-  return shaderProgram;
 }
