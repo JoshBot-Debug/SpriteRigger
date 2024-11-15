@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL3/SDL.h>
+
 #include "Viewport/Viewport.h"
 #include "ECS/Registry.h"
 #include "Input/Mouse.h"

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <cstring>
-
+#include <string>
 #include "Registry.h"
 
 using EntityID = int;
@@ -15,7 +14,7 @@ class Entity
 {
 private:
   EntityID id;        ///< Unique identifier for the entity.
-  const char *name;   ///< Name of the entity.
+  std::string name;   ///< Name of the entity.
   Registry *registry; ///< Pointer to the Registry managing this entity.
 
 public:
@@ -26,7 +25,7 @@ public:
    * @param id The unique identifier for the entity.
    * @param registry A pointer to the Registry managing this entity.
    */
-  Entity(const char *name, int id, Registry *registry) : id(id), name(name), registry(registry) {};
+  Entity(const std::string &name, int id, Registry *registry) : id(id), name(name), registry(registry) {};
 
   /**
    * Retrieves the entity's unique identifier.
@@ -89,9 +88,9 @@ public:
    * @param name The name to compare against.
    * @return True if the names match, false otherwise.
    */
-  bool is(const char *name)
+  bool is(const std::string &name)
   {
-    return strcmp(this->name, name) == 0;
+    return this->name == name;
   }
 
   /**

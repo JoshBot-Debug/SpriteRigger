@@ -1,5 +1,11 @@
 #include "Start.h"
+
+#include <GL/glew.h>
+#include <SDL3_image/SDL_image.h>
+
 #include "Project/Project.h"
+#include "BannerImage.h"
+#include "Utility.h"
 
 Start::Start(Project *project) : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS), project(project)
 {

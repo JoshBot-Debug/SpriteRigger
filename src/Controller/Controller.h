@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ECS/Registry.h"
-#include "ECS/Entity.h"
 
 class Controller
 {

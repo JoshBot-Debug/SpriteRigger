@@ -2,11 +2,8 @@
 
 #include <string>
 #include <vector>
-#include <filesystem>
 
-#include "Utility.h"
 #include "Application.h"
-#include "BannerImage.h"
 
 class Project;
 
@@ -14,7 +11,7 @@ class Start : public Application
 {
 private:
   Project *project;
-  GLuint banner;
+  unsigned int banner;
   std::vector<std::string> *recentProjects;
 
 public:

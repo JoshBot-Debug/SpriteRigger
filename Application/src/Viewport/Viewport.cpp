@@ -1,9 +1,12 @@
 #include "Viewport.h"
+
 #include <algorithm>
 
-Viewport::Viewport(Application *application)
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+
+Viewport::Viewport()
 {
-  this->application = application;
   this->createFrameBuffer();
 }
 

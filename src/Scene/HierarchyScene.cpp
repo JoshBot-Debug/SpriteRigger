@@ -1,5 +1,7 @@
 #include "HierarchyScene.h"
-#include <imgui_internal.h>
+
+#include "imgui_internal.h"
+#include "Component/Component.h"
 
 void HierarchyScene::onInitialize() {}
 

@@ -1,25 +1,16 @@
 #pragma once
 
 #include <future>
-#include <cstdint>
 #include <map>
-#include <glm/glm.hpp>
-#include <GL/glew.h>
-
-#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
-#include <SDL3/SDL_opengl.h>
 
 #include "imgui.h"
-#include "imgui_impl_sdl3.h"
-#include "imgui_impl_opengl3.h"
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
 
 #include "ECS/Registry.h"
-#include "ECS/Entity.h"
 #include "FPS/FPS.h"
 
 #include "NativeFileDialog/NativeFileDialog.h"
-#include "Input/Input.h"
 
 const SDL_WindowFlags APPLICATION_WINDOW_FLAGS = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN);
 

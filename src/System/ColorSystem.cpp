@@ -1,4 +1,5 @@
 #include "ColorSystem.h"
+
 #include "Utility.h"
 #include "Component/Component.h"
 

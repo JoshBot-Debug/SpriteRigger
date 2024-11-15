@@ -11,7 +11,7 @@ struct GrabPayload
   GrabPayload(glm::vec2 offset, int zIndex) : offset(offset), zIndex(zIndex) {}
 };
 
-AnimatorViewport::AnimatorViewport(App *app) : Viewport(app), app(app)
+AnimatorViewport::AnimatorViewport(App *app) : app(app)
 {
   this->system = new SystemManager();
 }

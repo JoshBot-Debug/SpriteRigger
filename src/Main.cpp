@@ -1,9 +1,6 @@
-#include "SDL3/SDL.h"
 #include "Start.h"
 #include "App.h"
 #include "Project/Project.h"
-
-#include "StateSerializer/StateSerializer.h"
 
 static const ImWchar GlyphRange[] = {
     0xf000,

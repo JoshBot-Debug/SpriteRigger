@@ -1,9 +1,9 @@
 #pragma once
 
 #include "imgui.h"
+
 #include "App.h"
 #include "Scene/Scene.h"
-#include "Component/Component.h"
 #include "Asset/Asset.h"
 
 class AssetScene : public Scene
@@ -11,7 +11,7 @@ class AssetScene : public Scene
 private:
   App *app;
   Asset asset;
-  
+
 public:
   AssetScene(App *app) : app(app) {}
   ~AssetScene() {}

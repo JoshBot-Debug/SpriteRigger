@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Application.h>
+#include <SDL3/SDL.h>
 
 class Scene
 {

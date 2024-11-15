@@ -1,9 +1,7 @@
 #pragma once
 
-#include "imgui.h"
 #include "App.h"
 #include "Scene/Scene.h"
-#include "Component/Component.h"
 #include "Controller/Controller.h"
 
 class HierarchyScene : public Scene

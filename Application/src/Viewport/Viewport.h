@@ -1,15 +1,14 @@
 #pragma once
 
 #include <functional>
+#include <glm/glm.hpp>
 
-#include "Application.h"
+#include "imgui.h"
 #include "Scene/Scene.h"
 
 class Viewport : public Scene
 {
 private:
-  Application *application;
-
   unsigned int texture;
   unsigned int framebuffer;
 
@@ -39,7 +38,7 @@ private:
   void createFrameBuffer();
 
 public:
-  Viewport(Application *application);
+  Viewport();
 
   virtual ~Viewport();
 

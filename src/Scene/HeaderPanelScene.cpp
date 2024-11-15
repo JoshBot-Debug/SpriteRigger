@@ -1,10 +1,14 @@
+#include "HeaderPanelScene.h"
+
 #include <string>
 #include <filesystem>
 
-#include "Scene/Scene.h"
-#include "HeaderPanelScene.h"
 #include "Project/Project.h"
-#include "Utility.h"
+
+HeaderPanelScene::HeaderPanelScene(App *app) : app(app)
+{
+  this->recentProjects = this->app->getProject()->recent.vector("recent");
+}
 
 void HeaderPanelScene::onDraw(float deltaTime)
 {

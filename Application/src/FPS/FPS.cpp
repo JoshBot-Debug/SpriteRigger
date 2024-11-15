@@ -2,7 +2,7 @@
 
 bool FPS::at(int fps)
 {
-  Uint32 current = SDL_GetTicks();
+  Uint64 current = SDL_GetTicks();
 
   this->interval = fps == 0 ? 0 : 1000 / fps;
 

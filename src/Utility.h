@@ -1,9 +1,9 @@
 #pragma once
 
-#include <imgui.h>
 #include <string>
-#include <filesystem>
 #include <glm/glm.hpp>
+
+#include "imgui.h"
 
 namespace Utility
 {
@@ -18,6 +18,4 @@ namespace Utility
   bool InputText(const char *label, std::string *str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void *user_data = nullptr);
 
   bool intersects(const glm::vec2 &point, const glm::vec2 &position, const glm::vec2 &size);
-
-  glm::vec2 lerp(const glm::vec2 &start, const glm::vec2 &end, float t);
 }

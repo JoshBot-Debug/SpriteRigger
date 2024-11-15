@@ -1,4 +1,6 @@
 #include "Controller.h"
+
+#include "ECS/Entity.h"
 #include "Component/Component.h"
 
 Controller::Controller(Registry *registry) : registry(registry) {}

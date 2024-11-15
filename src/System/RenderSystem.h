@@ -1,11 +1,9 @@
 #pragma once
 
-#include <string>
 #include <vector>
 #include <glm/glm.hpp>
 
 #include "ECS/Registry.h"
-#include "ECS/Entity.h"
 #include "ShaderManager/ShaderProgram.h"
 
 class RenderSystem

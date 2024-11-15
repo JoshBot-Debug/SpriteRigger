@@ -1,5 +1,11 @@
-#include <stdexcept>
 #include "Application.h"
+
+#include <stdexcept>
+
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_opengl3.h"
+
+#include <GL/glew.h>
 
 Application::Application(SDL_WindowFlags flags)
 {
