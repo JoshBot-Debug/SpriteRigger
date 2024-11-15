@@ -3,12 +3,12 @@
 #include <vector>
 #include <string>
 
-class Asset
+class AssetManager
 {
 private:
 public:
-  Asset() = default;
-  ~Asset() = default;
+  AssetManager() = default;
+  ~AssetManager() = default;
 
   void importAssets(std::vector<std::string> paths);
 };

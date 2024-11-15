@@ -66,6 +66,9 @@ bool ShaderProgram::createProgram()
 {
   unsigned int program = glCreateProgram();
 
+  if (program == 0)
+    std::cerr << "Failed to create shader program." << std::endl;
+
   for (auto shader : this->shaders)
     glAttachShader(program, shader);
 
@@ -93,12 +96,18 @@ bool ShaderProgram::createProgram()
 
   this->program = program;
 
+  this->bind();
+
   return true;
 }
 
 void ShaderProgram::bind()
 {
+  if (!glIsProgram(program)) {
+    std::cerr << "1 Invalid program ID!" << std::endl;
+}
   glUseProgram(this->program);
+  printf("%s %i\n", "Shader Program bound", this->program);
 }
 
 void ShaderProgram::unbind()
@@ -106,9 +115,14 @@ void ShaderProgram::unbind()
   glUseProgram(0);
 }
 
-void ShaderProgram::addUniformMatrix4fv(glm::mat4 uniform, std::string name)
+void ShaderProgram::addUniformMatrix4fv(glm::mat4 uniform, const std::string &name)
 {
   if (!this->locations[name])
     this->locations[name] = glGetUniformLocation(this->program, name.c_str());
+
+  printf("Program: %i\n", this->program);
+  printf("Uniform: %s\n", name.c_str());
+  printf("Uniform Location: %i\n", this->locations[name]);
+
   glUniformMatrix4fv(this->locations[name], 1, GL_FALSE, &uniform[0][0]);
 }

@@ -12,8 +12,7 @@ void main(){
   fragColor=color;
   
   vec2 translation=translate.xy;
-  // float angle=radians(translate.z);
-  float angle=radians(60);
+  float angle=radians(translate.z);
   
   mat2 rotation=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
   

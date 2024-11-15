@@ -11,7 +11,7 @@
 #include "Component/Component.h"
 #include "Bone/Bone.h"
 
-RenderSystem::RenderSystem()
+RenderSystem::RenderSystem(Registry *registry, ShaderManager *shaderManager) : registry(registry), shaderManager(shaderManager)
 {
   unsigned int vbo, ebo;
 
@@ -54,28 +54,18 @@ RenderSystem::RenderSystem()
 
   this->createBoneInstance({0.0f, 0.0f, 0.0f});
 
-  this->shaders.compile("src/Shader/vertex.glsl", GL_VERTEX_SHADER);
-  this->shaders.compile("src/Shader/fragment.glsl", GL_FRAGMENT_SHADER);
-  this->shaders.createProgram();
-  this->shaders.bind();
+  this->shaderManager->load("Bone", "src/Shader/vertex.glsl", "src/Shader/fragment.glsl");
+  this->shaderManager->bind("Bone");
 
-  glm::mat4 projection = glm::ortho(0.0f, 772.0f, 0.0f, 467.0f, -1.0f, 1.0f);
+  glm::mat4 projection = glm::ortho(0.0f, 725.0f, 0.0f, 504.0f, -1.0f, 1.0f);
   glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 0.0f));
   glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
   glm::mat4 mvp = projection * view * model;
 
-  this->shaders.addUniformMatrix4fv(mvp, "mvp");
+  this->shaderManager->addUniformMatrix4fv("Bone", mvp, "mvp");
 }
 
-// std::string RenderSystem::parseShader(const char *filepath)
-// {
-// }
-
-// unsigned int RenderSystem::createShader(std::string shader)
-// {
-// }
-
-void RenderSystem::draw(float deltaTime, Registry *registry)
+void RenderSystem::draw(float deltaTime)
 {
 
   // for (auto entity : registry->entities())
@@ -90,22 +80,6 @@ void RenderSystem::draw(float deltaTime, Registry *registry)
 
   glBindVertexArray(this->vao);
   glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, this->instances.size());
-}
-
-// TMP Method, will be removed and a button will be added in the GUI
-void RenderSystem::input()
-{
-  this->shaders.recompile();
-  this->shaders.createProgram();
-  this->shaders.bind();
-
-  // This is the camera, probably, we'll need to to keep that outside as well.
-  glm::mat4 projection = glm::ortho(0.0f, 772.0f, 0.0f, 467.0f, -1.0f, 1.0f);
-  glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 10.0f, 0.0f));
-  glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-
-  glm::mat4 mvp = projection * view * model;
-  this->shaders.addUniformMatrix4fv(mvp, "mvp");
 }
 
 void RenderSystem::createBoneInstance(glm::vec3 transform)

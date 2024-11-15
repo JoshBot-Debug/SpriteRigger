@@ -6,6 +6,11 @@
 
 class TransformSystem
 { 
+private:
+  Registry *registry;
+  Mouse *mouse;
+
 public:
-  void update(float deltaTime, Viewport *viewport, Registry *registry, Mouse *mouse);
+  TransformSystem(Registry *registry, Mouse *mouse) : registry(registry), mouse(mouse) {};
+  void update(float deltaTime);
 };

@@ -11,8 +11,6 @@ void HierarchyScene::onUpdate(float deltaTime) {}
 
 void HierarchyScene::onDraw(float deltaTime)
 {
-  Registry *registry = this->app->getRegistry();
-
   ImGuiWindowClass winClass;
   winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
   ImGui::SetNextWindowClass(&winClass);
@@ -29,7 +27,7 @@ void HierarchyScene::onDraw(float deltaTime)
     ImGui::EndPopup();
   }
 
-  for (auto armature : registry->get<CArmature>())
+  for (auto armature : this->registry->get<CArmature>())
   {
     if (ImGui::TreeNode(armature->name.c_str()))
     {

@@ -4,18 +4,17 @@
 #include <vector>
 
 #include "Application.h"
-
-class Project;
+#include "Manager/ProjectManager/ProjectManager.h"
 
 class Start : public Application
 {
 private:
-  Project *project;
+  ProjectManager *projectManager;
   unsigned int banner;
   std::vector<std::string> *recentProjects;
 
 public:
-  Start(Project *project);
+  Start(ProjectManager *projectManager);
   ~Start() = default;
 
   void onDraw(float deltaTime) override;

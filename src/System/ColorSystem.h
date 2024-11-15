@@ -5,7 +5,13 @@
 #include "Input/Mouse.h"
 
 class ColorSystem
-{ 
+{
+private:
+  Registry *registry;
+  Mouse *mouse;
+
 public:
-  void update(float deltaTime, Viewport *viewport, Registry *registry, Mouse *mouse);
+  ColorSystem(Registry *registry, Mouse *mouse) : registry(registry), mouse(mouse) {};
+
+  void update(float deltaTime);
 };

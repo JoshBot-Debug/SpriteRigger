@@ -7,7 +7,7 @@
 
 inline const char *SAVE_FILE_EXTENSION = "sprig";
 
-class Project
+class ProjectManager
 {
 private:
   Application *app;
@@ -33,8 +33,8 @@ public:
    */
   StateSerializer recent;
 
-  Project() = default;
-  ~Project() = default;
+  ProjectManager() = default;
+  ~ProjectManager() = default;
 
   /**
    * Is the application project still running.

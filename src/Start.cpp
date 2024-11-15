@@ -3,14 +3,13 @@
 #include <GL/glew.h>
 #include <SDL3_image/SDL_image.h>
 
-#include "Project/Project.h"
 #include "BannerImage.h"
 #include "Utility.h"
 
-Start::Start(Project *project) : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS), project(project)
+Start::Start(ProjectManager *projectManager) : Application(APPLICATION_WINDOW_FLAGS | SDL_WINDOW_BORDERLESS), projectManager(projectManager)
 {
-  this->project->setApplication(this);
-  this->recentProjects = this->project->recent.vector("recent");
+  this->projectManager->setApplication(this);
+  this->recentProjects = this->projectManager->recent.vector("recent");
 
   SDL_IOStream *stream = SDL_IOFromConstMem(BANNER_IMAGE_BUFFER, BANNER_IMAGE_BUFFER_SIZE);
   SDL_Surface *surface = IMG_Load_IO(stream, true);
@@ -57,7 +56,7 @@ void Start::onDraw(float deltaTime)
   ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10);
   ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0, 0});
   if (ImGui::Button("\ue5cd", ImVec2{closeButtonSize, closeButtonSize}))
-    this->project->quit();
+    this->projectManager->quit();
   ImGui::PopStyleVar(2);
   ImGui::PopStyleColor(3);
   ImGui::PopFont();
@@ -83,12 +82,12 @@ void Start::onDraw(float deltaTime)
   ImGui::Spacing();
   ImGui::Spacing();
 
-  if (ImGui::TextLink("Create a new project"))
-    this->project->openNew();
+  if (ImGui::TextLink("Create a new projectManager"))
+    this->projectManager->openNew();
 
   ImGui::Spacing();
-  if (ImGui::TextLink("Select a project"))
-    this->project->open();
+  if (ImGui::TextLink("Select a projectManager"))
+    this->projectManager->open();
 
   ImGui::Spacing();
   ImGui::Spacing();
@@ -103,7 +102,7 @@ void Start::onDraw(float deltaTime)
     std::filesystem::path filePath = recent;
 
     if (ImGui::TextLink(Utility::ellipsize(filePath.stem().string() + " - " + recent, 230).c_str()))
-      this->project->restart(SaveFile{recent});
+      this->projectManager->restart(SaveFile{recent});
 
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal | ImGuiHoveredFlags_NoSharedDelay))
       ImGui::SetTooltip("%s", recent.c_str());

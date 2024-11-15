@@ -1,6 +1,6 @@
 #include "Start.h"
 #include "App.h"
-#include "Project/Project.h"
+#include "Manager/ProjectManager/ProjectManager.h"
 
 static const ImWchar GlyphRange[] = {
     0xf000,
@@ -12,11 +12,11 @@ static const ImWchar GlyphRange[] = {
 
 int main(int argc, char *argv[])
 {
-  Project project;
-  project.recent.setSaveFile((std::filesystem::current_path() / "SpriteRigger.recent").string());
-  project.recent.read();
+  ProjectManager projectManager;
+  projectManager.recent.setSaveFile((std::filesystem::current_path() / "SpriteRigger.recent").string());
+  projectManager.recent.read();
 
-  Start *start = new Start(&project);
+  Start *start = new Start(&projectManager);
   start->setWindowTitle("Sprite Rigger");
   start->setVSync(1);
   start->setWindowDimensions({720, 480});
@@ -29,10 +29,10 @@ int main(int argc, char *argv[])
 
   delete start;
 
-  while (project.isRunning())
+  while (projectManager.isRunning())
   {
-    auto fileName = *project.state.getSaveFileName();
-    App *app = new App(&project);
+    auto fileName = *projectManager.state.getSaveFileName();
+    App *app = new App(&projectManager);
     app->setWindowTitle((fileName + " - Sprite Rigger").c_str());
     app->setVSync(1);
     app->setWindowDimensions({1080, 720});

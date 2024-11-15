@@ -1,34 +1,34 @@
-#include "Project.h"
+#include "ProjectManager.h"
 
-bool Project::isRunning()
+bool ProjectManager::isRunning()
 {
   return this->running;
 }
 
-void Project::setApplication(Application *app)
+void ProjectManager::setApplication(Application *app)
 {
   this->app = app;
 }
 
-void Project::restart(SaveFile saveFile)
+void ProjectManager::restart(SaveFile saveFile)
 {
   this->state.setSaveFile(saveFile);
   this->state.read();
   this->app->quit();
 }
 
-void Project::quit()
+void ProjectManager::quit()
 {
   this->running = false;
   this->app->quit();
 }
 
-void Project::save()
+void ProjectManager::save()
 {
   this->state.write();
 }
 
-void Project::saveAs()
+void ProjectManager::saveAs()
 {
   auto callback = [this](std::string path)
   {
@@ -44,7 +44,7 @@ void Project::saveAs()
   this->app->AsyncTask(callback, NativeFileDialog::SaveFile, this->app->getWindow(), filters, 1);
 }
 
-void Project::open()
+void ProjectManager::open()
 {
   auto callback = [this](std::string path)
   {
@@ -57,7 +57,7 @@ void Project::open()
   this->app->AsyncTask(callback, NativeFileDialog::SelectFile, this->app->getWindow(), filters, 1);
 }
 
-void Project::openNew()
+void ProjectManager::openNew()
 {
   auto callback = [this](std::string path)
   {

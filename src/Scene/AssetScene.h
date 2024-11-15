@@ -2,19 +2,17 @@
 
 #include "imgui.h"
 
-#include "App.h"
 #include "Scene/Scene.h"
-#include "Asset/Asset.h"
+#include "Manager/AssetManager/AssetManager.h"
 
 class AssetScene : public Scene
 {
 private:
-  App *app;
-  Asset asset;
+  AssetManager *assetManager;
 
 public:
-  AssetScene(App *app) : app(app) {}
-  ~AssetScene() {}
+  AssetScene(AssetManager *assetManager) : assetManager(assetManager) {};
+  ~AssetScene() = default;
 
   void onInitialize() override;
   void onInput(SDL_Event *event, float deltaTime) override;

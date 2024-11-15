@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include <stdio.h>
+
 Viewport::Viewport()
 {
   this->createFrameBuffer();

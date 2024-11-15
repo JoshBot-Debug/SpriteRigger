@@ -1,17 +1,17 @@
 #pragma once
 
-#include "App.h"
 #include "Scene/Scene.h"
+#include "ECS/Registry.h"
 #include "Controller/Controller.h"
 
 class HierarchyScene : public Scene
 {
 private:
-  App *app;
+  Registry *registry;
   Controller controller;
 
 public:
-  HierarchyScene(App *app) : app(app), controller(this->app->getRegistry()) {}
+  HierarchyScene(Registry *registry) : registry(registry), controller(registry) {}
   ~HierarchyScene() {}
 
   void onInitialize() override;

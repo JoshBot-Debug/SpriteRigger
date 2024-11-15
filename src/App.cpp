@@ -6,22 +6,25 @@
 
 #include <imgui_internal.h>
 
-#include "Project/Project.h"
 #include "Component/Component.h"
-#include "Scene/AssetScene.h"
-#include "Scene/HierarchyScene.h"
-#include "Scene/HeaderPanelScene.h"
-#include "Scene/AnimatorViewport.h"
 
-App::App(Project *project) : project(project)
+#include "Manager/AssetManager/AssetManager.h"
+#include "Manager/SystemManager/SystemManager.h"
+#include "Manager/ShaderManager/ShaderManager.h"
+
+App::App(ProjectManager *projectManager) : projectManager(projectManager)
 {
   this->addProjectToRecentFiles(5);
-  this->project->setApplication(this);
+  this->projectManager->setApplication(this);
 
-  this->assetScene = new AssetScene(this);
-  this->hierarchyScene = new HierarchyScene(this);
-  this->headerPanelScene = new HeaderPanelScene(this);
-  this->animatorViewport = new AnimatorViewport(this);
+  this->assetManager = new AssetManager();
+  this->shaderManager = new ShaderManager();
+  this->systemManager = new SystemManager(&this->registry, this->input.getMouse(), this->shaderManager);
+  
+  this->assetScene = new AssetScene(this->assetManager);
+  this->hierarchyScene = new HierarchyScene(&this->registry);
+  this->headerPanelScene = new HeaderPanelScene(this->projectManager);
+  this->animatorViewport = new AnimatorViewport(this->systemManager);
 }
 
 App::~App()
@@ -43,7 +46,7 @@ void App::onInitialize()
 void App::onInput(SDL_Event *event, float deltaTime)
 {
   if (this->isWindowClosing(event))
-    this->getProject()->quit();
+    this->projectManager->quit();
 
   this->input.onEvent(event);
   this->assetScene->onInput(event, deltaTime);
@@ -90,8 +93,8 @@ Mouse *App::getMouseInput()
 
 void App::addProjectToRecentFiles(int maxRecentFiles)
 {
-  std::vector<std::string> *recent = this->project->recent.vector("recent");
-  std::string filePath = std::string(*this->project->state.getSaveFile());
+  std::vector<std::string> *recent = this->projectManager->recent.vector("recent");
+  std::string filePath = std::string(*this->projectManager->state.getSaveFile());
 
   auto it = std::find(recent->begin(), recent->end(), filePath);
   if (it != recent->end())
@@ -102,5 +105,5 @@ void App::addProjectToRecentFiles(int maxRecentFiles)
   if (recent->size() > maxRecentFiles)
     recent->erase(recent->begin() + 5, recent->end());
 
-  this->project->recent.write();
+  this->projectManager->recent.write();
 }

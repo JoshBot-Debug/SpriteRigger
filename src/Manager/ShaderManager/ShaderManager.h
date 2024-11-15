@@ -15,7 +15,9 @@ public:
 
   void load(const std::string &name, const char *vertexFile, const char *fragmentFile);
 
-  bool bind(const std::string &name);
+  void bind(const std::string &name);
   
-  bool unbind(const std::string &name);
+  void unbind(const std::string &name);
+
+  void addUniformMatrix4fv(const std::string &shaderName, glm::mat4 uniform, const std::string &name);
 };

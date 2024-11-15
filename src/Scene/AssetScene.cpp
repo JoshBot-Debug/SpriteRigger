@@ -40,14 +40,12 @@ void AssetScene::DrawMenu()
     {
       if (ImGui::MenuItem("Import assets"))
       {
-        Asset *asset = &this->asset;
-        
-        auto callback = [asset](std::vector<std::string> paths)
-        { asset->importAssets(paths); };
+        // auto callback = [this](std::vector<std::string> paths)
+        // { this->assetManager->importAssets(paths); };
 
-        NativeFileDialog::Filters filters[1] = {{"Images", "png,jpg,jpeg"}};
+        // NativeFileDialog::Filters filters[1] = {{"Images", "png,jpg,jpeg"}};
 
-        this->app->AsyncTask(callback, NativeFileDialog::SelectFiles, this->app->getWindow(), filters, 1);
+        // this->app->AsyncTask(callback, NativeFileDialog::SelectFiles, this->app->getWindow(), filters, 1);
       }
       ImGui::EndMenu();
     }

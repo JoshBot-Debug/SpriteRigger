@@ -3,17 +3,22 @@
 #include "Application.h"
 #include "Utility.h"
 #include "Input/Input.h"
+#include "Manager/ProjectManager/ProjectManager.h"
+#include "Manager/ShaderManager/ShaderManager.h"
+#include "Manager/AssetManager/AssetManager.h"
 
-class Project;
-class HeaderPanelScene;
-class AnimatorViewport;
-class HierarchyScene;
-class AssetScene;
+#include "Scene/AssetScene.h"
+#include "Scene/HierarchyScene.h"
+#include "Scene/HeaderPanelScene.h"
+#include "Scene/AnimatorViewport.h"
 
 class App : public Application
 {
 private:
-  Project *project;
+  ProjectManager *projectManager;
+  AssetManager *assetManager;
+  ShaderManager *shaderManager;
+  SystemManager *systemManager;
   Input input;
 
   HeaderPanelScene *headerPanelScene;
@@ -22,7 +27,7 @@ private:
   AssetScene *assetScene;
 
 public:
-  App(Project *project);
+  App(ProjectManager *projectManager);
   ~App();
 
   void onInitialize() override;
@@ -32,11 +37,6 @@ public:
   void onCleanUp() override;
 
   Mouse *getMouseInput();
-
-  Project *getProject()
-  {
-    return this->project;
-  }
 
   void addProjectToRecentFiles(int maxRecentFiles);
 };

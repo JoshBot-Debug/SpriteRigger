@@ -20,7 +20,7 @@ private:
   unsigned int program;
   std::vector<unsigned int> shaders;
   std::vector<ShaderFile> recompileFiles;
-  std::unordered_map<std::string, unsigned int> locations;
+  std::unordered_map<std::string, int> locations;
 
 public:
   ShaderProgram() = default;
@@ -36,10 +36,5 @@ public:
 
   void unbind();
 
-  void addUniformMatrix4fv(glm::mat4 uniform, std::string name);
-
-  operator unsigned int()
-  {
-    return this->program;
-  }
+  void addUniformMatrix4fv(glm::mat4 uniform, const std::string &name);
 };
