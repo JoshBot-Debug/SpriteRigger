@@ -1,10 +1,10 @@
 #pragma once
 
 inline const float BONE_VERTICES[] = {
-    -10.0f, -10.0f, 1.0f, 0.0f, 0.0f,
-    10.0f, -10.0f, 1.0f, 0.0f, 0.0f,
-    10.0f, 10.0f, 1.0f, 0.0f, 0.0f,
-    -10.0f, 10.0f, 1.0f, 0.0f, 0.0f
+    -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+    -1.0f, 1.0f, 1.0f, 0.0f, 0.0f
     };
 
 inline const unsigned int BONE_INDICES[] = {

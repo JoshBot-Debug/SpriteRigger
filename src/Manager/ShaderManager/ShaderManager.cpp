@@ -1,37 +1,40 @@
 #include "ShaderManager.h"
 
-ShaderProgram &ShaderManager::get(const std::string &name)
+ShaderManager::~ShaderManager()
+{
+  for (const auto &program : this->programs)
+    delete program.second;
+}
+
+ShaderProgram *ShaderManager::get(const std::string &name)
 {
   return this->programs[name];
 }
 
 void ShaderManager::load(const std::string &name, const char *vertexFile, const char *fragmentFile)
 {
-  ShaderProgram program;
+  ShaderProgram *program = new ShaderProgram();
 
-  if (!program.compile(vertexFile, GL_VERTEX_SHADER))
-    printf("%s\n", "ShaderProgram Failed to compile vertex shader file.");
+  program->compile(vertexFile, GL_VERTEX_SHADER);
 
-  if (!program.compile(fragmentFile, GL_FRAGMENT_SHADER))
-    printf("%s\n", "ShaderProgram Failed to compile fragment shader file.");
+  program->compile(fragmentFile, GL_FRAGMENT_SHADER);
 
-  if (!program.createProgram())
-    printf("%s\n", "ShaderProgram Failed to create program.");
+  program->createProgram();
 
   this->programs[name] = program;
 }
 
 void ShaderManager::bind(const std::string &name)
 {
-  this->programs[name].bind();
+  this->programs[name]->bind();
 }
 
 void ShaderManager::unbind(const std::string &name)
 {
-  this->programs[name].unbind();
+  this->programs[name]->unbind();
 }
 
 void ShaderManager::addUniformMatrix4fv(const std::string &shaderName, glm::mat4 uniform, const std::string &name)
 {
-  this->programs[shaderName].addUniformMatrix4fv(uniform, name);
+  this->programs[shaderName]->addUniformMatrix4fv(uniform, name);
 }

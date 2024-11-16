@@ -5,13 +5,13 @@
 class ShaderManager
 {
 private:
-  std::unordered_map<std::string, ShaderProgram> programs;
+  std::unordered_map<std::string, ShaderProgram *> programs;
 
 public:
   ShaderManager() = default;
-  ~ShaderManager() = default;
+  ~ShaderManager();
 
-  ShaderProgram &get(const std::string &name);
+  ShaderProgram *get(const std::string &name);
 
   void load(const std::string &name, const char *vertexFile, const char *fragmentFile);
 
