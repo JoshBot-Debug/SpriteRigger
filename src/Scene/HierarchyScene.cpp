@@ -21,7 +21,6 @@ void HierarchyScene::onDraw(float deltaTime)
   {
     if (ImGui::MenuItem("Create armature"))
     {
-      this->controller.createArmature();
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();

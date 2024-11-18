@@ -13,9 +13,9 @@ void TransformSystem::update(float deltaTime)
     {
       auto [transform, bone] = entity->collect<CTransform, CBone>();
 
-      // if (mouse->state == MouseState::PRESS_LEFT)
-      //   if (Utility::intersects((mouse->position - viewport->getPosition()), transform->position, bone->size))
-      //     mouse->press(entity->getId(), transform->position);
+      // if (this->mouse->state == MouseState::PRESS_LEFT)
+      //   if (Utility::intersects((this->mouse->position - viewport->getPosition()), transform->position, bone->size))
+      //     this->mouse->press(entity->getId(), transform->position);
 
       MouseEntityState state = this->mouse->getMouseEntityState(entity->getId());
 

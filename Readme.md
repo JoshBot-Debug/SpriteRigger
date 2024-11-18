@@ -1,5 +1,7 @@
 # TODO
-Move all managers to App.h, ShaderManager, Model (create/load a model)
+- [x] Move all managers to App.h, ShaderManager, Model (create/load a model)
+- [ ] Bind once, use a cache, if a shader/buffer is bound, skip the opengl call
+- [ ] Input needs to have a mouse offset .setMouseOffset which I can call when the target viewport is resized. This removes the viewport dependency from other scenes
 
 # Application Development Plan: Pivot Animator-like Tool
 

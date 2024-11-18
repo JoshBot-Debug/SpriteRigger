@@ -8,7 +8,6 @@
 
 #include "Component/Component.h"
 
-#include "Manager/AssetManager/AssetManager.h"
 #include "Manager/SystemManager/SystemManager.h"
 #include "Manager/ShaderManager/ShaderManager.h"
 
@@ -17,11 +16,14 @@ App::App(ProjectManager *projectManager) : projectManager(projectManager)
   this->addProjectToRecentFiles(5);
   this->projectManager->setApplication(this);
 
-  this->assetManager = new AssetManager();
+  // I don't want to use a class like this for 
+  // opengl stuff. I'd rather it be like SDL or opengl
+  // need to read the source code for hazel engine to get some
+  // inspiration
   this->shaderManager = new ShaderManager();
   this->systemManager = new SystemManager(&this->registry, this->input.getMouse(), this->shaderManager);
-  
-  this->assetScene = new AssetScene(this->assetManager);
+ 
+  this->assetScene = new AssetScene();
   this->hierarchyScene = new HierarchyScene(&this->registry);
   this->headerPanelScene = new HeaderPanelScene(this->projectManager);
   this->animatorViewport = new AnimatorViewport(this->systemManager);
@@ -33,6 +35,9 @@ App::~App()
   delete this->hierarchyScene;
   delete this->animatorViewport;
   delete this->headerPanelScene;
+
+  delete this->shaderManager;
+  delete this->systemManager;
 }
 
 void App::onInitialize()

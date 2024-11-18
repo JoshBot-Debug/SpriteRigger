@@ -5,7 +5,6 @@
 #include "Input/Input.h"
 #include "Manager/ProjectManager/ProjectManager.h"
 #include "Manager/ShaderManager/ShaderManager.h"
-#include "Manager/AssetManager/AssetManager.h"
 
 #include "Scene/AssetScene.h"
 #include "Scene/HierarchyScene.h"
@@ -16,7 +15,6 @@ class App : public Application
 {
 private:
   ProjectManager *projectManager;
-  AssetManager *assetManager;
   ShaderManager *shaderManager;
   SystemManager *systemManager;
   Input input;

@@ -94,13 +94,13 @@ void HeaderPanelScene::File_Options()
   {
     if (ImGui::BeginMenu("Theme"))
     {
-      // Theme currentTheme = this->app->getTheme();
+      // Theme currentTheme = this->projectManager->getTheme();
 
       // if (ImGui::MenuItem("Light", nullptr, currentTheme == Theme::LIGHT) && currentTheme != Theme::LIGHT)
-      //   this->app->setTheme(Theme::LIGHT);
+      //   this->projectManager->setTheme(Theme::LIGHT);
 
       // if (ImGui::MenuItem("Dark", nullptr, currentTheme == Theme::DARK) && currentTheme != Theme::DARK)
-      //   this->app->setTheme(Theme::DARK);
+      //   this->projectManager->setTheme(Theme::DARK);
 
       ImGui::EndMenu();
     }

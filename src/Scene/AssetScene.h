@@ -3,15 +3,13 @@
 #include "imgui.h"
 
 #include "Scene/Scene.h"
-#include "Manager/AssetManager/AssetManager.h"
 
 class AssetScene : public Scene
 {
 private:
-  AssetManager *assetManager;
 
 public:
-  AssetScene(AssetManager *assetManager) : assetManager(assetManager) {};
+  AssetScene() = default;
   ~AssetScene() = default;
 
   void onInitialize() override;

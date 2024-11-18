@@ -50,19 +50,11 @@ RenderSystem::RenderSystem(Registry *registry, ShaderManager *shaderManager) : r
   glVertexAttribDivisor(2, 1);
 
   // Unbind vertex array
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
-
-  this->createBoneInstance({0.0f, 0.0f, 0.0f});
 
   this->shaderManager->load("Bone", "src/Shader/vertex.glsl", "src/Shader/fragment.glsl");
   this->shaderManager->bind("Bone");
-
-  glm::mat4 projection = glm::ortho(0.0f, 725.0f, 0.0f, 504.0f, -1.0f, 1.0f);
-  glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 0.0f));
-  glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-  glm::mat4 mvp = projection * view * model;
-
-  this->shaderManager->addUniformMatrix4fv("Bone", mvp, "mvp");
 }
 
 void RenderSystem::draw(float deltaTime)
@@ -77,6 +69,13 @@ void RenderSystem::draw(float deltaTime)
   //     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, this->instances.size());
   //   }
   // }
+
+  glm::mat4 projection = glm::ortho(0.0f, 725.0f, 0.0f, 504.0f, -1.0f, 1.0f);
+  glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 0.0f));
+  glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+  glm::mat4 mvp = projection * view * model;
+
+  this->shaderManager->addUniformMatrix4fv("Bone", mvp, "mvp");
 
   glBindVertexArray(this->vao);
   glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, this->instances.size());
