@@ -14,17 +14,28 @@ struct ShaderFile
   ShaderFile(const char *filepath, GLenum type): filepath(filepath), type(type) {};
 };
 
-class ShaderProgram
+class Shader
 {
 private:
   unsigned int program;
   std::vector<unsigned int> shaders;
   std::vector<ShaderFile> recompileFiles;
-  std::unordered_map<std::string, int> locations;
+  mutable std::unordered_map<std::string, int> uniformLocation;
 
 public:
-  ShaderProgram() = default;
-  ~ShaderProgram();
+  Shader() = default;
+  ~Shader();
+
+  /**
+   * Disable copy constructor
+   */
+  Shader(const Shader &) = delete;
+
+  /**
+   * Disable assignment operator
+   */
+  Shader &operator=(const Shader &) = delete;
+
 
   bool compile(const char *filepath, GLenum type, bool enableRecompile = true);
 
@@ -32,9 +43,9 @@ public:
 
   bool createProgram();
 
-  void bind();
+  void bind() const;
 
-  void unbind();
+  void unbind() const;
 
-  void addUniformMatrix4fv(glm::mat4 uniform, const std::string &name);
+  void addUniformMatrix4fv(const std::string &name, glm::mat4 uniform) const;
 };

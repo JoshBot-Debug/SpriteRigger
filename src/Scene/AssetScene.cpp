@@ -1,18 +1,6 @@
 #include "AssetScene.h"
 #include <imgui_internal.h>
 
-void AssetScene::onInitialize()
-{
-}
-
-void AssetScene::onInput(SDL_Event *event, float deltaTime)
-{
-}
-
-void AssetScene::onUpdate(float deltaTime)
-{
-}
-
 void AssetScene::onDraw(float deltaTime)
 {
   ImGui::ShowDemoWindow();
@@ -26,10 +14,6 @@ void AssetScene::onDraw(float deltaTime)
   this->DrawMenu();
 
   ImGui::End();
-}
-
-void AssetScene::onCleanUp()
-{
 }
 
 void AssetScene::DrawMenu()

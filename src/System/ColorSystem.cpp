@@ -3,14 +3,14 @@
 #include "Utility.h"
 #include "Component/Component.h"
 
-void ColorSystem::update(float deltaTime)
+void ColorSystem::update(float deltaTime, Registry *registry, Mouse *mouse)
 {
-  for (auto entity : this->registry->entities())
+  for (auto entity : registry->entities())
   {
     if (entity->is("Bone"))
     {
       auto bone = entity->get<CBone>();
-      MouseEntityState state = this->mouse->getMouseEntityState(entity->getId());
+      MouseEntityState state = mouse->getMouseEntityState(entity->getId());
       bone->color.b = state.isFocused ? 0 : 255;
     }
   }

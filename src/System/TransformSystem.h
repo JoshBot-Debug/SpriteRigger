@@ -5,12 +5,10 @@
 #include "Input/Mouse.h"
 
 class TransformSystem
-{ 
-private:
-  Registry *registry;
-  Mouse *mouse;
-
+{
 public:
-  TransformSystem(Registry *registry, Mouse *mouse) : registry(registry), mouse(mouse) {};
-  void update(float deltaTime);
+  TransformSystem() = default;
+  ~TransformSystem() = default;
+
+  void update(float deltaTime, Registry *registry, Mouse *mouse);
 };

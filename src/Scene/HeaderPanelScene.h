@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Scene/Scene.h"
-#include "Manager/ProjectManager/ProjectManager.h"
+#include "ProjectManager/ProjectManager.h"
 
 class HeaderPanelScene : public Scene
 {
@@ -10,9 +10,10 @@ private:
   std::vector<std::string> *recentProjects;
 
 public:
-  HeaderPanelScene(ProjectManager *projectManager);
+  HeaderPanelScene() = default;
   ~HeaderPanelScene() = default;
 
+  void onInitialize(ProjectManager *projectManager);
   void onDraw(float deltaTime) override;
 
   void File_Menu();

@@ -94,12 +94,12 @@ void Viewport::onDraw(float deltaTime)
   ImGui::PopStyleVar();
 }
 
-glm::vec2 Viewport::getSize()
+glm::vec2 *Viewport::getSize()
 {
-  return this->size;
+  return &this->size;
 }
 
-glm::vec2 Viewport::getPosition()
+glm::vec2 *Viewport::getPosition()
 {
-  return this->position;
+  return &this->position;
 }

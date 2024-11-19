@@ -8,44 +8,29 @@
 
 #include "Component/Component.h"
 
-#include "Manager/SystemManager/SystemManager.h"
-#include "Manager/ShaderManager/ShaderManager.h"
+/**
+ * Create an armature
+ * Joint extendable
+ *
+ * Process to setup a vertex array, buffer and element buffer
+ * Decide between instancing or uniforms.
+ * Ability to add textures and bind them to bones.
+ *
+ * Move out Render to Application
+ */
 
-App::App(ProjectManager *projectManager) : projectManager(projectManager)
+void App::onInitialize()
 {
   this->addProjectToRecentFiles(5);
   this->projectManager->setApplication(this);
 
-  // I don't want to use a class like this for 
-  // opengl stuff. I'd rather it be like SDL or opengl
-  // need to read the source code for hazel engine to get some
-  // inspiration
-  this->shaderManager = new ShaderManager();
-  this->systemManager = new SystemManager(&this->registry, this->input.getMouse(), this->shaderManager);
- 
-  this->assetScene = new AssetScene();
-  this->hierarchyScene = new HierarchyScene(&this->registry);
-  this->headerPanelScene = new HeaderPanelScene(this->projectManager);
-  this->animatorViewport = new AnimatorViewport(this->systemManager);
-}
+  this->assetScene.onInitialize();
+  this->headerPanelScene.onInitialize(this->projectManager);
 
-App::~App()
-{
-  delete this->assetScene;
-  delete this->hierarchyScene;
-  delete this->animatorViewport;
-  delete this->headerPanelScene;
+  this->controller.onInitialize(&this->registry, &this->colorSystem, &this->renderSystem, &this->transformSystem);
 
-  delete this->shaderManager;
-  delete this->systemManager;
-}
-
-void App::onInitialize()
-{
-  this->assetScene->onInitialize();
-  this->hierarchyScene->onInitialize();
-  this->headerPanelScene->onInitialize();
-  this->animatorViewport->onInitialize();
+  this->hierarchyScene.onInitialize(&this->registry, &this->controller);
+  this->animatorViewport.onInitialize(&this->registry, &this->controller, &this->colorSystem, &this->renderSystem, &this->transformSystem);
 }
 
 void App::onInput(SDL_Event *event, float deltaTime)
@@ -53,47 +38,41 @@ void App::onInput(SDL_Event *event, float deltaTime)
   if (this->isWindowClosing(event))
     this->projectManager->quit();
 
-  this->input.onEvent(event);
-  this->assetScene->onInput(event, deltaTime);
-  this->hierarchyScene->onInput(event, deltaTime);
-  this->headerPanelScene->onInput(event, deltaTime);
-  this->animatorViewport->onInput(event, deltaTime);
+  this->assetScene.onInput(event, deltaTime);
+  this->hierarchyScene.onInput(event, deltaTime);
+  this->headerPanelScene.onInput(event, deltaTime);
+  this->animatorViewport.onInput(event, deltaTime);
 }
 
 void App::onUpdate(float deltaTime)
 {
-  this->assetScene->onUpdate(deltaTime);
-  this->hierarchyScene->onUpdate(deltaTime);
-  this->headerPanelScene->onUpdate(deltaTime);
-  this->animatorViewport->onUpdate(deltaTime);
+  this->assetScene.onUpdate(deltaTime);
+  this->hierarchyScene.onUpdate(deltaTime);
+  this->headerPanelScene.onUpdate(deltaTime);
+  this->animatorViewport.onUpdate(deltaTime);
 }
 
 void App::onDraw(float deltaTime)
 {
-  this->assetScene->onDraw(deltaTime);
-  this->hierarchyScene->onDraw(deltaTime);
-  this->headerPanelScene->onDraw(deltaTime);
+  this->assetScene.onDraw(deltaTime);
+  this->hierarchyScene.onDraw(deltaTime);
+  this->headerPanelScene.onDraw(deltaTime);
 
   ImGuiWindowClass winClass;
   winClass.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
   ImGui::SetNextWindowClass(&winClass);
-  this->animatorViewport->onDraw(deltaTime);
+  this->animatorViewport.onDraw(deltaTime);
 }
 
 void App::onCleanUp()
 {
-  this->assetScene->onCleanUp();
-  this->hierarchyScene->onCleanUp();
-  this->headerPanelScene->onCleanUp();
-  this->animatorViewport->onCleanUp();
+  this->assetScene.onCleanUp();
+  this->hierarchyScene.onCleanUp();
+  this->headerPanelScene.onCleanUp();
+  this->animatorViewport.onCleanUp();
 
   // TODO freeing the registry will eventually happen elsewhere
   this->registry.free<CTransform, CBone, CArmature>();
-}
-
-Mouse *App::getMouseInput()
-{
-  return this->input.getMouse();
 }
 
 void App::addProjectToRecentFiles(int maxRecentFiles)

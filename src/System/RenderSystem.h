@@ -4,24 +4,24 @@
 #include <glm/glm.hpp>
 
 #include "ECS/Registry.h"
-#include "Manager/ShaderManager/ShaderManager.h"
+#include "Render/Mesh/Mesh.h"
+
+struct BoneMesh {
+  float verticies[8];
+  int indices[6];
+};
 
 class RenderSystem
 {
 private:
-  unsigned int vao;
-
-  unsigned int instanceVBO;
-  std::vector<glm::vec3> instances;
-
   Registry *registry;
-  ShaderManager *shaderManager;
+  std::vector<Mesh *> meshes;
 
 public:
-  RenderSystem(Registry *registry, ShaderManager *shaderManager);
+  RenderSystem() = default;
   ~RenderSystem() = default;
 
   void draw(float deltaTime);
 
-  void createBoneInstance(glm::vec3 transform);
+  void push(Mesh *mesh);
 };

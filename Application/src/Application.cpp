@@ -1,11 +1,27 @@
 #include "Application.h"
 
 #include <stdexcept>
+#include <iostream>
 
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_opengl3.h"
 
 #include <GL/glew.h>
+
+void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam)
+{
+  std::cerr << "OpenGL Debug Message (" << id << "): " << message << std::endl;
+  std::cerr << "Source: " << source << ", Type: " << type << ", Severity: " << severity << std::endl;
+}
+
+static void setupOpenGLDebugging()
+{
+  glEnable(GL_DEBUG_OUTPUT);
+  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+  glDebugMessageCallback(DebugCallback, nullptr);
+  glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+}
 
 Application::Application(SDL_WindowFlags flags)
 {
@@ -45,6 +61,8 @@ Application::Application(SDL_WindowFlags flags)
 
   ImGui_ImplSDL3_InitForOpenGL(window, this->glContext);
   ImGui_ImplOpenGL3_Init(glslVersion);
+
+  setupOpenGLDebugging();
 }
 
 Application::~Application()
@@ -174,7 +192,8 @@ void Application::open()
 
     this->onUpdate(deltaTime);
 
-    glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+    if (io.DisplaySize.x > -1 && (int)io.DisplaySize.y > -1)
+      glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     glClearColor(this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
     glClear(GL_COLOR_BUFFER_BIT);
 

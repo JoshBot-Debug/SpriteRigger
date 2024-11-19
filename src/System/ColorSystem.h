@@ -6,12 +6,9 @@
 
 class ColorSystem
 {
-private:
-  Registry *registry;
-  Mouse *mouse;
-
 public:
-  ColorSystem(Registry *registry, Mouse *mouse) : registry(registry), mouse(mouse) {};
+  ColorSystem() = default;
+  ~ColorSystem() = default;
 
-  void update(float deltaTime);
+  void update(float deltaTime, Registry *registry, Mouse *mouse);
 };

@@ -1,17 +1,17 @@
-#include "ShaderProgram.h"
+#include "Shader.h"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 
-ShaderProgram::~ShaderProgram()
+Shader::~Shader()
 {
   if (this->program != 0)
     glDeleteProgram(this->program);
 }
 
-bool ShaderProgram::compile(const char *filepath, GLenum type, bool enableRecompile)
+bool Shader::compile(const char *filepath, GLenum type, bool enableRecompile)
 {
   std::ifstream stream(filepath);
 
@@ -54,7 +54,7 @@ bool ShaderProgram::compile(const char *filepath, GLenum type, bool enableRecomp
   return true;
 }
 
-bool ShaderProgram::recompile()
+bool Shader::recompile()
 {
   for (auto file : this->recompileFiles)
     if (!this->compile(file.filepath, file.type, false))
@@ -62,7 +62,7 @@ bool ShaderProgram::recompile()
   return true;
 }
 
-bool ShaderProgram::createProgram()
+bool Shader::createProgram()
 {
   unsigned int program = glCreateProgram();
 
@@ -99,29 +99,23 @@ bool ShaderProgram::createProgram()
   return true;
 }
 
-void ShaderProgram::bind()
+void Shader::bind() const
 {
   if (!glIsProgram(this->program))
     std::cerr << "[Shader Program] Invalid program ID: " << this->program << std::endl;
 
   glUseProgram(this->program);
-  std::clog << "[Shader Program] Bound shader program ID: " << this->program << std::endl;
 }
 
-void ShaderProgram::unbind()
+void Shader::unbind() const
 {
   glUseProgram(0);
-  std::cerr << "[Shader Program] Unbound shader program: " << this->program << std::endl;
 }
 
-void ShaderProgram::addUniformMatrix4fv(glm::mat4 uniform, const std::string &name)
+void Shader::addUniformMatrix4fv(const std::string &name, glm::mat4 uniform) const
 {
-  if (!this->locations[name])
-    this->locations[name] = glGetUniformLocation(this->program, name.c_str());
+  if (!this->uniformLocation[name])
+    this->uniformLocation[name] = glGetUniformLocation(this->program, name.c_str());
 
-  std::cerr << "[Shader Program] Program ID: " << this->program << std::endl;
-  std::cerr << "[Shader Program] Uniform Name: " << name.c_str() << std::endl;
-  std::cerr << "[Shader Program] Uniform Location: " << this->locations[name] << std::endl;
-
-  glUniformMatrix4fv(this->locations[name], 1, GL_FALSE, &uniform[0][0]);
+  glUniformMatrix4fv(this->uniformLocation[name], 1, GL_FALSE, &uniform[0][0]);
 }

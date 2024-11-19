@@ -3,11 +3,11 @@
 #include "imgui_internal.h"
 #include "Component/Component.h"
 
-void HierarchyScene::onInitialize() {}
-
-void HierarchyScene::onInput(SDL_Event *event, float deltaTime) {}
-
-void HierarchyScene::onUpdate(float deltaTime) {}
+void HierarchyScene::onInitialize(Registry *registry, Controller *controller)
+{
+  this->registry = registry;
+  this->controller = controller;
+}
 
 void HierarchyScene::onDraw(float deltaTime)
 {
@@ -21,6 +21,7 @@ void HierarchyScene::onDraw(float deltaTime)
   {
     if (ImGui::MenuItem("Create armature"))
     {
+      this->controller->createArmature();
       ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
@@ -41,5 +42,3 @@ void HierarchyScene::onDraw(float deltaTime)
 
   ImGui::End();
 }
-
-void HierarchyScene::onCleanUp() {}

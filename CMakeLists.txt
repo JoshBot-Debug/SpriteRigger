@@ -5,6 +5,7 @@ project(SpriteRigger)
 find_package(SDL3 REQUIRED)
 find_package(SDL3_image REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(GLU REQUIRED)
 
 # Collect all source files (.cpp files)
 file(GLOB_RECURSE SOURCES_FILES
@@ -42,6 +43,7 @@ target_link_libraries(SpriteRigger PRIVATE
   SDL3_image
   OpenGL
   GLEW
+  OpenGL::GLU
   ${STATIC_LIB}
 
   # Libs for nfd

@@ -5,8 +5,9 @@
 
 #include "Utility.h"
 
-HeaderPanelScene::HeaderPanelScene(ProjectManager *projectManager): projectManager(projectManager)
+void HeaderPanelScene::onInitialize(ProjectManager *projectManager)
 {
+  this->projectManager = projectManager;
   this->recentProjects = this->projectManager->recent.vector("recent");
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL3/SDL.h>
 #include <glm/glm.hpp>
 #include "ECS/Entity.h"
 
@@ -48,6 +49,11 @@ private:
    */
   bool isFocused = false;
 
+  /**
+   * The offset of the viewport, this will be subracted from the mouse's position.
+   */
+  glm::vec2 *offset;
+
 public:
   /**
    * The current position of the mouse.
@@ -83,4 +89,14 @@ public:
    * Gets the entity's mouse state.
    */
   MouseEntityState getMouseEntityState(EntityID entity);
+
+  /**
+   * Set mouse events
+   */
+  void onEvent(SDL_Event *event);
+
+  /**
+   * Set the offset of the viewport, this will be subtracted from the position of the mouse.
+   */
+  void setOffset(glm::vec2 *offset);
 };

@@ -7,18 +7,28 @@
 #include "Viewport/Viewport.h"
 #include "Component/Component.h"
 
-class SystemManager;
+#include "System/ColorSystem.h"
+#include "System/RenderSystem.h"
+#include "System/TransformSystem.h"
+
+#include "Controller/Controller.h"
 
 class AnimatorViewport : public Viewport
 {
 private:
-  SystemManager *systemManager;
+  Registry *registry;
+  Mouse mouse;
+
+  ColorSystem *colorSystem;
+  RenderSystem *renderSystem;
+  TransformSystem *transformSystem;
 
 public:
-  AnimatorViewport(SystemManager *systemManager) : systemManager(systemManager) {};
+  AnimatorViewport() = default;
   ~AnimatorViewport() = default;
 
-  void onInitialize() override;
+  void onInitialize(Registry *registry, Controller *controller, ColorSystem *colorSystem, RenderSystem *renderSystem, TransformSystem *transformSystem);
+  void onInput(SDL_Event *event, float deltaTime) override;
   void onUpdate(float deltaTime) override;
   void onDrawViewport(float deltaTime) override;
 };

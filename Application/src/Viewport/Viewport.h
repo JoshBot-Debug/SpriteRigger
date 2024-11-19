@@ -96,10 +96,10 @@ public:
   /**
    * Get the size of the viewport
    */
-  glm::vec2 getSize();
+  glm::vec2 *getSize();
 
   /**
    * Get the position of the viewport
    */
-  glm::vec2 getPosition();
+  glm::vec2 *getPosition();
 };

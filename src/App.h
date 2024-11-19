@@ -2,9 +2,8 @@
 
 #include "Application.h"
 #include "Utility.h"
-#include "Input/Input.h"
-#include "Manager/ProjectManager/ProjectManager.h"
-#include "Manager/ShaderManager/ShaderManager.h"
+#include "Controller/Controller.h"
+#include "ProjectManager/ProjectManager.h"
 
 #include "Scene/AssetScene.h"
 #include "Scene/HierarchyScene.h"
@@ -15,26 +14,27 @@ class App : public Application
 {
 private:
   ProjectManager *projectManager;
-  ShaderManager *shaderManager;
-  SystemManager *systemManager;
-  Input input;
 
-  HeaderPanelScene *headerPanelScene;
-  AnimatorViewport *animatorViewport;
-  HierarchyScene *hierarchyScene;
-  AssetScene *assetScene;
+  Controller controller;
+
+  ColorSystem colorSystem;
+  RenderSystem renderSystem;
+  TransformSystem transformSystem;
+
+  AssetScene assetScene;
+  HierarchyScene hierarchyScene;
+  HeaderPanelScene headerPanelScene;
+  AnimatorViewport animatorViewport;
 
 public:
-  App(ProjectManager *projectManager);
-  ~App();
+  App(ProjectManager *projectManager): projectManager(projectManager) {};
+  ~App() = default;
 
   void onInitialize() override;
   void onInput(SDL_Event *event, float deltaTime) override;
   void onUpdate(float deltaTime) override;
   void onDraw(float deltaTime) override;
   void onCleanUp() override;
-
-  Mouse *getMouseInput();
 
   void addProjectToRecentFiles(int maxRecentFiles);
 };
