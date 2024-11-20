@@ -12,12 +12,14 @@
 #include "System/TransformSystem.h"
 
 #include "Controller/Controller.h"
+#include "Render/Camera/OrthographicCamera.h"
 
 class AnimatorViewport : public Viewport
 {
 private:
   Registry *registry;
   Mouse mouse;
+  OrthographicCamera camera;
 
   ColorSystem *colorSystem;
   RenderSystem *renderSystem;
@@ -31,4 +33,5 @@ public:
   void onInput(SDL_Event *event, float deltaTime) override;
   void onUpdate(float deltaTime) override;
   void onDrawViewport(float deltaTime) override;
+  void onResize(float width, float height) override;
 };

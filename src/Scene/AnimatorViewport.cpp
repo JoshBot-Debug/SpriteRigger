@@ -14,16 +14,26 @@ void AnimatorViewport::onInitialize(Registry *registry, Controller *controller, 
 {
   this->setTitle("Animator");
   this->setBackgroundColor(glm::vec4{0.7f, 0.7f, 0.7f, 1.0f});
+
   this->registry = registry;
-  this->mouse.setOffset(this->getPosition());
   this->colorSystem = colorSystem;
   this->renderSystem = renderSystem;
   this->transformSystem = transformSystem;
+
+  this->mouse.setOffset(this->getPosition());
+
+  this->renderSystem->setCamera(&this->camera);
+  this->renderSystem->setRegistry(this->registry);
 }
 
 void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
 {
   this->mouse.onEvent(event);
+  /**
+   * Can now set the position/rotation of the camera
+   */
+  // this->camera.setPosition(this->mouse.position.x, this->mouse.position.y);
+  // this->camera.setRotation(this->mouse.position.x);
 }
 
 void AnimatorViewport::onUpdate(float deltaTime)
@@ -35,4 +45,9 @@ void AnimatorViewport::onUpdate(float deltaTime)
 void AnimatorViewport::onDrawViewport(float deltaTime)
 {
   this->renderSystem->draw(deltaTime);
+}
+
+void AnimatorViewport::onResize(float width, float height)
+{
+  this->camera.setDimensions(width, height);
 }

@@ -5,6 +5,7 @@
 
 #include "ECS/Registry.h"
 #include "Render/Mesh/Mesh.h"
+#include "Render/Camera/OrthographicCamera.h"
 
 struct BoneMesh {
   float verticies[8];
@@ -15,7 +16,7 @@ class RenderSystem
 {
 private:
   Registry *registry;
-  std::vector<Mesh *> meshes;
+  OrthographicCamera *camera;
 
 public:
   RenderSystem() = default;
@@ -23,5 +24,6 @@ public:
 
   void draw(float deltaTime);
 
-  void push(Mesh *mesh);
+  void setRegistry(Registry *registry);
+  void setCamera(OrthographicCamera *camera);
 };

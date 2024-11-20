@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Scene/Scene.h"
-#include "ProjectManager/ProjectManager.h"
+#include "Manager/ProjectManager.h"
 
 class HeaderPanelScene : public Scene
 {

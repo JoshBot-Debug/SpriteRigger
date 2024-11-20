@@ -6,16 +6,13 @@ layout(location=2)in vec3 color;
 
 out vec3 fragColor;
 
-uniform mat4 mvp;
+uniform mat4 viewProjection;
 
 void main(){
   fragColor=color;
-  
-  vec2 translation=translate.xy;
+
   float angle=radians(translate.z);
-  
   mat2 rotation=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
   
-  // gl_Position=mvp*vec4(rotation*mesh+translation,0.,1.);
-  gl_Position=mvp*vec4(rotation*mesh,0.,1.);
+  gl_Position=viewProjection*vec4(rotation*mesh+translate.xy,0.,1.);
 }

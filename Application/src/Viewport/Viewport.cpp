@@ -7,11 +7,6 @@
 
 #include <stdio.h>
 
-Viewport::Viewport()
-{
-  this->createFrameBuffer();
-}
-
 Viewport::~Viewport() {}
 
 void Viewport::setTitle(const char *title)
@@ -24,19 +19,26 @@ void Viewport::setWindowFlags(ImGuiWindowFlags flags)
   this->flags = flags;
 }
 
-void Viewport::setDimensions(glm::vec2 size)
+void Viewport::setDimensions(glm::vec2 dimensions)
 {
-  this->size = size;
+  this->dimensions = dimensions;
 }
 
 void Viewport::resize(glm::vec2 size)
 {
-  this->setDimensions(size);
+  if (this->texture)
+  {
+    /**
+     * The viewport resized so we need to resize the texture we are rendering
+     * to! Duh!
+     */
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glBindTexture(GL_TEXTURE_2D, 0);
+  }
 
-  // TODO Mostly need to resize the texture here & the viewport somewhere.
-  // glViewport(0, 0, size.x, size.y);
-  // glBindTexture(GL_TEXTURE_2D, this->texture);
-  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  this->setDimensions(size);
+  this->onResize(size.x, size.y);
 }
 
 void Viewport::createFrameBuffer()
@@ -48,7 +50,7 @@ void Viewport::createFrameBuffer()
   // Create a texture to render to & bind it
   glGenTextures(1, &this->texture);
   glBindTexture(GL_TEXTURE_2D, this->texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->size.x, this->size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->dimensions.x, this->dimensions.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -76,9 +78,20 @@ void Viewport::onDraw(float deltaTime)
   this->position.x = position.x;
   this->position.y = position.y;
 
-  if (this->size.x != size.x || this->size.y != size.y)
+  if (this->dimensions.x != size.x || this->dimensions.y != size.y)
     this->resize({size.x, size.y});
 
+  /**
+   * Why create the during onDraw?
+   * This avoids creating the framebuffer with the wrong initial size.
+   * It used to be in the constructor but we don't have the correction dimentions to begin with.
+   * Hence, it was moved here so that we get the size of the viewport and can then create the
+   * texture with the correct size!
+   */
+  if (this->framebuffer == 0)
+    this->createFrameBuffer();
+
+  glViewport(0, 0, size.x, size.y);
   glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
 
   glClearColor(this->backgroundColor.r, this->backgroundColor.g, this->backgroundColor.b, this->backgroundColor.a);
@@ -88,15 +101,15 @@ void Viewport::onDraw(float deltaTime)
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  ImGui::Image((ImTextureID)this->texture, ImVec2(this->size.x, this->size.y));
+  ImGui::Image((ImTextureID)this->texture, ImVec2(this->dimensions.x, this->dimensions.y));
 
   ImGui::End();
   ImGui::PopStyleVar();
 }
 
-glm::vec2 *Viewport::getSize()
+glm::vec2 *Viewport::getDimensions()
 {
-  return &this->size;
+  return &this->dimensions;
 }
 
 glm::vec2 *Viewport::getPosition()

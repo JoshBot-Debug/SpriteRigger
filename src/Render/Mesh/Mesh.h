@@ -2,15 +2,9 @@
 
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 #include "GL/glew.h"
-#include "Render/Shader/Shader.h"
-
-struct Instance
-{
-  unsigned int vbo;
-};
 
 class Mesh
 {
@@ -23,10 +17,8 @@ private:
   mutable std::unordered_map<std::string, unsigned int> instanceIds;
   mutable std::unordered_map<std::string, std::vector<std::vector<float>>> instances;
 
-  Shader *shader;
-
 public:
-  Mesh(std::string name) : name(name), vao(0), vbo(0), ebo(0), indicesSize(0), shader(nullptr) {}
+  Mesh(std::string name) : name(name), vao(0), vbo(0), ebo(0), indicesSize(0) {}
   ~Mesh();
 
   /**
@@ -91,31 +83,24 @@ public:
   void createElementArrayBuffer(std::vector<unsigned int> indices) const;
 
   /**
-   * Set the array buffer data location for the shader.
-   * This function configures how per-vertex attributes (like positions, normals, texture coordinates, etc.)
-   * are passed to the vertex shader. It sets up the attribute pointer for the vertex data and enables
-   * it, using `glVertexAttribPointer` and `glEnableVertexAttribArray`.
+   * Set up a vertex attribute for the shader.
    *
-   * @param index The location index in the shader. This is the attribute location in the shader
-   *              where the vertex data will be accessed. The index corresponds to the `layout(location = X)`
-   *              in the vertex shader. It should start from 0 and match the attribute location specified in the shader.
+   * This function configures an OpenGL vertex attribute by specifying how the vertex data is
+   * organized in the buffer and how the shader should access it. The attribute is bound to a specific
+   * index in the shader, and the parameters like size, stride, and offset are used to define how the data
+   * is laid out in the buffer and how it should be accessed by the shader during rendering.
    *
-   * @param count The number of floats to include in this location. This represents the size of the attribute
-   *              being passed to the shader. For example:
-   *              - 1 for a `float` (scalar value),
-   *              - 2 for a `vec2` (two floats),
-   *              - 3 for a `vec3` (three floats),
-   *              - 4 for a `vec4` (four floats).
-   *              It defines how many components each vertex attribute has for this particular location.
+   * This is typically used to set up vertex data such as positions, normals, texture coordinates, etc.
    *
-   * @param offset The offset (in terms of floats) to the start of this attribute within the vertex buffer.
-   *               This defines the starting point of this particular attribute in the vertex data array.
-   *               For example, if the first attribute is a `vec3` at location 0, its offset is 0.
-   *               If the second attribute is a `vec2` at location 1 and follows immediately after the `vec3`,
-   *               the offset would be 3 (since `vec3` takes up 3 floats). The offset is usually used when
-   *               multiple attributes (e.g., position, normal, color) are packed together in the vertex data.
+   * @param index The index of the vertex attribute in the shader to which the data will be assigned. This
+   *              corresponds to the `layout(location = index)` attribute in the shader code.
+   * @param size The number of components in the vertex attribute (e.g., 3 for `vec3` attributes like positions or normals).
+   * @param stride The distance in bytes between consecutive attributes within the buffer. It defines how much data
+   *               should be skipped to move to the next attribute in the buffer.
+   * @param offset The offset in the buffer where the specific attribute data starts. This helps in extracting
+   *               the data from the correct position in the buffer.
    */
-  void setVertexAttrib(unsigned int index, unsigned int count, unsigned int offset) const;
+  void setVertexAttrib(unsigned int index, unsigned int size, unsigned int stride, unsigned int offset) const;
 
   /**
    * Create the instance's array buffer and bind it.
@@ -134,31 +119,25 @@ public:
   void createInstanceBuffer(std::string name) const;
 
   /**
-   * Set the instance array buffer data location for the shader.
-   * This function configures how per-instance attributes (like position, color, scale, etc.)
-   * are passed to the vertex shader for each instance of the geometry. It sets up the
-   * attribute pointer and enables it, using `glVertexAttribPointer` and `glVertexAttribDivisor`.
+   * Set up an instance vertex attribute for per-instance data in the shader.
    *
-   * @param index The location index in the shader. This is the attribute location that the shader
-   *              uses to access the instance data. This index should start from 0 and correspond
-   *              to the layout location specified in the vertex shader.
+   * This function configures an OpenGL vertex attribute to fetch per-instance data (e.g., transformations or other attributes)
+   * from the instance buffer. It binds the instance data to a specific index and sets various parameters such as
+   * the size of the attribute, the stride between consecutive attributes, the offset within the buffer, and the divisor
+   * for instanced drawing.
    *
-   * @param count The number of floats to include in this location. This is the size of the attribute
-   *              (e.g., 3 for a `vec3` or 4 for a `vec4`). It specifies how many components are
-   *              used to define the per-instance data for each instance.
+   * The attribute data is accessed per instance during instanced rendering, allowing each instance of an object
+   * to have unique attributes (e.g., position, rotation, scale) while sharing the same mesh data.
    *
-   * @param offset The offset (in terms of float elements) to the start of this attribute within the
-   *               instance buffer. For example, if you have multiple per-instance attributes packed
-   *               together, you specify the starting point of this attribute. The first attribute might
-   *               have an offset of 0, the second could be 3 for a `vec3`, etc.
-   *
-   * @param divisor The divisor tells OpenGL how often the attribute should advance (i.e., how often
-   *                the value should be updated for each instance). A divisor of 1 means that the
-   *                attribute will change once per instance (i.e., each instance gets a different value).
-   *                A divisor of 0 means that the value will be the same for all instances (i.e., it's a
-   *                per-vertex attribute, not per-instance). This is essential for efficient instanced rendering.
+   * @param index The index of the vertex attribute in the shader to which the data will be assigned.
+   * @param size The number of components in the vertex attribute (e.g., 3 for vec3).
+   * @param stride The distance in bytes between consecutive attributes within the instance buffer.
+   * @param offset The offset in the buffer where the per-instance data starts, used to point to the beginning
+   *               of the specific attribute data for each instance.
+   * @param divisor The divisor for instancing, which specifies how frequently the attribute should change. A value of
+   *                1 indicates the attribute is updated once per instance, while a value of 0 means it’s constant for all instances.
    */
-  void setInstanceVertexAttrib(unsigned int index, unsigned int count, unsigned int offset, unsigned int divisor = 1) const;
+  void setInstanceVertexAttrib(unsigned int index, unsigned int size, unsigned int stride, unsigned int offset, unsigned int divisor = 1) const;
 
   /**
    * Create an instance buffer for storing per-instance data and bind it.
@@ -175,8 +154,15 @@ public:
    *             different instance data buffers.
    * @param vertices Pointer to the array of vertex data for the instance, typically used to store
    *                 per-instance attributes, like transformation matrices (e.g., translation, rotation, scale).
+   *
+   * @return The number of verticies in the buffer
    */
-  void setInstanceBuffer(std::string name, std::vector<float> vertices) const;
+  unsigned int setInstanceBuffer(std::string name, std::vector<float> vertices) const;
+
+  /**
+   * Bind the VAO, VBO, EBO if any
+   */
+  void bind() const;
 
   /**
    * Unbind the VAO, VBO, EBO if any.
@@ -192,14 +178,12 @@ public:
    */
   void unbind() const;
 
-  Shader *createShader();
+  unsigned int getVertexArray() const;
+  unsigned int getArrayBuffer() const;
+  unsigned int getElementArrayBuffer() const;
 
-  Shader *getShader();
+  unsigned int getIndicesSize() const;
+  unsigned int getInstanceSize() const;
 
-  unsigned int getVertexArray();
-  unsigned int getArrayBuffer();
-  unsigned int getElementArrayBuffer();
-
-  unsigned int getIndicesSize();
-  unsigned int getInstanceSize();
+  void drawInstances() const;
 };

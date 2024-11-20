@@ -9,8 +9,8 @@
 class Viewport : public Scene
 {
 private:
-  unsigned int texture;
-  unsigned int framebuffer;
+  unsigned int texture = 0;
+  unsigned int framebuffer = 0;
 
   const char *title = "Viewport";
 
@@ -20,7 +20,7 @@ private:
   glm::vec4 backgroundColor = glm::vec4{0, 0, 0, 1.0f};
 
   // Viewport width and height
-  glm::vec2 size{1080, 720};
+  glm::vec2 dimensions{0, 0};
 
   // Viewport position
   glm::vec2 position{0, 0};
@@ -38,7 +38,7 @@ private:
   void createFrameBuffer();
 
 public:
-  Viewport();
+  Viewport() = default;
 
   virtual ~Viewport();
 
@@ -96,10 +96,15 @@ public:
   /**
    * Get the size of the viewport
    */
-  glm::vec2 *getSize();
+  glm::vec2 *getDimensions();
 
   /**
    * Get the position of the viewport
    */
   glm::vec2 *getPosition();
+
+  /**
+   * Called when the viewport is resized.
+   */
+  virtual void onResize(float width, float height) {};
 };

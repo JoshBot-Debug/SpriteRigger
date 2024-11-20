@@ -8,17 +8,6 @@
 
 #include "Component/Component.h"
 
-/**
- * Create an armature
- * Joint extendable
- *
- * Process to setup a vertex array, buffer and element buffer
- * Decide between instancing or uniforms.
- * Ability to add textures and bind them to bones.
- *
- * Move out Render to Application
- */
-
 void App::onInitialize()
 {
   this->addProjectToRecentFiles(5);
@@ -27,7 +16,7 @@ void App::onInitialize()
   this->assetScene.onInitialize();
   this->headerPanelScene.onInitialize(this->projectManager);
 
-  this->controller.onInitialize(&this->registry, &this->colorSystem, &this->renderSystem, &this->transformSystem);
+  this->controller.onInitialize(&this->registry, &this->resourceManager);
 
   this->hierarchyScene.onInitialize(&this->registry, &this->controller);
   this->animatorViewport.onInitialize(&this->registry, &this->controller, &this->colorSystem, &this->renderSystem, &this->transformSystem);

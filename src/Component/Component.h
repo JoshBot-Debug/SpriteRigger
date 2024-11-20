@@ -1,6 +1,9 @@
 #pragma once
 #include "Application.h"
 
+#include "Render/Mesh/Mesh.h"
+#include "Render/Shader/Shader.h"
+
 struct CTransform
 {
   glm::vec2 position;
@@ -66,4 +69,25 @@ struct CBone
   CBone(std::string name, EntityID armature) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
   CBone(std::string name, EntityID armature, EntityID parent) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
   CBone(std::string name, EntityID armature, EntityID parent, glm::vec2 position) : armature(armature), parent(-1), name(name), position(position), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
+};
+
+struct CMesh
+{
+  Mesh *mesh;
+
+  CMesh(Mesh *mesh): mesh(mesh) {}
+};
+
+struct CMeshInstance
+{
+  unsigned int offset;
+
+  CMeshInstance(unsigned int offset): offset(offset) {}
+};
+
+struct CShader
+{
+  Shader *shader;
+
+  CShader(Shader *shader): shader(shader) {}
 };

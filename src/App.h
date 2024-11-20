@@ -3,7 +3,8 @@
 #include "Application.h"
 #include "Utility.h"
 #include "Controller/Controller.h"
-#include "ProjectManager/ProjectManager.h"
+#include "Manager/ProjectManager.h"
+#include "Manager/ResourceManager.h"
 
 #include "Scene/AssetScene.h"
 #include "Scene/HierarchyScene.h"
@@ -14,6 +15,7 @@ class App : public Application
 {
 private:
   ProjectManager *projectManager;
+  ResourceManager resourceManager;
 
   Controller controller;
 
