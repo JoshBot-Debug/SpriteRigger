@@ -10,5 +10,5 @@ public:
   ~ResourceManager() = default;
 
   Mesh *createBone();
-  unsigned int createBoneInstance(Mesh *mesh);
+  void createBoneInstance(Mesh *mesh);
 };

@@ -157,7 +157,35 @@ public:
    *
    * @return The number of verticies in the buffer
    */
-  unsigned int setInstanceBuffer(std::string name, std::vector<float> vertices) const;
+  void setInstanceBuffer(std::string name, std::vector<float> vertices) const;
+
+  /**
+   * Update a portion of the instance buffer with new per-instance data.
+   *
+   * This function updates a specific section of an existing instance buffer with new data.
+   * It is useful for modifying per-instance attributes (e.g., transformation matrices like
+   * translation, rotation, scale) without having to recreate or rebind the entire buffer.
+   * The function allows efficient updating of instance-specific data, enabling dynamic changes
+   * for each instance in an object (for example, updating the positions or transformations
+   * of objects in a scene).
+   *
+   * @param name The name of the instance buffer to be updated. This should correspond
+   *             to the buffer created earlier, used for managing or distinguishing different
+   *             sets of instance data.
+   * @param offset The number of **floats** to skip from the beginning of the buffer before
+   *               updating. This offset is in terms of the number of per-instance attributes
+   *               (e.g., a matrix or vector) and must be provided in **elements** (not bytes).
+   *               If you're updating a matrix (e.g., 16 floats), make sure the `offset`
+   *               correctly corresponds to the number of matrices or sets of data.
+   * @param vertices A vector containing the new instance data (e.g., transformation matrices).
+   *                 This data will replace the existing content starting from the specified
+   *                 offset, and it must match the size and format expected by the buffer.
+   *
+   * @note The `offset` is specified in bytes, so you must ensure that it aligns correctly
+   *       with the data layout in the buffer (e.g., considering the size of each per-instance
+   *       attribute like a matrix or vector).
+   */
+  void updateInstanceBuffer(std::string name, unsigned int offset, std::vector<float> vertices) const;
 
   /**
    * Bind the VAO, VBO, EBO if any

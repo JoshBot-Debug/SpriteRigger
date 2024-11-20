@@ -21,6 +21,10 @@ void TransformSystem::update(float deltaTime, Registry *registry, Mouse *mouse)
 
       if (state.isDragging)
         transform->position = glm::mix(transform->position, state.position, deltaTime * 20);
+
+      // TODO move this to the right place [ColorSystem | TransformSystem]
+      auto mesh = registry->get<CMesh>(bone->armature);
+      mesh->mesh->updateInstanceBuffer("transform", 0, {transform->position.x, transform->position.y, 0.0f});
     }
   }
 }

@@ -78,13 +78,6 @@ struct CMesh
   CMesh(Mesh *mesh): mesh(mesh) {}
 };
 
-struct CMeshInstance
-{
-  unsigned int offset;
-
-  CMeshInstance(unsigned int offset): offset(offset) {}
-};
-
 struct CShader
 {
   Shader *shader;

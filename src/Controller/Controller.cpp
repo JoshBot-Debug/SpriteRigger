@@ -31,7 +31,7 @@ void Controller::createArmature()
   shader->createProgram();
 
   Mesh *mesh = this->resourceManager->createBone();
-  unsigned int boneInstance = this->resourceManager->createBoneInstance(mesh);
+  this->resourceManager->createBoneInstance(mesh);
 
   Entity *armature = this->registry->createEntity("Armature");
   CArmature *cArmature = armature->add<CArmature>("Armature 1");
@@ -41,7 +41,6 @@ void Controller::createArmature()
   Entity *bone = this->registry->createEntity("Bone");
   bone->add<CTransform>();
   bone->add<CBone>("Bone 1", *armature);
-  bone->add<CMeshInstance>(boneInstance);
 
   cArmature->bones.push_back(*bone);
 }

@@ -62,13 +62,19 @@ void Mesh::setInstanceVertexAttrib(unsigned int index, unsigned int size, unsign
   glVertexAttribDivisor(index, divisor);
 }
 
-unsigned int Mesh::setInstanceBuffer(std::string name, std::vector<float> vertices) const
+void Mesh::setInstanceBuffer(std::string name, std::vector<float> vertices) const
 {
   this->instances[name].push_back(vertices);
   glBindBuffer(GL_ARRAY_BUFFER, this->instanceIds[name]);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  return vertices.size();
+}
+
+void Mesh::updateInstanceBuffer(std::string name, unsigned int offset, std::vector<float> vertices) const
+{
+  glBindBuffer(GL_ARRAY_BUFFER, this->instanceIds[name]);
+  glBufferSubData(GL_ARRAY_BUFFER, offset * sizeof(float), vertices.size() * sizeof(float), vertices.data());
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::bind() const

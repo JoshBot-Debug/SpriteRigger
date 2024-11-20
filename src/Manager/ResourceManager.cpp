@@ -31,11 +31,11 @@ Mesh *ResourceManager::createBone()
   return mesh;
 }
 
-unsigned int ResourceManager::createBoneInstance(Mesh *mesh)
+void ResourceManager::createBoneInstance(Mesh *mesh)
 {
   std::vector<float> transform = {0.0f, 0.0f, 0.0f};
   mesh->setInstanceBuffer("transform", transform);
 
   std::vector<float> color = {1.0f, 1.0f, 1.0f};
-  return mesh->setInstanceBuffer("color", color);
+  mesh->setInstanceBuffer("color", color);
 }

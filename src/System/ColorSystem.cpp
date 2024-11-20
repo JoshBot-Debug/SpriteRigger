@@ -11,7 +11,11 @@ void ColorSystem::update(float deltaTime, Registry *registry, Mouse *mouse)
     {
       auto bone = entity->get<CBone>();
       MouseEntityState state = mouse->getMouseEntityState(entity->getId());
-      bone->color.b = state.isFocused ? 0 : 255;
+      bone->color.b = state.isFocused ? 0.0f : 1.0f;
+
+      // TODO move this to the right place [ColorSystem | TransformSystem]
+      auto mesh = registry->get<CMesh>(bone->armature);
+      mesh->mesh->updateInstanceBuffer("color", 0, {bone->color.r, bone->color.g, bone->color.b});
     }
   }
 }
