@@ -1,7 +1,7 @@
 #pragma once
 #include "Application.h"
 
-#include "Render/Model/Mesh.h"
+#include "Render/Model/InstancedMesh.h"
 #include "Render/Shader/Shader.h"
 
 struct CTransform

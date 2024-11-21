@@ -8,7 +8,7 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 
-class Mesh
+class InstancedMesh
 {
 private:
   VertexArray vao;
@@ -27,7 +27,7 @@ public:
 
   // We don't need instanced, instead we can replace it
   // with a size_t to specify the instancePreallocatedSize
-  Mesh(std::vector<T> vertices, std::vector<unsigned int> indices, unsigned int instanceCount = 0, size_t instanceSize = 0) : instanceCount(instanceCount), instanceSize(instanceSize)
+  InstancedMesh(std::vector<T> vertices, std::vector<unsigned int> indices, unsigned int instanceCount = 0, size_t instanceSize = 0) : instanceCount(instanceCount), instanceSize(instanceSize)
   {
     vao.generate();
     vao.bind();
@@ -47,17 +47,17 @@ public:
     indicesCount = indices.size();
   }
 
-  ~Mesh() {}
+  ~InstancedMesh() {}
 
   /**
    * Disable copy constructor
    */
-  Mesh(const Mesh &) = delete;
+  InstancedMesh(const InstancedMesh &) = delete;
 
   /**
    * Disable assignment operator
    */
-  Mesh &operator=(const Mesh &) = delete;
+  InstancedMesh &operator=(const InstancedMesh &) = delete;
 
   void bind()
   {
@@ -118,7 +118,7 @@ public:
     ibo.update(instances[id], size, data);
   }
 
-  void drawInstances()
+  void draw()
   {
     vao.bind();
     ebo.bind();

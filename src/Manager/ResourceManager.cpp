@@ -17,15 +17,11 @@ ResourceManager::ResourceManager()
       0, 1, 2,
       0, 2, 3};
 
-  Mesh *mesh = new Mesh(vertices, indices, 3, 5 * sizeof(float));
+  InstancedMesh *mesh = new InstancedMesh(vertices, indices, 3, 5 * sizeof(float));
 
   mesh->setVertexAttribPointer(0, 2, VertexDataType::FLOAT, false, 2 * sizeof(float), 0);
   mesh->setInstanceVertexAttribPointer(1, 2, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)0);
   mesh->setInstanceVertexAttribPointer(2, 3, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)(2 * sizeof(float)));
-
-  // Instance *data = mesh->createInstance("data", 3 * 5 * sizeof(float));
-  // data->setVertexAttribPointer(1, 2, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)0);
-  // data->setVertexAttribPointer(2, 3, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)(2 * sizeof(float)));
 
   mesh->unbind();
 
@@ -47,5 +43,5 @@ void ResourceManager::updateBone(unsigned int id, const std::vector<float> &data
 
 void ResourceManager::drawBone()
 {
-  this->meshes["Bone"]->drawInstances();
+  this->meshes["Bone"]->draw();
 }

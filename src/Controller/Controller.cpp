@@ -1,5 +1,5 @@
 #include "Controller.h"
-#include "Render/Model/Mesh.h"
+#include "Render/Model/InstancedMesh.h"
 #include "Render/Shader/Shader.h"
 #include <iostream>
 

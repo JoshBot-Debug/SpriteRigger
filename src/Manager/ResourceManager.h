@@ -2,12 +2,12 @@
 
 #include <unordered_map>
 #include <glm/glm.hpp>
-#include "Render/Model/Mesh.h"
+#include "Render/Model/InstancedMesh.h"
 
 class ResourceManager
 {
 private:
-  std::unordered_map<std::string, Mesh *> meshes;
+  std::unordered_map<std::string, InstancedMesh *> meshes;
 
 public:
   ResourceManager();

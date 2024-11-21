@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "ECS/Registry.h"
-#include "Render/Model/Mesh.h"
+#include "Render/Model/InstancedMesh.h"
 #include "Render/Camera/OrthographicCamera.h"
 #include "Manager/ResourceManager.h"
 
