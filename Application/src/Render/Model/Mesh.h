@@ -8,12 +8,6 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 
-struct Instance
-{
-  size_t size;
-  size_t offset;
-};
-
 class Mesh
 {
 private:
@@ -26,7 +20,7 @@ private:
 
   size_t instanceSize;
   unsigned int instanceCount;
-  std::unordered_map<unsigned int, Instance> instances;
+  std::unordered_map<unsigned int, size_t> instances;
 
 public:
   template <typename T>
@@ -85,7 +79,7 @@ public:
     vbo.bind();
     vao.setVertexAttribPointer(index, size, type, normalized, stride, pointer);
   }
-
+  
   void setInstanceVertexAttribPointer(unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer, unsigned int divisor = 1) const
   {
     ibo.bind();
@@ -95,56 +89,33 @@ public:
   template <typename T>
   void addInstance(unsigned int id, const std::vector<T> &data, VertexDraw draw = VertexDraw::DYNAMIC)
   {
-    size_t iSize = data.size() * sizeof(T);
-    size_t iCount = instances.size();
+    instances[id] = instances.size();
 
-    if (iCount >= instanceCount)
-      ibo.resize(iCount * iSize, (instanceCount *= 2) * iSize);
+    if (instances[id] >= instanceCount)
+      ibo.resize((instanceCount *= 2) * data.size() * sizeof(T), VertexDraw::DYNAMIC);
 
-    ibo.bind();
-
-    void *ptr = glMapBufferRange(GL_ARRAY_BUFFER,
-                                 iCount * iSize,
-                                 iSize,
-                                 GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
-
-    memcpy(ptr, data.data(), iSize);
-
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-
-    instances[id] = Instance{iSize, iCount - 1};
+    ibo.update(instances[id], data);
   }
 
   void addInstance(unsigned int id, size_t size, const void *data, VertexDraw draw = VertexDraw::DYNAMIC)
   {
-    size_t iCount = instances.size();
+    instances[id] = instances.size();
 
-    if (iCount >= instanceCount)
-      ibo.resize(iCount * size, (instanceCount *= 2) * size);
-
-    ibo.bind();
-
-    void *ptr = glMapBufferRange(GL_ARRAY_BUFFER,
-                                 iCount * size,
-                                 size,
-                                 GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
-
-    memcpy(ptr, data, size);
-
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-
-    instances[id] = Instance{size, iCount - 1};
+    if (instances[id] >= instanceCount)
+      ibo.resize((instanceCount *= 2) * size, VertexDraw::DYNAMIC);
+      
+    ibo.update(instances[id], size, data);
   }
 
   template <typename T>
   void updateInstance(unsigned int id, const std::vector<T> &data)
   {
-    // ibo.update(instances[id].offset, data);
+    ibo.update(instances[id], data);
   }
 
   void updateInstance(unsigned int id, size_t size, const void *data)
   {
-    // ibo.update(instances[id].offset, size, data);
+    ibo.update(instances[id], size, data);
   }
 
   void drawInstances()

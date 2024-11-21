@@ -70,7 +70,7 @@ public:
   void update(unsigned int offset, const std::vector<T> &data)
   {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, offset * sizeof(T), data.size() * sizeof(T), data.data());
+    glBufferSubData(GL_ARRAY_BUFFER, offset * data.size() * sizeof(T), data.size() * sizeof(T), data.data());
   }
 
   void update(size_t offset, size_t size, const void *data)
@@ -79,27 +79,38 @@ public:
     glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
   }
 
-  void resize(size_t psize, size_t nsize)
+  void resize(size_t size, VertexDraw draw = VertexDraw::STATIC)
   {
+    /**
+     * Read the size of the current vbo into psize
+     * Bind it as GL_COPY_READ_BUFFER
+     */
+    int psize;
+    glBindBuffer(GL_COPY_READ_BUFFER, vbo);
+    glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &psize);
+
+    /**
+     * Create the new vertex buffer with the new size
+     */
     unsigned int nvbo;
     glGenBuffers(1, &nvbo);
     glBindBuffer(GL_ARRAY_BUFFER, nvbo);
-    glBufferData(GL_ARRAY_BUFFER, nsize, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, nullptr, vertexDrawToGLenum(draw));
 
-    void *nptr = glMapBufferRange(GL_ARRAY_BUFFER, 0, nsize,
-                                  GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+    /**
+     * Bind the new vertex buffer as GL_COPY_WRITE_BUFFER
+     */
+    glBindBuffer(GL_COPY_WRITE_BUFFER, nvbo);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    /**
+     * Copy the data
+     */
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, psize);
 
-    void *pptr = glMapBufferRange(GL_ARRAY_BUFFER, 0, psize,
-                                  GL_MAP_READ_BIT);
-
-    memcpy(nptr, pptr, psize);
-
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, nvbo);
-    glUnmapBuffer(GL_ARRAY_BUFFER);
+    /**
+     * Delete the old buffer
+     */
+    glDeleteBuffers(1, &vbo);
 
     vbo = nvbo;
   }
