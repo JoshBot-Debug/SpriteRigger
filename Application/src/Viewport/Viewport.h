@@ -5,6 +5,7 @@
 
 #include "imgui.h"
 #include "Scene/Scene.h"
+#include "Input/Mouse.h"
 
 class Viewport : public Scene
 {
@@ -106,5 +107,5 @@ public:
   /**
    * Called when the viewport is resized.
    */
-  virtual void onResize(float width, float height) {};
+  virtual void onResize(glm::vec2 size) {};
 };

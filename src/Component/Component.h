@@ -1,17 +1,17 @@
 #pragma once
 #include "Application.h"
 
-#include "Render/Mesh/Mesh.h"
+#include "Render/Model/Mesh.h"
 #include "Render/Shader/Shader.h"
 
 struct CTransform
 {
   glm::vec2 position;
-  glm::vec2 rotation;
   glm::vec2 scale;
+  float rotation;
 
-  CTransform() : position(glm::vec2{0, 0}), rotation(glm::vec2{0, 0}), scale(glm::vec2{1, 1}) {}
-  CTransform(glm::vec2 position, glm::vec2 rotation, glm::vec2 scale) : position(position), rotation(rotation), scale(scale) {}
+  CTransform() : position(glm::vec2{0, 0}), rotation(0.0f), scale(glm::vec2{1, 1}) {}
+  CTransform(glm::vec2 position, float rotation, glm::vec2 scale) : position(position), rotation(rotation), scale(scale) {}
 };
 
 struct CArmature
@@ -66,16 +66,9 @@ struct CBone
    */
   glm::vec3 color;
 
-  CBone(std::string name, EntityID armature) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
-  CBone(std::string name, EntityID armature, EntityID parent) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
-  CBone(std::string name, EntityID armature, EntityID parent, glm::vec2 position) : armature(armature), parent(-1), name(name), position(position), size(glm::vec2{20, 100}), color(glm::vec3{255, 255, 255}) {}
-};
-
-struct CMesh
-{
-  Mesh *mesh;
-
-  CMesh(Mesh *mesh): mesh(mesh) {}
+  CBone(std::string name, EntityID armature) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{1.0f, 1.0f, 1.0f}) {}
+  CBone(std::string name, EntityID armature, EntityID parent) : armature(armature), parent(-1), name(name), position(glm::vec2{0, 0}), size(glm::vec2{20, 100}), color(glm::vec3{1.0f, 1.0f, 1.0f}) {}
+  CBone(std::string name, EntityID armature, EntityID parent, glm::vec2 position) : armature(armature), parent(-1), name(name), position(position), size(glm::vec2{20, 100}), color(glm::vec3{1.0f, 1.0f, 1.0f}) {}
 };
 
 struct CShader

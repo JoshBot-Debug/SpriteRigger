@@ -1,41 +1,46 @@
 #include "ResourceManager.h"
 
-Mesh *ResourceManager::createBone()
+ResourceManager::ResourceManager()
 {
-  Mesh *mesh = new Mesh("Bone");
-  mesh->createVertexArray();
-
   std::vector<float> vertices = {
-    -50.0f, -50.0f,
-     50.0f, -50.0f,
-     50.0f,  50.0f,
-    -50.0f,  50.0f,
+      -50.0f,
+      -50.0f,
+      50.0f,
+      -50.0f,
+      50.0f,
+      50.0f,
+      -50.0f,
+      50.0f,
   };
+
   std::vector<unsigned int> indices = {
       0, 1, 2,
       0, 2, 3};
 
-  mesh->createArrayBuffer(vertices);
-  mesh->createElementArrayBuffer(indices);
+  Mesh *mesh = new Mesh(vertices, indices, 3, 5 * sizeof(float));
 
-  mesh->setVertexAttrib(0, 2, 2, 0);
+  mesh->setVertexAttribPointer(0, 2, VertexDataType::FLOAT, false, 2 * sizeof(float), 0);
 
-  mesh->createInstanceBuffer("transform");
-  mesh->setInstanceVertexAttrib(1, 3, 3, 0);
-
-  mesh->createInstanceBuffer("color");
-  mesh->setInstanceVertexAttrib(2, 3, 3, 0);
+  mesh->setInstanceVertexAttribPointer(1, 2, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)0);
+  mesh->setInstanceVertexAttribPointer(2, 3, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)(2 * sizeof(float)));
 
   mesh->unbind();
 
-  return mesh;
+  this->meshes["Bone"] = mesh;
 }
 
-void ResourceManager::createBoneInstance(Mesh *mesh)
+void ResourceManager::addBone(unsigned int id)
 {
-  std::vector<float> transform = {0.0f, 0.0f, 0.0f};
-  mesh->setInstanceBuffer("transform", transform);
+  std::vector<float> instance = {(id - 1) * 20.0f, 0.0f, 1.0f, 0.0f, 0.0f};
+  this->meshes["Bone"]->addInstance(id, instance);
+}
 
-  std::vector<float> color = {1.0f, 1.0f, 1.0f};
-  mesh->setInstanceBuffer("color", color);
+void ResourceManager::updateBone(unsigned int id, const std::vector<float> &data)
+{
+  this->meshes["Bone"]->updateInstance(id, data);
+}
+
+void ResourceManager::drawBone()
+{
+  this->meshes["Bone"]->drawInstances();
 }

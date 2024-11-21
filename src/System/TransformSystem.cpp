@@ -16,15 +16,13 @@ void TransformSystem::update(float deltaTime, Registry *registry, Mouse *mouse)
       if (mouse->state == MouseState::PRESS_LEFT)
         if (Utility::intersects(mouse->position, transform->position, bone->size))
           mouse->press(entity->getId(), transform->position);
+        else
+          mouse->unfocus(entity->getId());
 
       MouseEntityState state = mouse->getMouseEntityState(entity->getId());
 
       if (state.isDragging)
         transform->position = glm::mix(transform->position, state.position, deltaTime * 20);
-
-      // TODO move this to the right place [ColorSystem | TransformSystem]
-      auto mesh = registry->get<CMesh>(bone->armature);
-      mesh->mesh->updateInstanceBuffer("transform", 0, {transform->position.x, transform->position.y, 0.0f});
     }
   }
 }

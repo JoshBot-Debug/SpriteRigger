@@ -10,9 +10,8 @@ uniform mat4 viewProjection;
 
 void main(){
   fragColor=color;
-
+  
   float angle=radians(translate.z);
   mat2 rotation=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));
-  
   gl_Position=viewProjection*vec4(rotation*mesh+translate.xy,0.,1.);
 }

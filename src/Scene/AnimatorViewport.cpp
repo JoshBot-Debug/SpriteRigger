@@ -10,7 +10,7 @@ struct GrabPayload
   GrabPayload(glm::vec2 offset, int zIndex) : offset(offset), zIndex(zIndex) {}
 };
 
-void AnimatorViewport::onInitialize(Registry *registry, Controller *controller, ColorSystem *colorSystem, RenderSystem *renderSystem, TransformSystem *transformSystem)
+void AnimatorViewport::onInitialize(Registry *registry, Controller *controller, ResourceManager *resourceManager, ColorSystem *colorSystem, RenderSystem *renderSystem, TransformSystem *transformSystem)
 {
   this->setTitle("Animator");
   this->setBackgroundColor(glm::vec4{0.7f, 0.7f, 0.7f, 1.0f});
@@ -20,10 +20,11 @@ void AnimatorViewport::onInitialize(Registry *registry, Controller *controller, 
   this->renderSystem = renderSystem;
   this->transformSystem = transformSystem;
 
-  this->mouse.setOffset(this->getPosition());
-
   this->renderSystem->setCamera(&this->camera);
   this->renderSystem->setRegistry(this->registry);
+  this->renderSystem->setResourceManager(resourceManager);
+
+  this->mouse.setBounds(this->getPosition(), this->getDimensions(), MouseOrigin::CENTER);
 }
 
 void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
@@ -47,7 +48,7 @@ void AnimatorViewport::onDrawViewport(float deltaTime)
   this->renderSystem->draw(deltaTime);
 }
 
-void AnimatorViewport::onResize(float width, float height)
+void AnimatorViewport::onResize(glm::vec2 size)
 {
-  this->camera.setDimensions(width, height);
+  this->camera.setDimensions(size.x, size.y);
 }

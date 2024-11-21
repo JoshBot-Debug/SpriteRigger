@@ -1,14 +1,19 @@
 #pragma once
 
-#include "Render/Mesh/Mesh.h"
+#include <unordered_map>
+#include <glm/glm.hpp>
+#include "Render/Model/Mesh.h"
 
 class ResourceManager
 {
 private:
+  std::unordered_map<std::string, Mesh *> meshes;
+
 public:
-  ResourceManager() = default;
+  ResourceManager();
   ~ResourceManager() = default;
 
-  Mesh *createBone();
-  void createBoneInstance(Mesh *mesh);
+  void addBone(unsigned int id);
+  void updateBone(unsigned int id, const std::vector<float> &data);
+  void drawBone();
 };

@@ -1,12 +1,24 @@
 #pragma once
 
-inline const float BONE_VERTICES[] = {
-    -10.0f, -10.0f,
-    10.0f, -10.0f,
-    10.0f, 10.0f,
-    -10.0f, 10.0f,
-    };
+#include <vector>
+#include <glm/glm.hpp>
 
-inline const unsigned int BONE_INDICES[] = {
+struct BoneMesh {
+  std::vector<float> vertices = {
+    -50.0f, -50.0f,
+     50.0f, -50.0f,
+     50.0f,  50.0f,
+    -50.0f,  50.0f,
+  };
+
+  std::vector<unsigned int> indices = {
     0, 1, 2,
-    0, 2, 3};
+    0, 2, 3
+  };
+};
+
+struct BoneInstance {
+  float rotation;
+  glm::vec2 position;
+  glm::vec4 color;
+};

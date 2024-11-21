@@ -6,12 +6,17 @@
 #include <vector>
 #include <string>
 
+enum class ShaderType {
+  VERTEX_SHADER,
+  FRAGMENT_SHADER
+};
+
 struct ShaderFile
 {
   const char *filepath;
-  GLenum type;
+  ShaderType type;
 
-  ShaderFile(const char *filepath, GLenum type): filepath(filepath), type(type) {};
+  ShaderFile(const char *filepath, ShaderType type): filepath(filepath), type(type) {};
 };
 
 class Shader
@@ -37,7 +42,7 @@ public:
   Shader &operator=(const Shader &) = delete;
 
 
-  bool compile(const char *filepath, GLenum type, bool enableRecompile = true);
+  bool compile(const char *filepath, ShaderType type, bool enableRecompile = true);
 
   bool recompile();
 

@@ -5,13 +5,25 @@
 #include <sstream>
 #include <string>
 
+GLenum shaderTypeToGLenum(ShaderType type)
+{
+  switch (type)
+  {
+  case ShaderType::VERTEX_SHADER:
+    return GL_VERTEX_SHADER;
+  case ShaderType::FRAGMENT_SHADER:
+    return GL_FRAGMENT_SHADER;
+  }
+  return GL_VERTEX_SHADER;
+}
+
 Shader::~Shader()
 {
   if (this->program != 0)
     glDeleteProgram(this->program);
 }
 
-bool Shader::compile(const char *filepath, GLenum type, bool enableRecompile)
+bool Shader::compile(const char *filepath, ShaderType type, bool enableRecompile)
 {
   std::ifstream stream(filepath);
 
@@ -31,7 +43,7 @@ bool Shader::compile(const char *filepath, GLenum type, bool enableRecompile)
   std::string shaderStr = sStream.str();
   const char *shaderCStr = shaderStr.c_str();
 
-  unsigned int shader = glCreateShader(type);
+  unsigned int shader = glCreateShader(shaderTypeToGLenum(type));
   glShaderSource(shader, 1, &shaderCStr, nullptr);
   glCompileShader(shader);
 

@@ -13,11 +13,35 @@ enum class MouseState
   MOVING,
 };
 
+enum class MouseBounds
+{
+  NONE,
+  IN_BOUNDS,
+  OUT_OF_BOUNDS,
+};
+
+enum class MouseOrigin
+{
+  TOP_LEFT,
+  CENTER,
+};
+
 struct MouseEntityState
 {
   glm::vec2 position;
   bool isDragging;
   bool isFocused;
+};
+
+struct Bounds
+{
+  glm::vec2 *position = nullptr;
+  glm::vec2 *dimensions = nullptr;
+  MouseOrigin origin = MouseOrigin::TOP_LEFT;
+  MouseBounds state = MouseBounds::NONE;
+
+  Bounds() = default;
+  Bounds(glm::vec2 *position, glm::vec2 *dimensions, MouseOrigin origin) : position(position), dimensions(dimensions), origin(origin) {}
 };
 
 class Mouse
@@ -53,6 +77,16 @@ private:
    * The offset of the viewport, this will be subracted from the mouse's position.
    */
   glm::vec2 *offset;
+
+  /**
+   * The bounds of the mouse region
+   */
+  Bounds bounds;
+
+  /**
+   * Updates the mouse position
+   */
+  void updateMousePosition(float x, float y);
 
 public:
   /**
@@ -96,7 +130,21 @@ public:
   void onEvent(SDL_Event *event);
 
   /**
-   * Set the offset of the viewport, this will be subtracted from the position of the mouse.
+   * Sets the bounds of the mouse.
+   * Useful if you only want to capture mouse events within a certain region
+   * in your screen. You can also set the origin of the mouse.
    */
-  void setOffset(glm::vec2 *offset);
+  void setBounds(glm::vec2 *position, glm::vec2 *dimensions, MouseOrigin origin);
+
+  /**
+   * Check if the mouse intersects with a rect
+   */
+  bool intersects(const glm::vec2 &position, const glm::vec2 &size);
+
+  /**
+   * If setBounds was called, this can be used to determin if the mouse was
+   * within the specified bounds or not.
+   * @return MouseBounds::IN_BOUNDS or MouseBounds::OUT_OF_BOUNDS or MouseBounds::NONE
+   */
+  MouseBounds getMouseBoundsState();
 };

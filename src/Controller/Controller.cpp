@@ -1,5 +1,5 @@
 #include "Controller.h"
-#include "Render/Mesh/Mesh.h"
+#include "Render/Model/Mesh.h"
 #include "Render/Shader/Shader.h"
 #include <iostream>
 
@@ -19,28 +19,32 @@ void Controller::onInitialize(Registry *registry, ResourceManager *resourceManag
 
 void Controller::createArmature()
 {
+  ++armatureCount;
+
   /**
    * Temp creating the shader here, in general, it would
-   * have been created in the asset manager and linked to this 
+   * have been created in the asset manager and linked to this
    * CShader component through the UI
    * The shader will be managed through a ShaderManager / ResourceManager
    */
   Shader *shader = new Shader();
-  shader->compile("src/Shader/vertex.glsl", GL_VERTEX_SHADER);
-  shader->compile("src/Shader/fragment.glsl", GL_FRAGMENT_SHADER);
+  shader->compile("src/Shader/vertex.glsl", ShaderType::VERTEX_SHADER);
+  shader->compile("src/Shader/fragment.glsl", ShaderType::FRAGMENT_SHADER);
   shader->createProgram();
 
-  Mesh *mesh = this->resourceManager->createBone();
-  this->resourceManager->createBoneInstance(mesh);
-
   Entity *armature = this->registry->createEntity("Armature");
-  CArmature *cArmature = armature->add<CArmature>("Armature 1");
-  armature->add<CMesh>(mesh);
+  std::string armatureName = "Armature " + std::to_string(armature->getId());
+  CArmature *cArmature = armature->add<CArmature>(armatureName);
   armature->add<CShader>(shader);
 
   Entity *bone = this->registry->createEntity("Bone");
   bone->add<CTransform>();
-  bone->add<CBone>("Bone 1", *armature);
+
+  std::string boneName = "Bone " + std::to_string(bone->getId());
+  CBone *cBone = bone->add<CBone>(boneName, *armature);
+  cBone->size = {50.0f, 50.0f};
+
+  this->resourceManager->addBone(bone->getId());
 
   cArmature->bones.push_back(*bone);
 }

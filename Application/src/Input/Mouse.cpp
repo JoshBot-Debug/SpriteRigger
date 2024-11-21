@@ -1,5 +1,23 @@
 #include "Mouse.h"
 
+void Mouse::updateMousePosition(float x, float y)
+{
+  this->position.x = x;
+  this->position.y = y;
+  
+  if (!(this->bounds.position && this->bounds.dimensions))
+    return;
+
+  this->bounds.state = this->intersects(*this->bounds.position, *this->bounds.dimensions)
+                           ? MouseBounds::IN_BOUNDS
+                           : MouseBounds::OUT_OF_BOUNDS;
+
+  this->position -= *this->bounds.position;
+
+  if (this->bounds.origin == MouseOrigin::CENTER)
+    this->position -= *this->bounds.dimensions / 2.0f;
+}
+
 void Mouse::press(EntityID entity, glm::vec2 position)
 {
   this->entity = entity;
@@ -45,9 +63,7 @@ void Mouse::onEvent(SDL_Event *event)
   switch (event->type)
   {
   case SDL_EVENT_MOUSE_MOTION:
-    this->position.x = event->button.x;
-    this->position.y = event->button.y;
-    this->position -= *this->offset;
+    this->updateMousePosition(event->button.x, event->button.y);
     this->setState(MouseState::MOVING);
     break;
   case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -66,7 +82,18 @@ void Mouse::onEvent(SDL_Event *event)
   }
 }
 
-void Mouse::setOffset(glm::vec2 *offset)
+void Mouse::setBounds(glm::vec2 *position, glm::vec2 *dimensions, MouseOrigin origin)
 {
-  this->offset = offset;
+  this->bounds = {position, dimensions, origin};
+}
+
+bool Mouse::intersects(const glm::vec2 &position, const glm::vec2 &size)
+{
+  return (this->position.x >= position.x && this->position.x <= position.x + size.x) &&
+         (this->position.y >= position.y && this->position.y <= position.y + size.y);
+}
+
+MouseBounds Mouse::getMouseBoundsState()
+{
+  return this->bounds.state;
 }

@@ -19,7 +19,7 @@ void App::onInitialize()
   this->controller.onInitialize(&this->registry, &this->resourceManager);
 
   this->hierarchyScene.onInitialize(&this->registry, &this->controller);
-  this->animatorViewport.onInitialize(&this->registry, &this->controller, &this->colorSystem, &this->renderSystem, &this->transformSystem);
+  this->animatorViewport.onInitialize(&this->registry, &this->controller, &this->resourceManager, &this->colorSystem, &this->renderSystem, &this->transformSystem);
 }
 
 void App::onInput(SDL_Event *event, float deltaTime)

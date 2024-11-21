@@ -7,6 +7,7 @@
 #include "Viewport/Viewport.h"
 #include "Component/Component.h"
 
+#include "Manager/ResourceManager.h"
 #include "System/ColorSystem.h"
 #include "System/RenderSystem.h"
 #include "System/TransformSystem.h"
@@ -29,9 +30,9 @@ public:
   AnimatorViewport() = default;
   ~AnimatorViewport() = default;
 
-  void onInitialize(Registry *registry, Controller *controller, ColorSystem *colorSystem, RenderSystem *renderSystem, TransformSystem *transformSystem);
+  void onInitialize(Registry *registry, Controller *controller, ResourceManager *resourceManager, ColorSystem *colorSystem, RenderSystem *renderSystem, TransformSystem *transformSystem);
   void onInput(SDL_Event *event, float deltaTime) override;
   void onUpdate(float deltaTime) override;
   void onDrawViewport(float deltaTime) override;
-  void onResize(float width, float height) override;
+  void onResize(glm::vec2 size) override;
 };

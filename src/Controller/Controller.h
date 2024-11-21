@@ -13,6 +13,8 @@ private:
   Registry *registry;
   ResourceManager *resourceManager;
 
+  unsigned int armatureCount = 0;
+
 public:
   Controller();
   ~Controller();

@@ -38,7 +38,7 @@ void Viewport::resize(glm::vec2 size)
   }
 
   this->setDimensions(size);
-  this->onResize(size.x, size.y);
+  this->onResize(size);
 }
 
 void Viewport::createFrameBuffer()
