@@ -50,7 +50,7 @@ private:
 
   size_t indices; // The number of indices to draw
 
-  std::unordered_map<unsigned int, size_t> instances;            // A map storing instances by their ID and their corresponding index.
+  mutable std::unordered_map<unsigned int, size_t> instances;            // A map storing instances by their ID and their corresponding index.
   mutable std::unordered_map<unsigned int, InstanceBuffer> ibos; // A map storing instance buffers, keyed by buffer ID.
 
 public:
@@ -185,7 +185,7 @@ public:
    * @tparam T The type of the data being updated (e.g., float, glm::vec3).
    */
   template <typename T>
-  void update(unsigned int bufferId, unsigned int id, const std::vector<T> &data)
+  void update(unsigned int bufferId, unsigned int id, const std::vector<T> &data) const
   {
     ibos.at(bufferId).ibo.update(instances[id], data);
   }
@@ -198,7 +198,7 @@ public:
    * @param size The size of the data to update (in bytes).
    * @param data A pointer to the raw data to update the buffer with.
    */
-  void update(unsigned int bufferId, unsigned int id, size_t size, const void *data);
+  void update(unsigned int bufferId, unsigned int id, size_t size, const void *data) const;
 
   /**
    * Updates the instance buffer with data at a specific offset.
@@ -210,7 +210,7 @@ public:
    * @tparam T The type of the data being updated (e.g., float, glm::vec3).
    */
   template <typename T>
-  void update(unsigned int bufferId, size_t offset, const std::vector<T> &data)
+  void update(unsigned int bufferId, size_t offset, const std::vector<T> &data) const
   {
     ibos.at(bufferId).ibo.update(offset, data.size() * sizeof(T), data.data());
   }
@@ -223,11 +223,11 @@ public:
    * @param size The size of the data to update (in bytes).
    * @param data A pointer to the raw data to update the buffer with.
    */
-  void update(unsigned int bufferId, size_t offset, size_t size, const void *data);
+  void update(unsigned int bufferId, size_t offset, size_t size, const void *data) const;
 
   /**
    * Draws the instances of the mesh using instanced rendering.
    * This method binds the necessary buffers and issues the draw call for all instances.
    */
-  void draw();
+  void draw() const;
 };

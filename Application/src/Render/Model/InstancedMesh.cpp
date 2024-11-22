@@ -46,17 +46,17 @@ void InstancedMesh::add(unsigned int bufferId, unsigned int id, size_t size, con
   update(bufferId, id, size, data);
 }
 
-void InstancedMesh::update(unsigned int bufferId, unsigned int id, size_t size, const void *data)
+void InstancedMesh::update(unsigned int bufferId, unsigned int id, size_t size, const void *data) const
 {
   ibos.at(bufferId).ibo.update(instances[id] * size, size, data);
 }
 
-void InstancedMesh::update(unsigned int bufferId, size_t offset, size_t size, const void *data)
+void InstancedMesh::update(unsigned int bufferId, size_t offset, size_t size, const void *data) const
 {
   ibos.at(bufferId).ibo.update(offset, size, data);
 }
 
-void InstancedMesh::draw()
+void InstancedMesh::draw() const
 {
   vao.bind();
   ebo.bind();

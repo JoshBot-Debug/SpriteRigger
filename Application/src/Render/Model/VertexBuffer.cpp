@@ -64,4 +64,4 @@ void VertexBuffer::bind() const { glBindBuffer(GL_ARRAY_BUFFER, vbo); }
 
 void VertexBuffer::unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
-  unsigned int VertexBuffer::get() const { return vbo; }
+unsigned int VertexBuffer::get() const { return vbo; }

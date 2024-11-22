@@ -19,6 +19,7 @@ void ElementBuffer::set(size_t size, const void *data, VertexDraw draw)
 }
 
 void ElementBuffer::bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); }
+
 void ElementBuffer::unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
 
 unsigned int ElementBuffer::get() const { return ebo; }
