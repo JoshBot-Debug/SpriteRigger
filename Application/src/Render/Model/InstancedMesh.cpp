@@ -9,7 +9,7 @@ void InstancedMesh::unbind()
   vao.unbind();
 }
 
-void InstancedMesh::createInstanceBuffer(unsigned int bufferId, unsigned int count, size_t size, VertexDraw draw = VertexDraw::DYNAMIC)
+void InstancedMesh::createInstanceBuffer(unsigned int bufferId, unsigned int count, size_t size, VertexDraw draw)
 {
   ibos.emplace(bufferId, InstanceBuffer(VertexBuffer(), count, size, draw));
   ibos.at(bufferId).ibo.generate();
@@ -22,7 +22,7 @@ void InstancedMesh::setBufferAttrib(unsigned int index, unsigned int size, Verte
   vao.setVertexAttribPointer(index, size, type, normalized, stride, pointer);
 }
 
-void InstancedMesh::setInstanceBufferAttrib(unsigned int bufferId, unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer, unsigned int divisor = 1) const
+void InstancedMesh::setInstanceBufferAttrib(unsigned int bufferId, unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer, unsigned int divisor) const
 {
   auto &ib = ibos.at(bufferId);
   ib.ibo.bind();

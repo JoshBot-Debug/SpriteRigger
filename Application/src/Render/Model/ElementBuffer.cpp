@@ -12,7 +12,7 @@ void ElementBuffer::generate()
     glGenBuffers(1, &ebo);
 }
 
-void ElementBuffer::set(size_t size, const void *data, VertexDraw draw = VertexDraw::STATIC)
+void ElementBuffer::set(size_t size, const void *data, VertexDraw draw)
 {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, vertexDrawToGLenum(draw));

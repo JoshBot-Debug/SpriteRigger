@@ -12,7 +12,7 @@ void VertexBuffer::generate()
     glGenBuffers(1, &vbo);
 }
 
-void VertexBuffer::set(size_t size, const void *data, VertexDraw draw = VertexDraw::STATIC)
+void VertexBuffer::set(size_t size, const void *data, VertexDraw draw)
 {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, size, data, vertexDrawToGLenum(draw));
@@ -24,7 +24,7 @@ void VertexBuffer::update(size_t offset, size_t size, const void *data)
   glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 }
 
-void VertexBuffer::resize(size_t size, VertexDraw draw = VertexDraw::STATIC)
+void VertexBuffer::resize(size_t size, VertexDraw draw)
 {
   /**
    * Read the size of the current vbo into psize

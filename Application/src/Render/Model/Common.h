@@ -1,3 +1,5 @@
+#pragma once
+
 #include <GL/glew.h>
 
 enum class VertexDraw
@@ -6,6 +8,19 @@ enum class VertexDraw
   DYNAMIC,
   STREAM
 };
+
+enum class VertexDataType
+{
+  FLOAT,
+  INT,
+  UNSIGNED_INT,
+  BYTE,
+  UNSIGNED_BYTE,
+  SHORT,
+  UNSIGNED_SHORT,
+  BOOL,
+};
+
 
 inline GLenum vertexDrawToGLenum(VertexDraw draw)
 {
@@ -20,18 +35,6 @@ inline GLenum vertexDrawToGLenum(VertexDraw draw)
   default:
     return GL_STATIC_DRAW;
   }
-}
-
-enum class VertexDataType
-{
-  FLOAT,
-  INT,
-  UNSIGNED_INT,
-  BYTE,
-  UNSIGNED_BYTE,
-  SHORT,
-  UNSIGNED_SHORT,
-  BOOL,
 };
 
 inline GLenum dataTypeToGLenum(VertexDataType type)
@@ -57,4 +60,4 @@ inline GLenum dataTypeToGLenum(VertexDataType type)
   default:
     return GL_FLOAT;
   }
-}
+};
