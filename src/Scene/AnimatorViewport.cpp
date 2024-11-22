@@ -30,16 +30,29 @@ void AnimatorViewport::onInitialize(Registry *registry, Controller *controller, 
 void AnimatorViewport::onInput(SDL_Event *event, float deltaTime)
 {
   this->mouse.onEvent(event);
-  /**
-   * Can now set the position/rotation of the camera
-   */
-  // this->camera.setPosition(this->mouse.position.x, this->mouse.position.y);
-  // this->camera.setRotation(this->mouse.position.x);
+  this->keyboard.onEvent(event);
+
+  float speed = 200.0f;
+  glm::vec2 moveDirection(0.0f, 0.0f);
+
+  if (this->keyboard.isPressed(Key::LEFT))
+    moveDirection.x = -1.0f;
+
+  if (this->keyboard.isPressed(Key::RIGHT))
+    moveDirection.x = 1.0f;
+
+  if (this->keyboard.isPressed(Key::UP))
+    moveDirection.y = -1.0f;
+
+  if (this->keyboard.isPressed(Key::DOWN))
+    moveDirection.y = 1.0f;
+
+  this->camera.move(speed * moveDirection.x * deltaTime, speed * moveDirection.y * deltaTime);
 }
 
 void AnimatorViewport::onUpdate(float deltaTime)
 {
-  this->transformSystem->update(deltaTime, this->registry, &this->mouse);
+  this->transformSystem->update(deltaTime, this->registry, &this->mouse, &this->camera);
   this->colorSystem->update(deltaTime, this->registry, &this->mouse);
 }
 

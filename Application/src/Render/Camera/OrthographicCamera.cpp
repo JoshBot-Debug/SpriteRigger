@@ -41,6 +41,13 @@ void OrthographicCamera::setPosition(float x, float y)
   this->calculateViewProjection();
 }
 
+void OrthographicCamera::move(float deltaX, float deltaY)
+{
+  this->position.x += deltaX;
+  this->position.y += deltaY;
+  this->calculateViewProjection();
+}
+
 void OrthographicCamera::setRotation(float rotation)
 {
   this->rotation = rotation;
@@ -50,4 +57,14 @@ void OrthographicCamera::setRotation(float rotation)
 glm::mat4 OrthographicCamera::getViewProjection() const
 {
   return this->viewProjection;
+}
+
+glm::vec2 OrthographicCamera::getPosition() const
+{
+  return this->position;
+}
+
+float OrthographicCamera::getRotation() const
+{
+  return this->rotation;
 }

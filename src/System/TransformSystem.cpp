@@ -5,7 +5,7 @@
 #include "Utility.h"
 #include "Component/Component.h"
 
-void TransformSystem::update(float deltaTime, Registry *registry, Mouse *mouse)
+void TransformSystem::update(float deltaTime, Registry *registry, Mouse *mouse, OrthographicCamera *camera)
 {
   for (auto entity : registry->entities())
   {
@@ -14,7 +14,7 @@ void TransformSystem::update(float deltaTime, Registry *registry, Mouse *mouse)
       auto [transform, bone] = entity->collect<CTransform, CBone>();
 
       if (mouse->state == MouseState::PRESS_LEFT)
-        if (Utility::intersects(mouse->position, transform->position, bone->size))
+        if (Utility::intersects(mouse->position, transform->position - camera->getPosition(), bone->size))
           mouse->press(entity->getId(), transform->position);
         else if (mouse->getMouseBoundsState() == MouseBounds::IN_BOUNDS)
           mouse->unfocus(entity->getId());

@@ -3,6 +3,7 @@
 #include "imgui.h"
 
 #include "Input/Mouse.h"
+#include "Input/Keyboard.h"
 #include "ECS/Registry.h"
 #include "Viewport/Viewport.h"
 #include "Component/Component.h"
@@ -20,6 +21,7 @@ class AnimatorViewport : public Viewport
 private:
   Registry *registry;
   Mouse mouse;
+  Keyboard keyboard;
   OrthographicCamera camera;
 
   ColorSystem *colorSystem;
