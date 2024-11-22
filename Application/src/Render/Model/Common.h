@@ -21,7 +21,6 @@ enum class VertexDataType
   BOOL,
 };
 
-
 inline GLenum vertexDrawToGLenum(VertexDraw draw)
 {
   switch (draw)
