@@ -2,53 +2,25 @@
 
 #include <GL/glew.h>
 
-enum class VertexDataType
-{
-  FLOAT,
-  INT,
-  UNSIGNED_INT,
-  BYTE,
-  UNSIGNED_BYTE,
-  SHORT,
-  UNSIGNED_SHORT,
-  BOOL,
-};
-
-inline GLenum dataTypeToGLenum(VertexDataType type)
-{
-  switch (type)
-  {
-  case VertexDataType::FLOAT:
-    return GL_FLOAT;
-  case VertexDataType::INT:
-    return GL_INT;
-  case VertexDataType::UNSIGNED_INT:
-    return GL_UNSIGNED_INT;
-  case VertexDataType::BYTE:
-    return GL_BYTE;
-  case VertexDataType::UNSIGNED_BYTE:
-    return GL_UNSIGNED_BYTE;
-  case VertexDataType::SHORT:
-    return GL_SHORT;
-  case VertexDataType::UNSIGNED_SHORT:
-    return GL_UNSIGNED_SHORT;
-  case VertexDataType::BOOL:
-    return GL_BOOL;
-  default:
-    return GL_FLOAT;
-  }
-}
+#include "Common.h"
 
 class VertexArray
 {
+private:
+  unsigned int vao = 0;
+
 public:
   VertexArray() = default;
 
-  ~VertexArray()
-  {
-    if (vao)
-      glDeleteVertexArrays(1, &vao);
-  }
+  /**
+   * Destructor for the VertexArray.
+   *
+   * This function deletes the OpenGL Vertex Array Object (VAO) when the VertexArray is destroyed.
+   * It ensures that the VAO is properly cleaned up, freeing OpenGL resources.
+   *
+   * If the VAO is valid (not zero), it calls `glDeleteVertexArrays` to delete the VAO from the GPU memory.
+   */
+  ~VertexArray();
 
   /**
    * Disable copy constructor
@@ -60,30 +32,62 @@ public:
    */
   VertexArray &operator=(const VertexArray &) = delete;
 
-  void generate()
-  {
-    if (!vao)
-      glGenVertexArrays(1, &vao);
-  }
+  /**
+   * Generates the Vertex Array Object (VAO) if it hasn't already been created.
+   *
+   * This function calls `glGenVertexArrays` to generate a VAO if the `vao` handle is not already initialized.
+   */
+  void generate();
 
-  void setVertexAttribPointer(unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer) const
-  {
-    glVertexAttribPointer(index, size, dataTypeToGLenum(type), normalized ? GL_TRUE : GL_FALSE, stride, pointer);
-    glEnableVertexAttribArray(index);
-  }
+  /**
+   * Sets a vertex attribute pointer for a non-instanced vertex buffer.
+   *
+   * @param index The index of the vertex attribute (e.g., position, color).
+   * @param size The number of components per attribute (e.g., 3 for a 3D vector).
+   * @param type The data type of the attribute (e.g., `GL_FLOAT`).
+   * @param normalized Specifies whether fixed-point data values should be normalized.
+   * @param stride The byte offset between consecutive vertex attributes in the array.
+   * @param pointer A pointer to the data in the buffer.
+   *
+   * This function binds the vertex buffer to the VAO and enables the specified vertex attribute.
+   */
+  void setVertexAttribPointer(unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer) const;
 
-  void setVertexAttribPointer(unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer, unsigned int divisor) const
-  {
-    glVertexAttribPointer(index, size, dataTypeToGLenum(type), normalized ? GL_TRUE : GL_FALSE, stride, pointer);
-    glEnableVertexAttribArray(index);
-    glVertexAttribDivisor(index, divisor);
-  }
+  /**
+   * Sets a vertex attribute pointer for an instanced vertex buffer.
+   *
+   * @param index The index of the vertex attribute (e.g., position, color).
+   * @param size The number of components per attribute (e.g., 3 for a 3D vector).
+   * @param type The data type of the attribute (e.g., `GL_FLOAT`).
+   * @param normalized Specifies whether fixed-point data values should be normalized.
+   * @param stride The byte offset between consecutive vertex attributes in the array.
+   * @param pointer A pointer to the data in the buffer.
+   * @param divisor Specifies the frequency of attribute updates for instancing.
+   *
+   * This function works similarly to `setVertexAttribPointer`, but it also calls `glVertexAttribDivisor`
+   * to control how often the attribute is updated in instanced rendering (used in instanced draws).
+   */
+  void setVertexAttribPointer(unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer, unsigned int divisor) const;
 
-  void bind() const { glBindVertexArray(vao); }
-  void unbind() const { glBindVertexArray(0); }
+  /**
+   * Binds the Vertex Array Object (VAO) to the OpenGL context.
+   *
+   * This function makes the VAO the active one, meaning subsequent OpenGL calls will use this VAO
+   * until another VAO is bound or the binding is unbound.
+   */
+  void bind() const;
 
-  unsigned int get() const { return vao; }
+  /**
+   * Unbinds the currently bound Vertex Array Object (VAO).
+   *
+   * This function makes the current VAO no longer active by binding the zero VAO (default VAO).
+   */
+  void unbind() const;
 
-private:
-  unsigned int vao = 0;
+  /**
+   * Gets the OpenGL ID of the Vertex Array Object (VAO).
+   *
+   * @return The OpenGL ID of the currently bound VAO.
+   */
+  unsigned int get() const;
 };

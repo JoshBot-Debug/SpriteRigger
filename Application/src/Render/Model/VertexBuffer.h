@@ -4,38 +4,25 @@
 #include <vector>
 #include <cstring>
 
-enum class VertexDraw
-{
-  STATIC,
-  DYNAMIC,
-  STREAM
-};
-
-inline GLenum vertexDrawToGLenum(VertexDraw draw)
-{
-  switch (draw)
-  {
-  case VertexDraw::STATIC:
-    return GL_STATIC_DRAW;
-  case VertexDraw::DYNAMIC:
-    return GL_DYNAMIC_DRAW;
-  case VertexDraw::STREAM:
-    return GL_STREAM_DRAW;
-  default:
-    return GL_STATIC_DRAW;
-  }
-}
+#include "Common.h"
 
 class VertexBuffer
 {
+private:
+  unsigned int vbo = 0;
+
 public:
   VertexBuffer() = default;
 
-  ~VertexBuffer()
-  {
-    if (vbo)
-      glDeleteBuffers(1, &vbo);
-  }
+  /**
+   * Destructor for the VertexBuffer.
+   *
+   * This function deletes the OpenGL buffer object (VBO) when the VertexBuffer is destroyed.
+   * It ensures that the VBO is properly cleaned up to free OpenGL resources.
+   *
+   * If the VBO is valid (not zero), it calls `glDeleteBuffers` to delete the buffer from the GPU memory.
+   */
+  ~VertexBuffer();
 
   /**
    * Disable copy constructor
@@ -52,12 +39,22 @@ public:
    */
   VertexBuffer(VertexBuffer &&other) noexcept {};
 
-  void generate()
-  {
-    if (!vbo)
-      glGenBuffers(1, &vbo);
-  }
+  /**
+   * Generates a buffer if it doesn't already exist.
+   *
+   * This function checks if the vertex buffer object (VBO) is already generated,
+   * and if not, it calls OpenGL to generate one.
+   */
+  void generate();
 
+  /**
+   * Sets the buffer data with a vector of generic data type.
+   *
+   * @param data The data to store in the buffer. This is a vector of any type T.
+   * @param draw Specifies how the buffer will be used (static, dynamic, etc.). Default is STATIC.
+   *
+   * @tparam T The type of the elements in the vector (e.g., float, glm::vec3).
+   */
   template <typename T>
   void set(const std::vector<T> &data, VertexDraw draw = VertexDraw::STATIC)
   {
@@ -65,12 +62,23 @@ public:
     glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(T), data.data(), vertexDrawToGLenum(draw));
   }
 
-  void set(size_t size, const void *data, VertexDraw draw = VertexDraw::STATIC)
-  {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, size, data, vertexDrawToGLenum(draw));
-  }
+  /**
+   * Sets the buffer data using raw data (void pointer).
+   *
+   * @param size The size of the data in bytes.
+   * @param data A pointer to the raw data to be uploaded to the buffer.
+   * @param draw Specifies how the buffer will be used (static, dynamic, etc.). Default is STATIC.
+   */
+  void set(size_t size, const void *data, VertexDraw draw = VertexDraw::STATIC);
 
+  /**
+   * Updates part of the buffer with a vector of generic data type.
+   *
+   * @param offset The offset in the buffer to start updating (in terms of number of elements).
+   * @param data The new data to upload to the buffer. This is a vector of any type T.
+   *
+   * @tparam T The type of the elements in the vector (e.g., float, glm::vec3).
+   */
   template <typename T>
   void update(unsigned int offset, const std::vector<T> &data)
   {
@@ -78,53 +86,37 @@ public:
     glBufferSubData(GL_ARRAY_BUFFER, offset * data.size() * sizeof(T), data.size() * sizeof(T), data.data());
   }
 
-  void update(size_t offset, size_t size, const void *data)
-  {
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
-  }
+  /**
+   * Updates part of the buffer using raw data.
+   *
+   * @param offset The offset in the buffer to start updating (in bytes).
+   * @param size The size of the data to update (in bytes).
+   * @param data A pointer to the raw data to upload to the buffer.
+   */
+  void update(size_t offset, size_t size, const void *data);
 
-  void resize(size_t size, VertexDraw draw = VertexDraw::STATIC)
-  {
-    /**
-     * Read the size of the current vbo into psize
-     * Bind it as GL_COPY_READ_BUFFER
-     */
-    int psize;
-    glBindBuffer(GL_COPY_READ_BUFFER, vbo);
-    glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &psize);
+  /**
+   * Resizes the buffer and copies the existing data to the new buffer.
+   *
+   * @param size The new size for the buffer (in bytes).
+   * @param draw Specifies how the buffer will be used (static, dynamic, etc.). Default is STATIC.
+   */
+  void resize(size_t size, VertexDraw draw = VertexDraw::STATIC);
 
-    /**
-     * Create the new vertex buffer with the new size
-     */
-    unsigned int nvbo;
-    glGenBuffers(1, &nvbo);
-    glBindBuffer(GL_ARRAY_BUFFER, nvbo);
-    glBufferData(GL_ARRAY_BUFFER, size, nullptr, vertexDrawToGLenum(draw));
+  /**
+   * Binds the buffer to the GL_ARRAY_BUFFER target.
+   */
+  void bind() const;
 
-    /**
-     * Bind the new vertex buffer as GL_COPY_WRITE_BUFFER
-     */
-    glBindBuffer(GL_COPY_WRITE_BUFFER, nvbo);
+  /**
+   * Unbinds the buffer from the GL_ARRAY_BUFFER target.
+   */
+  void unbind() const;
 
-    /**
-     * Copy the data
-     */
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, psize);
-
-    /**
-     * Delete the old buffer
-     */
-    glDeleteBuffers(1, &vbo);
-
-    vbo = nvbo;
-  }
-
-  void bind() const { glBindBuffer(GL_ARRAY_BUFFER, vbo); }
-  void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
-
-  unsigned int get() const { return vbo; }
-
-private:
-  unsigned int vbo = 0;
+  /**
+   * Gets the OpenGL ID of the buffer.
+   *
+   * @return The OpenGL ID of the buffer.
+   */
+  unsigned int get() const;
 };
