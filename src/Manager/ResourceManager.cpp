@@ -3,45 +3,52 @@
 ResourceManager::ResourceManager()
 {
   std::vector<float> vertices = {
-      -50.0f,
-      -50.0f,
-      50.0f,
-      -50.0f,
-      50.0f,
-      50.0f,
-      -50.0f,
-      50.0f,
+      -0.0f,
+      -0.0f,
+      100.0f,
+      -0.0f,
+      100.0f,
+      100.0f,
+      -0.0f,
+      100.0f,
   };
 
   std::vector<unsigned int> indices = {
       0, 1, 2,
       0, 2, 3};
 
-  InstancedMesh *mesh = new InstancedMesh(vertices, indices, 3, 5 * sizeof(float));
+  InstancedMesh *instance = new InstancedMesh(vertices, indices);
 
-  mesh->setVertexAttribPointer(0, 2, VertexDataType::FLOAT, false, 2 * sizeof(float), 0);
-  mesh->setInstanceVertexAttribPointer(1, 2, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)0);
-  mesh->setInstanceVertexAttribPointer(2, 3, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)(2 * sizeof(float)));
+  instance->setBufferAttrib(0, 2, VertexDataType::FLOAT, false, 2 * sizeof(float), 0);
 
-  mesh->unbind();
+  instance->createInstanceBuffer(0, 100, 3 * sizeof(float), VertexDraw::DYNAMIC);
+  instance->setInstanceBufferAttrib(0, 1, 3, VertexDataType::FLOAT, false, 3 * sizeof(float), 0);
 
-  this->meshes["Bone"] = mesh;
+  instance->createInstanceBuffer(1, 100, 3 * sizeof(float), VertexDraw::DYNAMIC);
+  instance->setInstanceBufferAttrib(1, 2, 3, VertexDataType::FLOAT, false, 3 * sizeof(float), 0);
+
+  instance->unbind();
+
+  this->instances["Bone"] = instance;
 }
 
 void ResourceManager::addBone(unsigned int id)
 {
-  std::vector<float> instance = {(id - 1) * 20.0f, 0.0f, 1.0f, 0.0f, 0.0f};
-  this->meshes["Bone"]->addInstance(id, instance);
-  this->meshes["Bone"]->setInstanceVertexAttribPointer(1, 2, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)0);
-  this->meshes["Bone"]->setInstanceVertexAttribPointer(2, 3, VertexDataType::FLOAT, false, 5 * sizeof(float), (const void *)(2 * sizeof(float)));
+  std::vector<float> transform = {0.0f, 0.0f, 0.0f};
+  this->instances["Bone"]->add(0, id, transform);
 }
 
-void ResourceManager::updateBone(unsigned int id, const std::vector<float> &data)
+void ResourceManager::updateBoneById(unsigned int bufferId, unsigned int id, const std::vector<float> &data)
 {
-  this->meshes["Bone"]->updateInstance(id, data);
+  this->instances["Bone"]->update(bufferId, id, data);
+}
+
+void ResourceManager::updateBoneByOffset(unsigned int bufferId, size_t offset, const std::vector<float> &data)
+{
+  this->instances["Bone"]->update(bufferId, offset, data);
 }
 
 void ResourceManager::drawBone()
 {
-  this->meshes["Bone"]->draw();
+  this->instances["Bone"]->draw();
 }

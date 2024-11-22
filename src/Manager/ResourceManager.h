@@ -7,13 +7,14 @@
 class ResourceManager
 {
 private:
-  std::unordered_map<std::string, InstancedMesh *> meshes;
+  std::unordered_map<std::string, InstancedMesh *> instances;
 
 public:
   ResourceManager();
   ~ResourceManager() = default;
 
   void addBone(unsigned int id);
-  void updateBone(unsigned int id, const std::vector<float> &data);
+  void updateBoneById(unsigned int bufferId, unsigned int id, const std::vector<float> &data);
+  void updateBoneByOffset(unsigned int bufferId, size_t offset, const std::vector<float> &data);
   void drawBone();
 };

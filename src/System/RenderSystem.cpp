@@ -13,6 +13,11 @@
 
 void RenderSystem::draw(float deltaTime)
 {
+  std::vector<float> transforms;
+  std::vector<float> colors;
+  transforms.reserve(this->registry->entities().size());
+  colors.reserve(this->registry->entities().size());
+
   for (const auto &entity : this->registry->entities())
   {
     if (entity->is("Armature"))
@@ -24,12 +29,18 @@ void RenderSystem::draw(float deltaTime)
       for (const auto &boneEID : cArmature->bones)
       {
         const auto [cTransfrom, cBone] = this->registry->collect<CTransform, CBone>(boneEID);
-        std::vector<float> instance = {cTransfrom->position.x, cTransfrom->position.y, cBone->color.r, cBone->color.g, cBone->color.b};
-        this->resourceManager->updateBone(boneEID, instance);
+        transforms.push_back(cTransfrom->position.x);
+        transforms.push_back(cTransfrom->position.y);
+        transforms.push_back(cTransfrom->rotation);
+        colors.push_back(cBone->color.r);
+        colors.push_back(cBone->color.g);
+        colors.push_back(cBone->color.b);
       }
     }
   }
 
+  this->resourceManager->updateBoneByOffset(0, 0, transforms);
+  this->resourceManager->updateBoneByOffset(1, 0, colors);
   this->resourceManager->drawBone();
 }
 

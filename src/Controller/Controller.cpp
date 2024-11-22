@@ -38,11 +38,13 @@ void Controller::createArmature()
   armature->add<CShader>(shader);
 
   Entity *bone = this->registry->createEntity("Bone");
-  bone->add<CTransform>();
+  CTransform *cTransform = bone->add<CTransform>();
+  cTransform->position = {-50.0f, -50.0f};
 
   std::string boneName = "Bone " + std::to_string(bone->getId());
   CBone *cBone = bone->add<CBone>(boneName, *armature);
-  cBone->size = {50.0f, 50.0f};
+  cBone->size = {100.0f, 100.0f};
+  cBone->color = {1.0f, 0.0f, 0.0f};
 
   this->resourceManager->addBone(bone->getId());
 

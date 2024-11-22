@@ -47,6 +47,11 @@ public:
    */
   VertexBuffer &operator=(const VertexBuffer &) = delete;
 
+  /**
+   * Define a move constructor
+   */
+  VertexBuffer(VertexBuffer &&other) noexcept {};
+
   void generate()
   {
     if (!vbo)

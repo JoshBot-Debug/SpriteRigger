@@ -8,26 +8,56 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 
+struct InstanceBufferAttrib
+{
+  size_t stride;
+  VertexDataType type;
+
+  unsigned int size;
+  unsigned int index;
+
+  bool normalized;
+  const void *pointer;
+  unsigned int divisor;
+};
+
+struct InstanceBuffer
+{
+  VertexBuffer ibo;
+  unsigned int count;
+  size_t size;
+  VertexDraw draw;
+  InstanceBufferAttrib attrib;
+
+  InstanceBuffer(VertexBuffer &&ibo, unsigned int count, size_t size, VertexDraw draw) : ibo(std::move(ibo)), count(count), size(size), draw(draw) {}
+
+  void setInstanceBufferAttrib(unsigned int &index, unsigned int &size, VertexDataType &type, bool &normalized, size_t &stride, const void *pointer, unsigned int &divisor)
+  {
+    attrib.index = index;
+    attrib.size = size;
+    attrib.type = type;
+    attrib.normalized = normalized;
+    attrib.stride = stride;
+    attrib.pointer = pointer;
+    attrib.divisor = divisor;
+  }
+};
+
 class InstancedMesh
 {
 private:
-  VertexArray vao;
-  VertexBuffer vbo;
-  VertexBuffer ibo;
-  ElementBuffer ebo;
+  VertexArray vao;   // Vertext array
+  VertexBuffer vbo;  // Vertext buffer
+  ElementBuffer ebo; // Element buffer
 
-  size_t indicesCount;
+  size_t indices; // The number of indices to draw
 
-  size_t instanceSize;
-  unsigned int instanceCount;
   std::unordered_map<unsigned int, size_t> instances;
+  mutable std::unordered_map<unsigned int, InstanceBuffer> ibos;
 
 public:
   template <typename T>
-
-  // We don't need instanced, instead we can replace it
-  // with a size_t to specify the instancePreallocatedSize
-  InstancedMesh(std::vector<T> vertices, std::vector<unsigned int> indices, unsigned int instanceCount = 0, size_t instanceSize = 0) : instanceCount(instanceCount), instanceSize(instanceSize)
+  InstancedMesh(std::vector<T> vertices, std::vector<unsigned int> indices)
   {
     vao.generate();
     vao.bind();
@@ -38,13 +68,7 @@ public:
     vbo.set(vertices);
     ebo.set(indices);
 
-    if (instanceCount)
-    {
-      ibo.generate();
-      ibo.set(instanceCount * instanceSize, nullptr, VertexDraw::DYNAMIC);
-    }
-
-    indicesCount = indices.size();
+    this->indices = indices.size();
   }
 
   ~InstancedMesh() {}
@@ -59,69 +83,95 @@ public:
    */
   InstancedMesh &operator=(const InstancedMesh &) = delete;
 
-  void bind()
-  {
-    vao.bind();
-    vbo.bind();
-    ebo.bind();
-  }
-
   void unbind()
   {
     vbo.unbind();
     ebo.unbind();
-    ibo.unbind();
+    for (auto &pair : ibos)
+      pair.second.ibo.unbind();
     vao.unbind();
   }
 
-  void setVertexAttribPointer(unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer) const
+  void createInstanceBuffer(unsigned int bufferId, unsigned int count, size_t size, VertexDraw draw = VertexDraw::DYNAMIC)
+  {
+    ibos.emplace(bufferId, InstanceBuffer(VertexBuffer(), count, size, draw));
+    ibos.at(bufferId).ibo.generate();
+    ibos.at(bufferId).ibo.set(count * size, nullptr, draw);
+  }
+
+  void setBufferAttrib(unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer) const
   {
     vbo.bind();
     vao.setVertexAttribPointer(index, size, type, normalized, stride, pointer);
   }
-  
-  void setInstanceVertexAttribPointer(unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer, unsigned int divisor = 1) const
+
+  void setInstanceBufferAttrib(unsigned int bufferId, unsigned int index, unsigned int size, VertexDataType type, bool normalized, size_t stride, const void *pointer, unsigned int divisor = 1) const
   {
-    ibo.bind();
+    auto &ib = ibos.at(bufferId);
+    ib.ibo.bind();
+    ib.setInstanceBufferAttrib(index, size, type, normalized, stride, pointer, divisor);
     vao.setVertexAttribPointer(index, size, type, normalized, stride, pointer, divisor);
   }
 
   template <typename T>
-  void addInstance(unsigned int id, const std::vector<T> &data, VertexDraw draw = VertexDraw::DYNAMIC)
+  void add(unsigned int bufferId, unsigned int id, const std::vector<T> &data)
   {
-    instances[id] = instances.size();
+    if (!instances.contains(id))
+      instances[id] = instances.size();
 
-    if (instances[id] >= instanceCount)
-      ibo.resize((instanceCount *= 2) * data.size() * sizeof(T), VertexDraw::DYNAMIC);
+    for (auto &pair : ibos)
+      if (instances[id] >= pair.second.count)
+      {
+        pair.second.ibo.resize((pair.second.count *= 2) * pair.second.size, pair.second.draw);
+        auto &attrib = pair.second.attrib;
+        vao.setVertexAttribPointer(attrib.index, attrib.size, attrib.type, attrib.normalized, attrib.stride, attrib.pointer, attrib.divisor);
+      }
 
-    ibo.update(instances[id], data);
+    update(bufferId, id, data);
   }
 
-  void addInstance(unsigned int id, size_t size, const void *data, VertexDraw draw = VertexDraw::DYNAMIC)
+  void add(unsigned int bufferId, unsigned int id, size_t size, const void *data)
   {
-    instances[id] = instances.size();
+    if (!instances.contains(id))
+      instances[id] = instances.size();
 
-    if (instances[id] >= instanceCount)
-      ibo.resize((instanceCount *= 2) * size, VertexDraw::DYNAMIC);
-      
-    ibo.update(instances[id], size, data);
+    for (auto &pair : ibos)
+      if (instances[id] >= pair.second.count)
+      {
+        pair.second.ibo.resize((pair.second.count *= 2) * pair.second.size, pair.second.draw);
+        auto &attrib = pair.second.attrib;
+        vao.setVertexAttribPointer(attrib.index, attrib.size, attrib.type, attrib.normalized, attrib.stride, attrib.pointer, attrib.divisor);
+      }
+
+    update(bufferId, id, size, data);
   }
 
   template <typename T>
-  void updateInstance(unsigned int id, const std::vector<T> &data)
+  void update(unsigned int bufferId, unsigned int id, const std::vector<T> &data)
   {
-    ibo.update(instances[id], data);
+    ibos.at(bufferId).ibo.update(instances[id], data);
   }
 
-  void updateInstance(unsigned int id, size_t size, const void *data)
+  void update(unsigned int bufferId, unsigned int id, size_t size, const void *data)
   {
-    ibo.update(instances[id], size, data);
+    ibos.at(bufferId).ibo.update(instances[id] * size, size, data);
+  }
+
+  template <typename T>
+  void update(unsigned int bufferId, size_t offset, const std::vector<T> &data)
+  {
+    ibos.at(bufferId).ibo.update(offset, data.size() * sizeof(T), data.data());
+  }
+
+  void update(unsigned int bufferId, size_t offset, size_t size, const void *data)
+  {
+    ibos.at(bufferId).ibo.update(offset, size, data);
   }
 
   void draw()
   {
     vao.bind();
     ebo.bind();
-    glDrawElementsInstanced(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0, instances.size());
+    glDrawElementsInstanced(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0, instances.size());
   }
 };

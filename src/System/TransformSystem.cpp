@@ -16,7 +16,7 @@ void TransformSystem::update(float deltaTime, Registry *registry, Mouse *mouse)
       if (mouse->state == MouseState::PRESS_LEFT)
         if (Utility::intersects(mouse->position, transform->position, bone->size))
           mouse->press(entity->getId(), transform->position);
-        else
+        else if (mouse->getMouseBoundsState() == MouseBounds::IN_BOUNDS)
           mouse->unfocus(entity->getId());
 
       MouseEntityState state = mouse->getMouseEntityState(entity->getId());
