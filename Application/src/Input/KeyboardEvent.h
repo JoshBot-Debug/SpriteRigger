@@ -9,9 +9,6 @@ enum class LRKey {
 
 enum class Key
 {
-  // Special state denoting nothing being pressed
-  NONE = -1,
-
   // Letters
   A = SDL_SCANCODE_A,
   B = SDL_SCANCODE_B,

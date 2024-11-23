@@ -9,6 +9,8 @@
 #include "Component/Component.h"
 
 #include "Manager/ResourceManager.h"
+
+#include "System/CameraSystem.h"
 #include "System/ColorSystem.h"
 #include "System/RenderSystem.h"
 #include "System/TransformSystem.h"
@@ -23,6 +25,8 @@ private:
   Mouse mouse;
   Keyboard keyboard;
   OrthographicCamera camera;
+
+  CameraSystem cameraSystem;
 
   ColorSystem *colorSystem;
   RenderSystem *renderSystem;
