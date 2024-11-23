@@ -59,7 +59,7 @@ public:
   void set(const std::vector<T> &data, VertexDraw draw = VertexDraw::STATIC)
   {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(T), data.data(), vertexDrawToGLenum(draw));
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(T), data.data(), (unsigned int)draw);
   }
 
   /**

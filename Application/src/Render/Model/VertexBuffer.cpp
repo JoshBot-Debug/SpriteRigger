@@ -15,7 +15,7 @@ void VertexBuffer::generate()
 void VertexBuffer::set(size_t size, const void *data, VertexDraw draw)
 {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, size, data, vertexDrawToGLenum(draw));
+  glBufferData(GL_ARRAY_BUFFER, size, data, (unsigned int)draw);
 }
 
 void VertexBuffer::update(size_t offset, size_t size, const void *data)
@@ -40,7 +40,7 @@ void VertexBuffer::resize(size_t size, VertexDraw draw)
   unsigned int nvbo;
   glGenBuffers(1, &nvbo);
   glBindBuffer(GL_ARRAY_BUFFER, nvbo);
-  glBufferData(GL_ARRAY_BUFFER, size, nullptr, vertexDrawToGLenum(draw));
+  glBufferData(GL_ARRAY_BUFFER, size, nullptr, (unsigned int)draw);
 
   /**
    * Bind the new vertex buffer as GL_COPY_WRITE_BUFFER

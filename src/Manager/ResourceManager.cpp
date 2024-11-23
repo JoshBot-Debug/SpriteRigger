@@ -50,5 +50,5 @@ void ResourceManager::updateBoneByOffset(unsigned int bufferId, size_t offset, c
 
 void ResourceManager::drawBone()
 {
-  this->instances["Bone"]->draw();
+  this->instances["Bone"]->draw(DrawPrimitive::TRIANGLES);
 }

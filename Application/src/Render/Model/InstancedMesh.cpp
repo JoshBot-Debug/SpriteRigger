@@ -56,9 +56,9 @@ void InstancedMesh::update(unsigned int bufferId, size_t offset, size_t size, co
   ibos.at(bufferId).ibo.update(offset, size, data);
 }
 
-void InstancedMesh::draw() const
+void InstancedMesh::draw(DrawPrimitive primitive) const
 {
   vao.bind();
   ebo.bind();
-  glDrawElementsInstanced(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0, instances.size());
+  glDrawElementsInstanced((unsigned int)primitive, indices, GL_UNSIGNED_INT, 0, instances.size());
 }

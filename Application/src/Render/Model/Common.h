@@ -4,59 +4,33 @@
 
 enum class VertexDraw
 {
-  STATIC,
-  DYNAMIC,
-  STREAM
+  STATIC = GL_STATIC_DRAW,
+  DYNAMIC = GL_DYNAMIC_DRAW,
+  STREAM = GL_STREAM_DRAW
 };
 
 enum class VertexDataType
 {
-  FLOAT,
-  INT,
-  UNSIGNED_INT,
-  BYTE,
-  UNSIGNED_BYTE,
-  SHORT,
-  UNSIGNED_SHORT,
-  BOOL,
+  FLOAT = GL_FLOAT,
+  INT = GL_INT,
+  UNSIGNED_INT = GL_UNSIGNED_INT,
+  BYTE = GL_BYTE,
+  UNSIGNED_BYTE = GL_UNSIGNED_BYTE,
+  SHORT = GL_SHORT,
+  UNSIGNED_SHORT = GL_UNSIGNED_SHORT,
+  BOOL = GL_BOOL,
 };
 
-inline GLenum vertexDrawToGLenum(VertexDraw draw)
+enum class DrawPrimitive
 {
-  switch (draw)
-  {
-  case VertexDraw::STATIC:
-    return GL_STATIC_DRAW;
-  case VertexDraw::DYNAMIC:
-    return GL_DYNAMIC_DRAW;
-  case VertexDraw::STREAM:
-    return GL_STREAM_DRAW;
-  default:
-    return GL_STATIC_DRAW;
-  }
-};
-
-inline GLenum dataTypeToGLenum(VertexDataType type)
-{
-  switch (type)
-  {
-  case VertexDataType::FLOAT:
-    return GL_FLOAT;
-  case VertexDataType::INT:
-    return GL_INT;
-  case VertexDataType::UNSIGNED_INT:
-    return GL_UNSIGNED_INT;
-  case VertexDataType::BYTE:
-    return GL_BYTE;
-  case VertexDataType::UNSIGNED_BYTE:
-    return GL_UNSIGNED_BYTE;
-  case VertexDataType::SHORT:
-    return GL_SHORT;
-  case VertexDataType::UNSIGNED_SHORT:
-    return GL_UNSIGNED_SHORT;
-  case VertexDataType::BOOL:
-    return GL_BOOL;
-  default:
-    return GL_FLOAT;
-  }
+  POINTS = GL_POINTS,
+  LINES = GL_LINES,
+  LINE_STRIP = GL_LINE_STRIP,
+  LINE_LOOP = GL_LINE_LOOP,
+  TRIANGLES = GL_TRIANGLES,
+  TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
+  TRIANGLE_FAN = GL_TRIANGLE_FAN,
+  QUADS = GL_QUADS,
+  QUAD_STRIP = GL_QUAD_STRIP,
+  POLYGON = GL_POLYGON,
 };

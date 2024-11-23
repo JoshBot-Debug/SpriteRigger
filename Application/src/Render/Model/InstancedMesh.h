@@ -50,7 +50,7 @@ private:
 
   size_t indices; // The number of indices to draw
 
-  mutable std::unordered_map<unsigned int, size_t> instances;            // A map storing instances by their ID and their corresponding index.
+  mutable std::unordered_map<unsigned int, size_t> instances;    // A map storing instances by their ID and their corresponding index.
   mutable std::unordered_map<unsigned int, InstanceBuffer> ibos; // A map storing instance buffers, keyed by buffer ID.
 
 public:
@@ -226,8 +226,15 @@ public:
   void update(unsigned int bufferId, size_t offset, size_t size, const void *data) const;
 
   /**
-   * Draws the instances of the mesh using instanced rendering.
-   * This method binds the necessary buffers and issues the draw call for all instances.
+   * Draws the mesh instances using instanced rendering.
+   * This method binds the necessary buffers (such as vertex and instance buffers) and issues
+   * a draw call to render multiple instances of the mesh with a single call. The provided
+   * primitive type determines how the vertices are interpreted (e.g., as triangles, lines, etc.).
+   *
+   * Instanced rendering allows for the efficient rendering of many copies of the same mesh with
+   * different transformations, properties, or data without the need to submit each instance separately.
+   *
+   * @param primitive The type of primitive to render (e.g., GL_TRIANGLES, GL_LINES).
    */
-  void draw() const;
+  void draw(DrawPrimitive primitive) const;
 };

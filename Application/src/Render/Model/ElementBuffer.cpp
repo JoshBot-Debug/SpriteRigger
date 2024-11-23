@@ -15,7 +15,7 @@ void ElementBuffer::generate()
 void ElementBuffer::set(size_t size, const void *data, VertexDraw draw)
 {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, vertexDrawToGLenum(draw));
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, (unsigned int)draw);
 }
 
 void ElementBuffer::bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo); }
