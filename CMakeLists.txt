@@ -43,7 +43,8 @@ target_link_libraries(SpriteRigger PRIVATE
   SDL3_image
   OpenGL
   GLEW
-  OpenGL::GLU
+  GLU
+  assimp
   ${STATIC_LIB}
 
   # Libs for nfd

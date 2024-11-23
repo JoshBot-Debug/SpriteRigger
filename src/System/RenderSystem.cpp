@@ -14,8 +14,11 @@
 void RenderSystem::draw(float deltaTime)
 {
   std::vector<float> transforms;
+  std::vector<float> scales;
   std::vector<float> colors;
+
   transforms.reserve(this->registry->entities().size());
+  scales.reserve(this->registry->entities().size());
   colors.reserve(this->registry->entities().size());
 
   for (const auto &entity : this->registry->entities())
@@ -32,6 +35,8 @@ void RenderSystem::draw(float deltaTime)
         transforms.push_back(cTransfrom->position.x);
         transforms.push_back(cTransfrom->position.y);
         transforms.push_back(cTransfrom->rotation);
+        scales.push_back(cTransfrom->scale.x);
+        scales.push_back(cTransfrom->scale.y);
         colors.push_back(cBone->color.r);
         colors.push_back(cBone->color.g);
         colors.push_back(cBone->color.b);
@@ -40,7 +45,8 @@ void RenderSystem::draw(float deltaTime)
   }
 
   this->resourceManager->updateBoneByOffset(0, 0, transforms);
-  this->resourceManager->updateBoneByOffset(1, 0, colors);
+  this->resourceManager->updateBoneByOffset(1, 0, scales);
+  this->resourceManager->updateBoneByOffset(2, 0, colors);
   this->resourceManager->drawBone();
 }
 
