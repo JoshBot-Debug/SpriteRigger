@@ -39,7 +39,7 @@ void Controller::createArmature()
 
   Entity *bone = this->registry->createEntity("Bone");
   CTransform *cTransform = bone->add<CTransform>();
-  cTransform->scale = {100.0f, 100.0f};
+  cTransform->scale = {20.0f, 20.0f};
 
   std::string boneName = "Bone " + std::to_string(bone->getId());
   CBone *cBone = bone->add<CBone>(boneName, *armature);

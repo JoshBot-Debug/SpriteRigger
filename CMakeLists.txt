@@ -43,7 +43,6 @@ target_link_libraries(SpriteRigger PRIVATE
   SDL3_image
   OpenGL
   GLEW
-  GLU
   assimp
   ${STATIC_LIB}
 
