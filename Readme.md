@@ -3,6 +3,8 @@
 - [ ] Bind once, use a cache, if a shader/buffer is bound, skip the opengl call
 - [x] Input needs to have a mouse offset .setMouseOffset which I can call when the target viewport is resized. This removes the viewport dependency from other scenes
 - [ ] Pass camera from App to viewport
+- [ ] Use one buffer for all vertices and indices
+- [ ] When drawing, you can specify the offset in bytes to the indices
 
 # Application Development Plan: Pivot Animator-like Tool
 
