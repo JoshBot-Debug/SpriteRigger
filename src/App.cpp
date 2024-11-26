@@ -14,7 +14,7 @@ void App::onInitialize()
   this->projectManager->setApplication(this);
 
   this->assetScene.onInitialize();
-  this->headerPanelScene.onInitialize(this->projectManager);
+  this->headerPanelScene.onInitialize(&this->registry, this->projectManager);
 
   this->controller.onInitialize(&this->registry, &this->resourceManager);
 

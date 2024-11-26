@@ -8,51 +8,29 @@
 
 ResourceManager::ResourceManager()
 {
-  // std::vector<float> vertices = {
-  //     -0.0f,
-  //     -0.0f,
-  //     100.0f,
-  //     -0.0f,
-  //     100.0f,
-  //     100.0f,
-  //     -0.0f,
-  //     100.0f,
-  // };
+  std::vector<MeshData> meshes;
 
-  // std::vector<unsigned int> indices = {
-  //     0, 1, 2,
-  //     0, 2, 3};
+  loadFBX("assets/model/bone.fbx", meshes);
 
-  std::vector<ModelData> models;
-
-  loadFBX("assets/model/bone.fbx", models);
-
-  ModelData model = models[0];
-
-  InstancedMesh *instance = new InstancedMesh(model.vertices, model.indices);
-
-  for (size_t i = 0; i < model.vertices.size(); i++)
+  for (MeshData &mesh : meshes)
   {
-    std::cout << model.vertices[i] << std::endl;
+    InstancedMesh *instance = new InstancedMesh(mesh.vertices, mesh.indices);
+
+    instance->setBufferAttrib(0, 3, VertexDataType::FLOAT, false, 8 * sizeof(float), 0);
+
+    instance->createInstanceBuffer(0, 100, 3 * sizeof(float), VertexDraw::DYNAMIC);
+    instance->setInstanceBufferAttrib(0, 1, 3, VertexDataType::FLOAT, false, 3 * sizeof(float), 0);
+
+    instance->createInstanceBuffer(1, 100, 2 * sizeof(float), VertexDraw::DYNAMIC);
+    instance->setInstanceBufferAttrib(1, 2, 2, VertexDataType::FLOAT, false, 2 * sizeof(float), 0);
+
+    instance->createInstanceBuffer(2, 100, 3 * sizeof(float), VertexDraw::DYNAMIC);
+    instance->setInstanceBufferAttrib(2, 3, 3, VertexDataType::FLOAT, false, 3 * sizeof(float), 0);
+
+    instance->unbind();
+    this->instances["Bone"] = instance;
+    break;
   }
-  
-
-  instance->setBufferAttrib(0, 3, VertexDataType::FLOAT, false, 8 * sizeof(float), 0); // Position
-  // instance->setBufferAttrib(1, 3, VertexDataType::FLOAT, false, 8 * sizeof(float), (void *)(3 * sizeof(float))); // Normal
-  // instance->setBufferAttrib(2, 2, VertexDataType::FLOAT, false, 8 * sizeof(float), (void *)(6 * sizeof(float))); // TexCoord
-
-  instance->createInstanceBuffer(0, 100, 3 * sizeof(float), VertexDraw::DYNAMIC);
-  instance->setInstanceBufferAttrib(0, 1, 3, VertexDataType::FLOAT, false, 3 * sizeof(float), 0);
-
-  instance->createInstanceBuffer(1, 100, 2 * sizeof(float), VertexDraw::DYNAMIC);
-  instance->setInstanceBufferAttrib(1, 2, 2, VertexDataType::FLOAT, false, 2 * sizeof(float), 0);
-
-  instance->createInstanceBuffer(2, 100, 3 * sizeof(float), VertexDraw::DYNAMIC);
-  instance->setInstanceBufferAttrib(2, 3, 3, VertexDataType::FLOAT, false, 3 * sizeof(float), 0);
-
-  instance->unbind();
-
-  this->instances["Bone"] = instance;
 }
 
 void ResourceManager::addBone(unsigned int id)
@@ -76,7 +54,7 @@ void ResourceManager::drawBone()
   this->instances["Bone"]->draw(DrawPrimitive::TRIANGLES);
 }
 
-void ResourceManager::loadFBX(const std::string &filename, std::vector<ModelData> &models)
+void ResourceManager::loadFBX(const std::string &filename, std::vector<MeshData> &meshes)
 {
   // Initialize Assimp importer
   Assimp::Importer importer;
@@ -91,13 +69,13 @@ void ResourceManager::loadFBX(const std::string &filename, std::vector<ModelData
   }
 
   // Reserve space in models
-  models.resize(scene->mNumMeshes);
+  meshes.resize(scene->mNumMeshes);
 
   // Iterate over each mesh in the scene
   for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
   {
     aiMesh *mesh = scene->mMeshes[i];
-    ModelData &data = models[i];
+    MeshData &data = meshes[i];
 
     // Process vertices
     for (unsigned int j = 0; j < mesh->mNumVertices; ++j)

@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include "Render/Model/InstancedMesh.h"
 
-struct ModelData {
+struct MeshData {
   std::vector<float> vertices;
   std::vector<unsigned int> indices;
 };
@@ -23,5 +23,5 @@ public:
   void updateBoneByOffset(unsigned int bufferId, size_t offset, const std::vector<float> &data);
   void drawBone();
 
-  void loadFBX(const std::string &filename, std::vector<ModelData> &models);
+  void loadFBX(const std::string &filename, std::vector<MeshData> &models);
 };

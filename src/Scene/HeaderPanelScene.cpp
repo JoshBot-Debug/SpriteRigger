@@ -4,9 +4,11 @@
 #include <filesystem>
 
 #include "Utility.h"
+#include "Component/Component.h"
 
-void HeaderPanelScene::onInitialize(ProjectManager *projectManager)
+void HeaderPanelScene::onInitialize(Registry *registry, ProjectManager *projectManager)
 {
+  this->registry = registry;
   this->projectManager = projectManager;
   this->recentProjects = this->projectManager->recent.vector("recent");
 }
@@ -23,6 +25,20 @@ void HeaderPanelScene::onDraw(float deltaTime)
 
     if (ImGui::BeginMenu("Edit"))
       this->Edit_Menu();
+
+    if (ImGui::BeginMenu("Developer Tools"))
+    {
+      if (ImGui::MenuItem("Reload Shaders"))
+      {
+        for (auto &shader : this->registry->get<CShader>())
+        {
+          shader->shader->recompile();
+          shader->shader->createProgram();
+        }
+      }
+
+      ImGui::EndMenu();
+    }
 
     ImGui::EndMainMenuBar();
   }
