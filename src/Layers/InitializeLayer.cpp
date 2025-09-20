@@ -119,13 +119,14 @@ void InitializeLayer::OnRender() {
   ImGui::Spacing();
 
   if (ImGui::TextLink("Create a new project")) {
-    m_Window->Quit();
-    m_State->Initialize();
+    if (m_State->New())
+      m_Window->Quit();
   }
 
   ImGui::Spacing();
   if (ImGui::TextLink("Open a project")) {
-    // this->projectManager->open();
+    if (m_State->Open())
+      m_Window->Quit();
   }
 
   ImGui::Spacing();

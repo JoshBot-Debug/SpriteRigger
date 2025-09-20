@@ -1,4 +1,4 @@
-set(IMGUI_SRC
+set(SRC
   ../imgui/imgui.cpp
   ../imgui/imgui_demo.cpp
   ../imgui/imgui_draw.cpp
@@ -8,7 +8,7 @@ set(IMGUI_SRC
   ../imgui/backends/imgui_impl_glfw.cpp
 )
 
-add_library(imgui STATIC ${IMGUI_SRC})
+add_library(imgui STATIC ${SRC})
 
 target_include_directories(imgui PUBLIC
   ../imgui

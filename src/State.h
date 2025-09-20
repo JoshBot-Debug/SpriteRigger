@@ -14,27 +14,25 @@ private:
   bool m_IsInitialized = false;
   bool m_StatelicationRunning = true;
 
+  std::string m_ProjectFile;
+
   std::vector<std::shared_ptr<SerializableLayer>> m_Layers;
 
 public:
   State();
 
-  void Initialize() { m_IsInitialized = true; };
-
   std::shared_ptr<SerializableLayer>
   Register(const std::shared_ptr<SerializableLayer> &layer);
 
-  void New();
+  bool New();
 
-  void Open();
+  bool Open();
   
   void Open(const std::string &filepath);
 
   void Save();
 
   void SaveAs();
-
-  void Restore(const std::string &filepath);
 
   bool IsApplicationRunning() { return m_StatelicationRunning; }
 
