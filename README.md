@@ -50,16 +50,16 @@ filename.sprig
 ## Serializer TODO
 
 - [ ] **Compression**: Add per-chunk compression (LZ4/zlib).
-- [ ] **Header**: Include magic string + version for compatibility checks.
-- [ ] **Manifest**: Store `{ name, type, offset, size }` for all chunks.
+- [x] **Header**: Include magic string + version for compatibility checks.
+- [x] **Manifest**: Store `{ name, type, offset, size }` for all chunks.
 - [ ] **Future versions**: Allow migration between file format versions.
-- [ ] **Atomic save**: Write to `.tmp` file, then rename on success.
+- [x] **Atomic save**: Write to `.tmp` file, then rename on success.
 
 ---
 
 ## Roadmap
 
-- [ ] Implement serializer/deserializer
+- [x] Implement serializer/deserializer
 - [ ] Add compression/decompression layer
 - [ ] Add checksum per chunk for corruption detection
 - [ ] Support incremental save if necessary
