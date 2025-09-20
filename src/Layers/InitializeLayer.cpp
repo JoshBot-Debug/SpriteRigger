@@ -141,7 +141,7 @@ void InitializeLayer::OnRender() {
     std::filesystem::path filePath = project;
 
     if (ImGui::TextLink(
-            Ellipsize(filePath.stem().string() + " - " + project, 230)
+            Ellipsize(RelativeHomePath(project), 230, EllipsizeType::START)
                 .c_str())) {
       m_State->Open(project);
       m_Window->Quit();
@@ -150,7 +150,7 @@ void InitializeLayer::OnRender() {
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip |
                              ImGuiHoveredFlags_DelayNormal |
                              ImGuiHoveredFlags_NoSharedDelay))
-      ImGui::SetTooltip("%s", project.c_str());
+      ImGui::SetTooltip("%s", RelativeHomePath(project).c_str());
 
     ImGui::Spacing();
   }

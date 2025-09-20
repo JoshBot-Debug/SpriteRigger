@@ -75,9 +75,9 @@ int main(int argc, char **argv) {
 
           for (const auto &project : state.GetRecentProjects()) {
             std::filesystem::path filePath = project;
-            if (ImGui::MenuItem(
-                    Ellipsize(filePath.stem().string() + " - " + project, 230)
-                        .c_str())) {
+            if (ImGui::MenuItem(Ellipsize(RelativeHomePath(project), 400,
+                                          EllipsizeType::START)
+                                    .c_str())) {
               state.Open(project);
               window.Quit();
             }

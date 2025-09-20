@@ -200,3 +200,18 @@ static bool IsDarkMode() {
       ExecCommand("gsettings get org.gnome.desktop.interface gtk-theme");
   return theme.find("dark") != std::string::npos;
 }
+
+static std::string RelativeHomePath(const std::filesystem::path& p) {
+    const char* home = std::getenv("HOME");
+    if (!home) return p.string();
+
+    std::filesystem::path homePath(home);
+
+    // check if `p` starts with home
+    auto abs = std::filesystem::absolute(p);
+    if (abs.string().rfind(homePath.string(), 0) == 0) {
+        return "~" + abs.string().substr(homePath.string().size());
+    }
+
+    return abs.string();
+}
