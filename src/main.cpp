@@ -46,6 +46,7 @@ int main(int argc, char **argv) {
       bool n = ImGui::IsKeyPressed(ImGuiKey_N, false);
       bool o = ImGui::IsKeyPressed(ImGuiKey_O, false);
       bool s = ImGui::IsKeyPressed(ImGuiKey_S, false);
+      bool q = ImGui::IsKeyPressed(ImGuiKey_Q, false);
 
       if (ctrl && n)
         if (state.New())
@@ -60,6 +61,11 @@ int main(int argc, char **argv) {
 
       if (shift && ctrl && s)
         state.SaveAs();
+
+      if (ctrl && q) {
+        window.Quit();
+        state.Quit();
+      }
 
       if (ImGui::BeginMenu("File")) {
 
@@ -86,11 +92,20 @@ int main(int argc, char **argv) {
           ImGui::EndMenu();
         }
 
+        ImGui::Separator();
+
         if (ImGui::MenuItem("Save", "Crtl S"))
           state.Save();
 
         if (ImGui::MenuItem("Save As", "Shift Crtl S"))
           state.SaveAs();
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Quit", "Crtl Q")) {
+          window.Quit();
+          state.Quit();
+        }
 
         ImGui::EndMenu();
       }
