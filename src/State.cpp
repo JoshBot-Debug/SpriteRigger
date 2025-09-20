@@ -10,8 +10,18 @@
 
 inline const std::string RECENT = "recent.sprig";
 
+inline const unsigned int MAX_RECENT = 20;
+
 State::State() : m_Serializer({.magic = "SPRIG", .version = 1}) {
   m_Serializer.Load(RECENT);
+
+  auto buffer = m_Serializer.GetAll("recent");
+
+  m_Serializer.Clear();
+
+  for (auto &b : buffer)
+    m_RecentProjects.emplace_back(
+        std::string(reinterpret_cast<char *>(b.data()), b.size()));
 }
 
 std::shared_ptr<SerializableLayer>
@@ -51,18 +61,7 @@ bool State::Open() {
   if (!file)
     return false;
 
-  std::string filepath = std::string(file);
-
-  m_Serializer.Load(filepath);
-
-  for (auto &layer : m_Layers)
-    layer->Restore(m_Serializer);
-
-  m_ProjectFile = filepath;
-
-  m_IsInitialized = true;
-
-  UpdateRecentProjects(filepath);
+  Open(std::string(file));
 
   return true;
 }
@@ -73,9 +72,13 @@ void State::Open(const std::string &filepath) {
   for (auto &layer : m_Layers)
     layer->Restore(m_Serializer);
 
+  m_Serializer.Clear();
+
   m_ProjectFile = filepath;
 
   m_IsInitialized = true;
+
+  UpdateRecentProjects(filepath);
 }
 
 void State::Save() {
@@ -104,8 +107,31 @@ void State::SaveAs() {
 }
 
 void State::UpdateRecentProjects(const std::string &filepath) {
+
+  m_Serializer.Load(RECENT);
+
+  auto buffer = m_Serializer.GetAll("recent");
+
+  m_Serializer.Clear();
+
+  std::vector<std::string> recent = {};
+
+  for (auto &b : buffer)
+    recent.emplace_back(
+        std::string(reinterpret_cast<char *>(b.data()), b.size()));
+
+  auto it = std::find(recent.begin(), recent.end(), filepath);
+  if (it != recent.end())
+    recent.erase(it);
+
+  if (recent.size() >= MAX_RECENT)
+    recent.erase(recent.begin() + MAX_RECENT - 1, recent.end());
+
+  recent.insert(recent.begin(), filepath);
+
   // Add to recent files
-  m_Serializer.Stage("recent", Serializer::Type::RAW, filepath.c_str(),
-                     filepath.size());
+  for (auto &r : recent)
+    m_Serializer.Stage("recent", r.c_str(), r.size());
+
   m_Serializer.Write(RECENT);
 }

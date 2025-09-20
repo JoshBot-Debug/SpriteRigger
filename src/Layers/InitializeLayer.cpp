@@ -137,22 +137,23 @@ void InitializeLayer::OnRender() {
   ImGui::Spacing();
   ImGui::Spacing();
 
-  // for (std::string recent : *this->recentProjects) {
-  //   std::filesystem::path filePath = recent;
+  for (const auto &project : m_State->GetRecentProjects()) {
+    std::filesystem::path filePath = project;
 
-  //   if (ImGui::TextLink(
-  //           Utility::ellipsize(filePath.stem().string() + " - " + recent,
-  //           230)
-  //               .c_str()))
-  //     m_App->Restore(recent);
+    if (ImGui::TextLink(
+            Ellipsize(filePath.stem().string() + " - " + project, 230)
+                .c_str())) {
+      m_State->Open(project);
+      m_Window->Quit();
+    }
 
-  //   if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip |
-  //                            ImGuiHoveredFlags_DelayNormal |
-  //                            ImGuiHoveredFlags_NoSharedDelay))
-  //     ImGui::SetTooltip("%s", recent.c_str());
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip |
+                             ImGuiHoveredFlags_DelayNormal |
+                             ImGuiHoveredFlags_NoSharedDelay))
+      ImGui::SetTooltip("%s", project.c_str());
 
-  //   ImGui::Spacing();
-  // }
+    ImGui::Spacing();
+  }
 
   ImGui::EndChild();
 

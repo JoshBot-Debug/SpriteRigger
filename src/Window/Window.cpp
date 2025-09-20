@@ -283,6 +283,7 @@ void Window::ScrollCallback(GLFWwindow *window, double xoffset,
                             double yoffset) {
   s_Scroll.x += static_cast<float>(xoffset);
   s_Scroll.y += static_cast<float>(yoffset);
+  ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
 Window::~Window() {

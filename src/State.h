@@ -12,11 +12,13 @@ private:
   Serializer m_Serializer;
 
   bool m_IsInitialized = false;
-  bool m_StatelicationRunning = true;
+  bool m_ApplicationRunning = true;
 
   std::string m_ProjectFile;
 
-  std::vector<std::shared_ptr<SerializableLayer>> m_Layers;
+  std::vector<std::string> m_RecentProjects = {};
+
+  std::vector<std::shared_ptr<SerializableLayer>> m_Layers = {};
 
 public:
   State();
@@ -27,7 +29,7 @@ public:
   bool New();
 
   bool Open();
-  
+
   void Open(const std::string &filepath);
 
   void Save();
@@ -36,9 +38,13 @@ public:
 
   void UpdateRecentProjects(const std::string &filepath);
 
-  bool IsApplicationRunning() { return m_StatelicationRunning; }
+  bool IsApplicationRunning() { return m_ApplicationRunning; }
 
   bool IsInitialized() { return m_IsInitialized; }
 
-  void Quit() { m_StatelicationRunning = false; }
+  void Quit() { m_ApplicationRunning = false; }
+
+  const std::vector<std::string> &GetRecentProjects() {
+    return m_RecentProjects;
+  };
 };

@@ -14,12 +14,13 @@ The project state is stored in a single container file with extension `.sprig`.
 filename.sprig
 ┌───────────────────────────────────────────────┐
 │ Header                                        │
-│   - magic (5 bytes)                           │
-│   - version (uint32_t)                        │
-│   - manifestSize (uint64_t)                   │
+│   - magic         (x bytes)                   │
+│   - version       (uint32_t)                  │
+│   - manifestSize  (uint64_t)                  │
+│   - chunksSize    (uint64_t)                  │
 ├───────────────────────────────────────────────┤
 │ Manifest (binary)                             │
-│   - entries: { name, type, offset, size }     │
+│   - entries: { key, offset, size }            │
 ├───────────────────────────────────────────────┤
 │ Chunk 1 (raw/compressed bytes)                │
 ├───────────────────────────────────────────────┤

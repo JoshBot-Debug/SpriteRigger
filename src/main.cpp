@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
       static_cast<State *>(glfwGetWindowUserPointer(window))->Quit();
     });
 
-    window.SetMenubar([&state]() {
+    window.SetMenubar([&state, &window]() {
       bool ctrl = ImGui::IsKeyDown(ImGuiMod_Ctrl);
       bool shift = ImGui::IsKeyDown(ImGuiMod_Shift);
       bool n = ImGui::IsKeyPressed(ImGuiKey_N, false);
@@ -48,10 +48,12 @@ int main(int argc, char **argv) {
       bool s = ImGui::IsKeyPressed(ImGuiKey_S, false);
 
       if (ctrl && n)
-        state.New();
+        if (state.New())
+          window.Quit();
 
       if (ctrl && o)
-        state.Open();
+        if (state.Open())
+          window.Quit();
 
       if (ctrl && s)
         state.Save();
@@ -62,14 +64,24 @@ int main(int argc, char **argv) {
       if (ImGui::BeginMenu("File")) {
 
         if (ImGui::MenuItem("New", "Crtl N"))
-          state.New();
+          if (state.New())
+            window.Quit();
 
         if (ImGui::MenuItem("Open", "Crtl O"))
-          state.Open();
+          if (state.Open())
+            window.Quit();
 
         if (ImGui::BeginMenu("Recent")) {
-          if (ImGui::MenuItem(Ellipsize("xyz.sprig", 230).c_str()))
-            state.Open("/path/to/file.sprig");
+
+          for (const auto &project : state.GetRecentProjects()) {
+            std::filesystem::path filePath = project;
+            if (ImGui::MenuItem(
+                    Ellipsize(filePath.stem().string() + " - " + project, 230)
+                        .c_str())) {
+              state.Open(project);
+              window.Quit();
+            }
+          }
 
           ImGui::EndMenu();
         }
