@@ -34,6 +34,8 @@ public:
 
   void SaveAs();
 
+  void UpdateRecentProjects(const std::string &filepath);
+
   bool IsApplicationRunning() { return m_StatelicationRunning; }
 
   bool IsInitialized() { return m_IsInitialized; }

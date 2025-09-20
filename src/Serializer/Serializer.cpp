@@ -27,7 +27,7 @@ void Serializer::Stage(const std::string &name, const Type &type,
   // Write the manifest
   {
     // Write the name
-    WriteBytes(m_Manifest, name.data(), static_cast<uint64_t>(name.size()));
+    WriteBytes(m_Manifest, name.c_str(), static_cast<uint64_t>(name.size()));
     // Write the type
     WriteBytes(m_Manifest, &type, static_cast<uint64_t>(sizeof(type)));
 
@@ -47,8 +47,8 @@ void Serializer::Stage(const std::string &name, const Type &type,
   std::memcpy(m_Chunks.data(), data, size);
 }
 
-void Serializer::Write(const std::string &tempfile) {
-  std::ofstream file(tempfile, std::ios::binary);
+void Serializer::Write(const std::string &filepath) {
+  std::ofstream file(filepath, std::ios::binary);
 
   if (!file.is_open()) {
     std::cerr << "Failed to save data." << std::endl;
@@ -56,7 +56,7 @@ void Serializer::Write(const std::string &tempfile) {
   }
 
   // Write the magic
-  file.write(m_Options.magic.data(), m_Options.magic.size());
+  file.write(m_Options.magic.c_str(), m_Options.magic.size());
 
   // Write the version
   file.write(reinterpret_cast<const char *>(&m_Options.version),
@@ -70,16 +70,21 @@ void Serializer::Write(const std::string &tempfile) {
   file.write(reinterpret_cast<const char *>(m_Chunks.data()), m_Chunks.size());
 
   file.close();
+
+  m_Manifest.clear();
+  m_Chunks.clear();
 }
 
-void Serializer::Save(const std::string &tempfile,
-                      const std::string &savefile) {
+void Serializer::Move(const std::string &from, const std::string &to) {
   try {
-    std::filesystem::rename(tempfile, savefile);
+    std::filesystem::rename(from, to);
   } catch (std::filesystem::filesystem_error &e) {
-    std::filesystem::remove(savefile);
-    std::filesystem::rename(tempfile, savefile);
+    std::filesystem::remove(to);
+    std::filesystem::rename(from, to);
   }
+
+  m_Manifest.clear();
+  m_Chunks.clear();
 }
 
 void Serializer::Load(const std::string &filepath) {
@@ -98,13 +103,21 @@ void Serializer::Load(const std::string &filepath) {
   uint32_t version = 0;
   file.read(reinterpret_cast<char *>(&version), sizeof(uint32_t));
 
+  // Read manifest size
+  uint64_t manifestSize = 0;
+  file.read(reinterpret_cast<char *>(&manifestSize), sizeof(uint64_t));
+
   std::cout << "Magic: " << magic << std::endl;
   std::cout << "Version: " << version << std::endl;
+  std::cout << "Manifest size: " << manifestSize << std::endl;
 
   assert(magic == m_Options.magic);
 
   /// TODO: Handle versions
   assert(version == m_Options.version);
 
-  file.close();
+  if (manifestSize == 0)
+    return;
+
+  m_Manifest.resize(manifestSize);
 }

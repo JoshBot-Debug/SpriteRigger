@@ -35,14 +35,14 @@ public:
              uint64_t size);
 
   /**
-   * Writes to a temporary file
+   * Writes to a file
    */
-  void Write(const std::string &tempfile);
+  void Write(const std::string &filepath);
 
   /**
-   * Moves from temp file to save file
+   * Moves a file
    */
-  void Save(const std::string &tempfile, const std::string &savefile);
+  void Move(const std::string &from, const std::string &to);
 
   /**
    * Loads the save file to memory
