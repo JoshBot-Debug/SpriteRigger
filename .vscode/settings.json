@@ -1,6 +1,9 @@
 {
+  "editor.folding": true,
+  "editor.foldingStrategy": "auto",
   "files.associations": {
     "*.mdx": "mdx",
+    "*.glsl": "glsl",
     "array": "cpp",
     "atomic": "cpp",
     "bit": "cpp",
@@ -74,7 +77,14 @@
     "iomanip": "cpp",
     "variant": "cpp",
     "fstream": "cpp",
-    "filesystem": "cpp"
+    "filesystem": "cpp",
+    "charconv": "cpp",
+    "format": "cpp",
+    "valarray": "cpp",
+    "execution": "cpp",
+    "*.embed": "cpp",
+    "complex": "cpp",
+    "stack": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

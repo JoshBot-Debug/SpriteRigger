@@ -1,75 +1,95 @@
 cmake_minimum_required(VERSION 3.22)
-project(SpriteRigger)
+project(ssrd)
 
-# Find SDL3 package
-find_package(SDL3 REQUIRED)
-find_package(SDL3_image REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(GLU REQUIRED)
+# === Options ===
+option(ENABLE_STL_DEBUG "Enable STL debug mode and DEBUG macro." OFF)
+option(ENABLE_THREAD_SANITIZER "Enable ThreadSanitizer (disables AddressSanitizer)" OFF)
 
-# Collect all source files (.cpp files)
-file(GLOB_RECURSE SOURCES_FILES
-  ${CMAKE_SOURCE_DIR}/src/*.cpp
+# === Compiler Flags ===
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-  # Application folder
-  ${CMAKE_SOURCE_DIR}/Application/src/*.cpp
-  ${CMAKE_SOURCE_DIR}/Application/lib/*.cpp
+# === Add vendor libraries ===
+add_subdirectory(vendor/imgui-cmake)
+
+# === Source Files ===
+file(GLOB_RECURSE SRC ${CMAKE_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE GLAD_SRC ${CMAKE_SOURCE_DIR}/vendor/glad/src/*.c)
+
+add_executable(SpriteRigger ${SRC} ${GLAD_SRC})
+
+# === Libraries ===
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(OPENGL REQUIRED opengl)
+pkg_check_modules(GLFW3 REQUIRED glfw3)
+pkg_check_modules(GLEW REQUIRED glew)
+
+message(STATUS "OPENGL_LIBRARIES = ${OPENGL_LIBRARIES}")
+message(STATUS "GLFW3_LIBRARIES = ${GLFW3_LIBRARIES}")
+message(STATUS "GLEW_LIBRARIES = ${GLEW_LIBRARIES}")
+
+# === Libraries ===
+target_link_libraries(SpriteRigger PRIVATE
+  ${OPENGL_LIBRARIES}
+  ${GLFW3_LIBRARIES}
+  ${GLEW_LIBRARIES}
+  imgui
 )
 
-# Include all source files (.cpp files)
-add_executable(SpriteRigger ${SOURCES_FILES})
-
-# Specify include directories. (header files)
+# === Include Directories ===
 target_include_directories(SpriteRigger PRIVATE 
   ${CMAKE_SOURCE_DIR}/src
-
-  # Application folder
-  ${CMAKE_SOURCE_DIR}/Application/src
-  ${CMAKE_SOURCE_DIR}/Application/include/imgui
-  ${CMAKE_SOURCE_DIR}/Application/include/nfd
+  ${CMAKE_SOURCE_DIR}/vendor/glad/include
+  ${CMAKE_SOURCE_DIR}/vendor/imgui
+  ${CMAKE_SOURCE_DIR}/vendor/imgui/backends
 )
 
-# Avoid shared libs, use static linking instead
-# Collect all bin files (.o files)
-# file(GLOB_RECURSE SHARED_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.o)
-# target_sources(SpriteRigger PRIVATE ${SHARED_LIB})
+# === Optional: ccache (speed up rebuilds) ===
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
+  message(STATUS "ccache is ENABLED.")
+endif()
 
-# Collect all bin files (.a files)
-file(GLOB_RECURSE STATIC_LIB ${CMAKE_SOURCE_DIR}/Application/bin/*.a)
+# === Debug Configuration ===
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-DDEBUG -D_GLIBCXX_DEBUG)
 
-# Link libraries
-target_link_libraries(SpriteRigger PRIVATE
-  SDL3
-  SDL3_image
-  OpenGL
-  GLEW
-  assimp
-  ${STATIC_LIB}
+  if(ENABLE_STL_DEBUG)
+    target_compile_options(ssrd PRIVATE
+      -Wall
+      -Wextra
+      -Wpedantic
+      -Wshadow
+      -Wconversion
+      -Wsign-conversion
+      -Wnull-dereference
+      -Wdouble-promotion
+      -Wformat=2
+      -Wunused
+    )
 
-  # Libs for nfd
-  gdk-3
-  gtk-3
-  gobject-2.0
-  glib-2.0
-)
+    message(STATUS "STL debug mode and DEBUG macro is ENABLED.")
 
-# Specify C++ standard
-set_target_properties(SpriteRigger PROPERTIES
-  CXX_STANDARD 20
-  CXX_STANDARD_REQUIRED ON
-  CXX_EXTENSIONS OFF
-)
+    if(ENABLE_THREAD_SANITIZER)
+      set(SANITIZE_FLAGS "-fsanitize=thread")
+      message(STATUS "Using ThreadSanitizer (no ASan/UBSan).")
+    else()
+      set(SANITIZE_FLAGS "-fsanitize=undefined,address -fno-omit-frame-pointer")
+      message(STATUS "Using AddressSanitizer + UndefinedBehaviorSanitizer.")
+    endif()
 
-# Enable the best optimization settings
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -flto -funroll-loops -fomit-frame-pointer")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-flto")
-set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-flto")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 ${SANITIZE_FLAGS}")
+    set(CMAKE_LINKER_FLAGS_DEBUG "${SANITIZE_FLAGS}")
+  else()
+    message(STATUS "STL debug mode and DEBUG macro is DISABLED.")
+  endif()
+endif()
 
-# Disable debug flags
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g0")
-
-# Strip symbols for production builds
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
-
-# Enable fast math
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math")
+# === Release Configuration ===
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -flto=auto -funroll-loops -fomit-frame-pointer -g0 -s -ffast-math")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-flto=auto")
+set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-flto=auto")

@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug",
+      "name": "Debug GDB",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/SpriteRigger",
@@ -10,25 +10,6 @@
       "cwd": "${workspaceFolder}",
       "externalConsole": false,
       "preLaunchTask": "Build Debug",
-      "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
-    },
-    {
-      "name": "MemoryLeak",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/SpriteRigger",
-      "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
-      "externalConsole": false,
-      "preLaunchTask": "Build Debug",
-      "postDebugTask": "valgrind",
       "MIMode": "gdb",
       "setupCommands": [
         {

@@ -9,7 +9,27 @@
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": ["$gcc"]
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "Build Debug \\w STL",
+      "type": "shell",
+      "command": "cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_STL_DEBUG=ON && cmake --build build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "Clear Logs",
+      "type": "shell",
+      "command": "rm -r ./logs/*",
+      "problemMatcher": []
     },
     {
       "label": "Build Release",
@@ -19,9 +39,10 @@
         "kind": "build",
         "isDefault": false
       },
-      "problemMatcher": ["$gcc"]
+      "problemMatcher": [
+        "$gcc"
+      ]
     },
-
     {
       "label": "valgrind",
       "type": "shell",
@@ -29,16 +50,24 @@
       "args": [
         "--leak-check=full",
         "--track-origins=yes",
-        "${workspaceFolder}/build/SpriteRigger"
+        "${workspaceFolder}/build/Kitagawa"
       ],
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": ["$gcc"],
+      "dependsOn": [
+        "Build Debug"
+      ],
+      "problemMatcher": [
+        "$gcc"
+      ],
       "presentation": {
-        "reveal": "always"
-      }
+        "reveal": "always",
+        "clear": true,
+        "panel": "dedicated",
+        "showReuseMessage": false
+      },
     }
   ]
 }
