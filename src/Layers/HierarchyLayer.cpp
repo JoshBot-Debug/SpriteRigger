@@ -3,14 +3,14 @@
 HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 
 void HierarchyLayer::OnAttach() {
-  m_ContextMenu.Register({.id = "contextMenu",
-                          .items = {
-                              {
-                                  .name = "New bone",
-                                  .shortcut = "Ctrl B",
-                                  .onClick = []() {},
-                              },
-                          }});
+  m_ContextMenu.Register({
+      .id = "contextMenu",
+      .items = {{
+          .name = "New bone",
+          .shortcut = "Ctrl B",
+          .onClick = []() {},
+      }},
+  });
 
   Window::RegisterShortcut({
       .ctrl = true,
