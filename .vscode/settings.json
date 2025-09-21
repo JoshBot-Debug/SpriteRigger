@@ -4,6 +4,11 @@
   "files.associations": {
     "*.mdx": "mdx",
     "*.glsl": "glsl",
+    "*.rmiss": "glsl",
+    "*.rint": "glsl",
+    "*.rchit": "glsl",
+    "*.rahit": "glsl",
+    "*.rgen": "glsl",
     "array": "cpp",
     "atomic": "cpp",
     "bit": "cpp",
@@ -84,7 +89,18 @@
     "execution": "cpp",
     "*.embed": "cpp",
     "complex": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "__bit_reference": "cpp",
+    "__bits": "cpp",
+    "__config": "cpp",
+    "__debug": "cpp",
+    "__hash_table": "cpp",
+    "__node_handle": "cpp",
+    "__nullptr": "cpp",
+    "__split_buffer": "cpp",
+    "__string": "cpp",
+    "__tuple": "cpp",
+    "__tree": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

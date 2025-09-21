@@ -39,7 +39,7 @@ public:
   /**
    * Loads the save file to memory
    */
-  void Load(const std::string &filepath);
+  bool Load(const std::string &filepath);
 
   /**
    * Get data

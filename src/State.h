@@ -30,13 +30,15 @@ public:
 
   bool Open();
 
-  void Open(const std::string &filepath);
+  bool Open(const std::string &filepath);
 
   void Save();
 
   void SaveAs();
 
-  void UpdateRecentProjects(const std::string &filepath);
+  void SyncRecentProjects();
+
+  void SyncRecentProjects(const std::string &filepath, bool remove = false);
 
   bool IsApplicationRunning() { return m_ApplicationRunning; }
 
@@ -44,7 +46,5 @@ public:
 
   void Quit() { m_ApplicationRunning = false; }
 
-  const std::vector<std::string> &GetRecentProjects() {
-    return m_RecentProjects;
-  };
+  std::vector<std::string> GetRecentProjects() { return m_RecentProjects; };
 };

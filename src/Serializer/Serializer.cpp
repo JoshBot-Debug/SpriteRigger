@@ -93,12 +93,12 @@ void Serializer::Move(const std::string &from, const std::string &to) {
   Clear();
 }
 
-void Serializer::Load(const std::string &filepath) {
+bool Serializer::Load(const std::string &filepath) {
   std::ifstream file(filepath, std::ios::binary);
 
   if (!file.is_open()) {
     std::cerr << "Failed to read file: " << filepath.data() << std::endl;
-    return;
+    return false;
   }
 
   // Read magic
@@ -127,14 +127,13 @@ void Serializer::Load(const std::string &filepath) {
   /// TODO: Handle versions
   assert(version == m_Options.version);
 
-  if (manifestSize == 0)
-    return;
-
   m_Manifest.resize(manifestSize);
   m_Chunks.resize(chunksSize);
 
   file.read(reinterpret_cast<char *>(m_Manifest.data()), manifestSize);
   file.read(reinterpret_cast<char *>(m_Chunks.data()), chunksSize);
+
+  return true;
 }
 
 std::vector<uint8_t> Serializer::Get(const std::string &key) {
