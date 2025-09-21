@@ -7,7 +7,6 @@
 
 class SerializableLayer : public Layer {
 public:
-  virtual std::string GetName() = 0;
   virtual void Save(Serializer &serializer) = 0;
   virtual void Restore(Serializer &serializer) = 0;
 };

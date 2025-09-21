@@ -6,6 +6,8 @@ ViewportLayer::ViewportLayer(State *state) : m_State(state) {}
 
 void ViewportLayer::OnAttach() {}
 
+void ViewportLayer::OnUpdate(float deltaTime) {}
+
 void ViewportLayer::OnRender() {
   ImGui::Begin("Viewport", nullptr, ImGuiBackendFlags_None);
 
@@ -13,8 +15,6 @@ void ViewportLayer::OnRender() {
 }
 
 void ViewportLayer::OnDetach() { m_State = nullptr; }
-
-std::string ViewportLayer::GetName() { return "ViewportLayer"; }
 
 void ViewportLayer::Save(Serializer &serializer) {}
 

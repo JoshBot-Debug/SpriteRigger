@@ -19,8 +19,6 @@ public:
 
   virtual void OnDetach() override;
 
-  virtual std::string GetName() override;
-
   virtual void Save(Serializer &serializer) override;
 
   virtual void Restore(Serializer &serializer) override;

@@ -11,8 +11,6 @@ void AssetLayer::OnRender() {
 
 void AssetLayer::OnDetach() { m_State = nullptr; }
 
-std::string AssetLayer::GetName() { return "AssetLayer"; }
-
 void AssetLayer::Save(Serializer &serializer) {}
 
 void AssetLayer::Restore(Serializer &serializer) {}

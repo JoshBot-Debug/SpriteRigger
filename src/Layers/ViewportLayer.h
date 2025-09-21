@@ -15,11 +15,11 @@ public:
 
   virtual void OnAttach() override;
 
+  virtual void OnUpdate(float deltaTime) override;
+
   virtual void OnRender() override;
 
   virtual void OnDetach() override;
-
-  virtual std::string GetName() override;
 
   virtual void Save(Serializer &serializer) override;
 

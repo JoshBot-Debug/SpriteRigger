@@ -11,8 +11,6 @@ void HierarchyLayer::OnRender() {
 
 void HierarchyLayer::OnDetach() { m_State = nullptr; }
 
-std::string HierarchyLayer::GetName() { return "HierarchyLayer"; }
-
 void HierarchyLayer::Save(Serializer &serializer) {}
 
 void HierarchyLayer::Restore(Serializer &serializer) {}
