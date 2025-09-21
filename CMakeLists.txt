@@ -13,7 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # === Add vendor libraries ===
 add_subdirectory(vendor/imgui-cmake)
-add_subdirectory(vendor/libtinyfiledialogs-cmake)
+add_subdirectory(vendor/tinyfiledialogs-cmake)
 
 # === Source Files ===
 file(GLOB_RECURSE SRC ${CMAKE_SOURCE_DIR}/src/*.cpp)
@@ -37,7 +37,7 @@ target_link_libraries(SpriteRigger PRIVATE
   ${GLFW3_LIBRARIES}
   ${GLEW_LIBRARIES}
   imgui
-  libtinyfiledialogs
+  tinyfiledialogs
 )
 
 # === Include Directories ===
@@ -46,7 +46,7 @@ target_include_directories(SpriteRigger PRIVATE
   ${CMAKE_SOURCE_DIR}/vendor/glad/include
   ${CMAKE_SOURCE_DIR}/vendor/imgui
   ${CMAKE_SOURCE_DIR}/vendor/imgui/backends
-  ${CMAKE_SOURCE_DIR}/vendor/libtinyfiledialogs
+  ${CMAKE_SOURCE_DIR}/vendor/tinyfiledialogs
 )
 
 # === Optional: ccache (speed up rebuilds) ===
