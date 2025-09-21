@@ -6,11 +6,17 @@ void HierarchyLayer::OnAttach() {
   m_ContextMenu.Register({.id = "contextMenu",
                           .items = {
                               {
-                                .name = "New bone",
-                                .shortcut = "Ctrl N",
-                                .onClick = []() {},
+                                  .name = "New bone",
+                                  .shortcut = "Ctrl B",
+                                  .onClick = []() {},
                               },
                           }});
+
+  Window::RegisterShortcut({
+      .ctrl = true,
+      .key = ImGuiKey_B,
+      .callback = [](Window *window) {},
+  });
 }
 
 void HierarchyLayer::OnUpdate(float deltaTime) {}
