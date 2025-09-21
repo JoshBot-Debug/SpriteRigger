@@ -5,10 +5,7 @@
 
 #include "Utility.h"
 
-// inline const std::string RECENT =
-// GetHomeDirectory() + "/.spriterigger/.sprig";
-
-inline const std::string RECENT = ".sprig";
+inline const std::string RECENT = GetHomeDirectory() + "/.spriterigger/.sprig";
 
 inline const unsigned int MAX_RECENT = 20;
 
@@ -31,7 +28,7 @@ bool State::New() {
   if (!file)
     return false;
 
-  std::string filepath = std::string(file) + ".sprig";
+  std::string filepath = AddFileExtension(file, ".sprig");
 
   m_Serializer.Write(filepath);
 
@@ -92,7 +89,7 @@ void State::SaveAs() {
   if (!file)
     return;
 
-  std::string filepath = std::string(file) + ".sprig";
+  std::string filepath = AddFileExtension(file, ".sprig");
 
   m_Serializer.Write(filepath);
 

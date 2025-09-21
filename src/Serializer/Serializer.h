@@ -1,8 +1,9 @@
 #pragma once
 
+#include <stdint.h>
 #include <string>
 #include <vector>
-#include <stdint.h>
+#include <filesystem>
 
 class Serializer {
 public:
@@ -29,7 +30,7 @@ public:
   /**
    * Writes to a file
    */
-  void Write(const std::string &filepath);
+  void Write(const std::filesystem::path &filepath);
 
   /**
    * Moves a file

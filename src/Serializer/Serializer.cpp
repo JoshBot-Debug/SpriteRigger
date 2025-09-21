@@ -45,7 +45,10 @@ void Serializer::Stage(const std::string &key, const void *data,
   std::memcpy(m_Chunks.data() + chunkOffset, data, size);
 }
 
-void Serializer::Write(const std::string &filepath) {
+void Serializer::Write(const std::filesystem::path &filepath) {
+
+  std::filesystem::create_directories(filepath.parent_path());
+
   std::ofstream file(filepath, std::ios::binary);
 
   if (!file.is_open()) {
@@ -116,11 +119,6 @@ bool Serializer::Load(const std::string &filepath) {
   // Read chunks size
   uint64_t chunksSize = 0;
   file.read(reinterpret_cast<char *>(&chunksSize), sizeof(uint64_t));
-
-  std::cout << "Magic: " << magic << std::endl;
-  std::cout << "Version: " << version << std::endl;
-  std::cout << "Manifest size: " << manifestSize << std::endl;
-  std::cout << "Chunks   size: " << chunksSize << std::endl;
 
   assert(magic == m_Options.magic);
 

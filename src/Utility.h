@@ -201,17 +201,26 @@ static bool IsDarkMode() {
   return theme.find("dark") != std::string::npos;
 }
 
-static std::string RelativeHomePath(const std::filesystem::path& p) {
-    const char* home = std::getenv("HOME");
-    if (!home) return p.string();
+static std::string RelativeHomePath(const std::filesystem::path &p) {
+  const char *home = std::getenv("HOME");
+  if (!home)
+    return p.string();
 
-    std::filesystem::path homePath(home);
+  std::filesystem::path homePath(home);
 
-    // check if `p` starts with home
-    auto abs = std::filesystem::absolute(p);
-    if (abs.string().rfind(homePath.string(), 0) == 0) {
-        return "~" + abs.string().substr(homePath.string().size());
-    }
+  // check if `p` starts with home
+  auto abs = std::filesystem::absolute(p);
+  if (abs.string().rfind(homePath.string(), 0) == 0) {
+    return "~" + abs.string().substr(homePath.string().size());
+  }
 
-    return abs.string();
+  return abs.string();
+}
+
+static std::string AddFileExtension(const std::string &filepath,
+                                    const std::string &extension) {
+  std::filesystem::path p(filepath);
+  if (p.extension() != extension)
+    p.replace_extension(extension);
+  return p.string();
 }
