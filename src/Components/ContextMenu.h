@@ -27,7 +27,7 @@ public:
 
   void Register(const Options &options) { m_Options = options; }
 
-  void OnRender() {
+  void Render() {
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right, false))
       ImGui::OpenPopup(m_Options.id);
 

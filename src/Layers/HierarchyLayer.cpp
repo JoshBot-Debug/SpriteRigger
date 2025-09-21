@@ -20,7 +20,7 @@ void HierarchyLayer::OnRender() {
 
   ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_None);
 
-  m_ContextMenu.OnRender();
+  m_ContextMenu.Render();
 
   ImGui::End();
 }
