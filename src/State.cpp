@@ -6,9 +6,9 @@
 #include "Utility.h"
 
 // inline const std::string RECENT =
-// GetHomeDirectory() + "/.spriterigger/recent.sprig";
+// GetHomeDirectory() + "/.spriterigger/.sprig";
 
-inline const std::string RECENT = "recent.sprig";
+inline const std::string RECENT = ".sprig";
 
 inline const unsigned int MAX_RECENT = 20;
 
