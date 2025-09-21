@@ -5,7 +5,7 @@ AssetLayer::AssetLayer(State *state) : m_State(state) {}
 void AssetLayer::OnAttach() {}
 
 void AssetLayer::OnRender() {
-  ImGui::Begin("Assets", nullptr, ImGuiBackendFlags_None);
+  ImGui::Begin("Assets", nullptr, ImGuiWindowFlags_None);
   ImGui::End();
 }
 

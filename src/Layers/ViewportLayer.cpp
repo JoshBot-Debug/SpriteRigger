@@ -9,7 +9,7 @@ void ViewportLayer::OnAttach() {}
 void ViewportLayer::OnUpdate(float deltaTime) {}
 
 void ViewportLayer::OnRender() {
-  ImGui::Begin("Viewport", nullptr, ImGuiBackendFlags_None);
+  ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_None);
 
   ImGui::End();
 }

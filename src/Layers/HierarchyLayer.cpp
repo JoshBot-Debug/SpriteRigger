@@ -5,7 +5,7 @@ HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 void HierarchyLayer::OnAttach() {}
 
 void HierarchyLayer::OnRender() {
-  ImGui::Begin("Hierarchy", nullptr, ImGuiBackendFlags_None);
+  ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_None);
   ImGui::End();
 }
 

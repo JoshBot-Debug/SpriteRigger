@@ -117,6 +117,9 @@ int main(int argc, char **argv) {
       for (auto &layer : layers)
         window.PushLayer(layer);
 
+    ImGuiStyle &style = ImGui::GetStyle();
+    style.WindowMenuButtonPosition = ImGuiDir_None;
+
     window.Run();
   }
 
