@@ -15,6 +15,8 @@
 
 #include "imgui.h"
 
+#include "ShortcutManager.h"
+
 class Window {
 public:
   struct Options {
@@ -100,4 +102,6 @@ public:
   static bool GetKey(const KeyboardKey &key, const KeyAction &action);
   static bool GetMouseButton(const MouseButton &key, const KeyAction &action);
   static GLFWwindow *GetWindow() { return s_Window; };
+  
+  static void RegisterShortcut(const ShortcutManager::Shortcut &shortcut);
 };

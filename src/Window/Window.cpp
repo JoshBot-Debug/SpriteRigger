@@ -53,9 +53,13 @@ void Window::Run() {
   if (m_Options.maximized)
     glfwMaximizeWindow(s_Window);
 
+  auto &shortcutManager = ShortcutManager::Instance();
+
   while (!glfwWindowShouldClose(s_Window) && m_Running) {
 
     glfwPollEvents();
+
+    shortcutManager.PollEvents();
 
     if (glfwGetWindowAttrib(s_Window, GLFW_ICONIFIED) != 0) {
       ImGui_ImplGlfw_Sleep(10);
@@ -170,7 +174,13 @@ bool Window::GetMouseButton(const MouseButton &key, const KeyAction &action) {
          static_cast<int>(action);
 }
 
+void Window::RegisterShortcut(const ShortcutManager::Shortcut &shortcut) {
+  ShortcutManager::Instance().Register(shortcut);
+}
+
 Window::Window(const Window::Options &options) : m_Options(options) {
+  ShortcutManager::Instance().SetWindow(this);
+
   glfwSetErrorCallback(ErrorCallback);
 
   if (!glfwInit())
@@ -306,4 +316,6 @@ Window::~Window() {
 
   s_Window = nullptr;
   s_Scroll = glm::vec2(0.0f);
+
+  ShortcutManager::Instance().Free();
 }

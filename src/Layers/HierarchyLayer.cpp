@@ -2,10 +2,26 @@
 
 HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 
-void HierarchyLayer::OnAttach() {}
+void HierarchyLayer::OnAttach() {
+  m_ContextMenu.Register({.id = "contextMenu",
+                          .items = {
+                              {
+                                .name = "New bone",
+                                .shortcut = "Ctrl N",
+                                .onClick = []() {},
+                              },
+                          }});
+}
+
+void HierarchyLayer::OnUpdate(float deltaTime) {}
 
 void HierarchyLayer::OnRender() {
+  ImGui::ShowDemoWindow();
+
   ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_None);
+
+  m_ContextMenu.OnRender();
+
   ImGui::End();
 }
 

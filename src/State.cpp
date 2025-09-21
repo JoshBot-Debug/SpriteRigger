@@ -83,7 +83,7 @@ void State::Save() {
 void State::SaveAs() {
   const char *filter[] = {"*.sprig"};
 
-  const char *file = tinyfd_openFileDialog("Create a new project", "", 1,
+  const char *file = tinyfd_openFileDialog("Save as", "", 1,
                                            filter, "SpriteRigger files", 0);
 
   if (!file)

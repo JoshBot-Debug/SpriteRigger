@@ -34,6 +34,60 @@ int main(int argc, char **argv) {
 
     Window window(options);
 
+    // Register keyboard shortcuts
+    if (initialized) {
+      Window::RegisterShortcut({
+          .ctrl = true,
+          .key = ImGuiKey_N,
+          .callback =
+              [&state](Window *window) {
+                if (state.New())
+                  window->Quit();
+              },
+      });
+
+      Window::RegisterShortcut({
+          .ctrl = true,
+          .key = ImGuiKey_O,
+          .callback =
+              [&state](Window *window) {
+                if (state.Open())
+                  window->Quit();
+              },
+      });
+
+      Window::RegisterShortcut({
+          .ctrl = true,
+          .key = ImGuiKey_S,
+          .callback =
+              [&state](Window *window) {
+                (void *)(window);
+                state.Save();
+              },
+      });
+
+      Window::RegisterShortcut({
+          .ctrl = true,
+          .shift = true,
+          .key = ImGuiKey_S,
+          .callback =
+              [&state](Window *window) {
+                (void *)(window);
+                state.SaveAs();
+              },
+      });
+
+      Window::RegisterShortcut({
+          .ctrl = true,
+          .key = ImGuiKey_Q,
+          .callback =
+              [&state](Window *window) {
+                window->Quit();
+                state.Quit();
+              },
+      });
+    }
+
     glfwSetWindowUserPointer(Window::GetWindow(), &state);
 
     glfwSetWindowCloseCallback(Window::GetWindow(), [](GLFWwindow *window) {
@@ -41,32 +95,6 @@ int main(int argc, char **argv) {
     });
 
     window.SetMenubar([&state, &window]() {
-      bool ctrl = ImGui::IsKeyDown(ImGuiMod_Ctrl);
-      bool shift = ImGui::IsKeyDown(ImGuiMod_Shift);
-      bool n = ImGui::IsKeyPressed(ImGuiKey_N, false);
-      bool o = ImGui::IsKeyPressed(ImGuiKey_O, false);
-      bool s = ImGui::IsKeyPressed(ImGuiKey_S, false);
-      bool q = ImGui::IsKeyPressed(ImGuiKey_Q, false);
-
-      if (ctrl && n)
-        if (state.New())
-          window.Quit();
-
-      if (ctrl && o)
-        if (state.Open())
-          window.Quit();
-
-      if (ctrl && s)
-        state.Save();
-
-      if (shift && ctrl && s)
-        state.SaveAs();
-
-      if (ctrl && q) {
-        window.Quit();
-        state.Quit();
-      }
-
       if (ImGui::BeginMenu("File")) {
 
         if (ImGui::MenuItem("New", "Crtl N"))
