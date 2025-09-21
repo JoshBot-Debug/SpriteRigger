@@ -2,6 +2,3 @@
 	path = vendor/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
-[submodule "vendor/libtinyfiledialogs"]
-	path = vendor/libtinyfiledialogs
-	url = https://github.com/native-toolkit/libtinyfiledialogs.git
