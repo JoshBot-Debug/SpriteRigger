@@ -34,7 +34,6 @@ int main(int argc, char **argv) {
 
     Window window(options);
 
-    // Register keyboard shortcuts
     if (initialized) {
       Window::RegisterShortcut({
           .ctrl = true,
