@@ -90,7 +90,9 @@ int main(int argc, char **argv) {
     glfwSetWindowUserPointer(Window::GetWindow(), &state);
 
     glfwSetWindowCloseCallback(Window::GetWindow(), [](GLFWwindow *window) {
-      static_cast<State *>(glfwGetWindowUserPointer(window))->Quit();
+      auto *state = static_cast<State *>(glfwGetWindowUserPointer(window));
+      state->Save();
+      state->Quit();
     });
 
     window.SetMenubar([&state, &window]() {
