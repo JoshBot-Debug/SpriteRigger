@@ -8,11 +8,6 @@ HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 
 void HierarchyLayer::OnAttach() {
 
-  m_Hierarchy.OnRenderItem([&](Hierarchy::Item *item) {
-    std::string ctxId = ("bcm:" + std::to_string(item->id)).c_str();
-    m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
-  });
-
   m_BoneContextMenu.Register({
       .renderOn = ContextMenu::PopupContext::ITEM,
       .items = {{
@@ -27,6 +22,11 @@ void HierarchyLayer::OnAttach() {
                 });
               },
       }},
+  });
+
+  m_Hierarchy.OnRenderItem([&](Hierarchy::Item *item) {
+    std::string ctxId = ("bcm:" + std::to_string(item->id)).c_str();
+    m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
   });
 
   auto onNewBone = [hierarchy = &m_Hierarchy](void *data) {
