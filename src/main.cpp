@@ -7,6 +7,7 @@
 #include "Layers/ViewportLayer.h"
 
 #include "Application/Rigger.h"
+#include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 #include "Utility.h"
@@ -16,6 +17,7 @@ int main(int argc, char **argv) {
   State state;
 
   ServiceLocator::Register<Rigger>();
+  ServiceLocator::Register<Registry>();
 
   std::vector<std::shared_ptr<SerializableLayer>> layers = {
       state.Register(std::make_shared<ViewportLayer>(&state)),
@@ -158,6 +160,7 @@ int main(int argc, char **argv) {
   }
 
   ServiceLocator::Unregister<Rigger>();
+  ServiceLocator::Unregister<Registry>();
 
   return 0;
 }

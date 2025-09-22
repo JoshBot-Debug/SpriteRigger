@@ -5,14 +5,19 @@
 #include "Window/Window.h"
 
 #include "Components/ContextMenu.h"
+#include "Components/Hierarchy.h"
 #include "SerializableLayer.h"
 #include "State.h"
+
+#include "ECS/Entity.h"
 
 class HierarchyLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
+  std::shared_ptr<Registry> m_Registry = nullptr;
 
   ContextMenu m_ContextMenu;
+  Hierarchy m_Hierarchy;
 
 public:
   explicit HierarchyLayer(State *state);

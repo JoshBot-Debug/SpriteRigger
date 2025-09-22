@@ -1,6 +1,8 @@
 #pragma once
 
 #include <any>
+#include <memory>
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
 
@@ -20,14 +22,15 @@ using EntityID = int;
  */
 class Registry {
 private:
-  EntityID m_EID = ALL;             ///< The next available entity ID.
-  std::vector<Entity *> m_Entities; ///< List of all entities in the registry.
-  std::unordered_map<EntityID, std::vector<std::any>>
+  EntityID m_EID = ALL; ///< The next available entity ID.
+  std::vector<std::shared_ptr<Entity>>
+      m_Entities; ///< List of all entities in the registry.
+  std::unordered_map<EntityID,
+                     std::unordered_map<std::type_index, std::shared_ptr<void>>>
       m_Storage; ///< Storage of components indexed by entity ID.
 
 public:
   Registry() = default;
-  ~Registry();
 
   /**
    * Creates a new entity with a given name.
@@ -35,7 +38,12 @@ public:
    * @param name The name of the entity.
    * @return A pointer to the newly created entity.
    */
-  Entity *CreateEntity(const char *name);
+  Entity *CreateEntity(const std::string &name) {
+    ++m_EID;
+    auto entity = std::make_shared<Entity>(m_EID, name, this);
+    m_Entities.push_back(entity);
+    return entity.get();
+  };
 
   /**
    * Adds a component of type T to the specified entity.
@@ -46,9 +54,9 @@ public:
    */
   template <typename T, typename... Args>
   T *Add(EntityID entity, Args &&...args) {
-    T *component = new T(std::forward<Args>(args)...);
-    m_Storage[entity].push_back((std::any)component);
-    return component;
+    auto component = std::make_shared<T>(std::forward<Args>(args)...);
+    m_Storage[entity][typeid(T)] = component;
+    return component.get();
   }
 
   /**
@@ -78,11 +86,11 @@ public:
    * @return A pointer to the component, or nullptr if not found.
    */
   template <typename T> T *Get(EntityID entity) {
-    for (auto &component : m_Storage[entity])
-      try {
-        return std::any_cast<T *>(component);
-      } catch (const std::bad_any_cast &e) {
-      }
+    try {
+      return std::static_pointer_cast<T>(m_Storage.at(entity).at(typeid(T)))
+          .get();
+    } catch (const std::exception &e) {
+    }
     return nullptr;
   }
 
@@ -104,11 +112,11 @@ public:
     std::vector<T *> result;
 
     for (const auto &[eid, components] : m_Storage)
-      for (auto &component : components)
-        try {
-          result.push_back(std::any_cast<T *>(component));
-        } catch (const std::bad_any_cast &e) {
-        }
+      try {
+        result.push_back(
+            std::static_pointer_cast<T>(components.at(typeid(T))).get());
+      } catch (const std::bad_any_cast &e) {
+      }
 
     return result;
   }
@@ -118,7 +126,12 @@ public:
    *
    * @return A vector of pointers to all entities.
    */
-  std::vector<Entity *> Entities() { return m_Entities; }
+  std::vector<Entity *> Entities() {
+    std::vector<Entity *> entities(m_Entities.size());
+    for (auto entity : m_Entities)
+      entities.push_back(entity.get());
+    return entities;
+  }
 
   /**
    * Frees a specific component type from the specified entity.
@@ -126,23 +139,14 @@ public:
    * @param entity The entity ID from which to free the component.
    */
   template <typename T> void Free(EntityID entity) {
-    if (m_Storage.find(entity) == m_Storage.end())
-      return;
-
-    for (const auto &component : m_Storage[entity]) {
-      try {
-        delete std::any_cast<T *>(component);
-      } catch (const std::bad_any_cast &e) {
-        // The cast failed, this is no the object we want, skip.
-      }
-    }
+    m_Storage.at(entity).erase(typeid(T));
   }
 
   /**
    * Frees all components of a specified type across all entities.
    */
   template <typename... T> void Free() {
-    for (const auto [eid, components] : m_Storage)
-      (Free<T>(eid), ...);
+    for (auto [eid, components] : m_Storage)
+      (components.erase(typeid(T)), ...);
   }
 };

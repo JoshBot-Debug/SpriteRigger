@@ -6,7 +6,7 @@
         "${workspaceFolder}/src/**",
         "${workspaceFolder}/vendor/imgui",
         "${workspaceFolder}/vendor/imgui/backends",
-        "${workspaceFolder}/vendor/libtinyfiledialogs"
+        "${workspaceFolder}/vendor/tinyfiledialogs"
       ],
       "defines": [],
       "cStandard": "c23",

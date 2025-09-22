@@ -24,7 +24,7 @@ public:
    * @param id The unique identifier for the entity.
    * @param registry A pointer to the Registry managing this entity.
    */
-  Entity(const std::string &name, int id, Registry *registry)
+  Entity(EntityID id, const std::string &name, Registry *registry)
       : m_Id(id), m_Name(name), m_Registry(registry){};
 
   /**
