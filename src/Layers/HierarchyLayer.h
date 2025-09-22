@@ -8,17 +8,14 @@
 #include "SerializableLayer.h"
 #include "State.h"
 
-#include "ServiceLocator/ServiceLocator.h"
-
 class HierarchyLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
-  ServiceLocator *m_Services = nullptr;
 
   ContextMenu m_ContextMenu;
 
 public:
-  explicit HierarchyLayer(State *state, ServiceLocator *services);
+  explicit HierarchyLayer(State *state);
 
   virtual void OnAttach() override;
 

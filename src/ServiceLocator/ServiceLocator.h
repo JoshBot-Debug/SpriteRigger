@@ -11,6 +11,7 @@ private:
       services;
 
 public:
+
   template <typename T, typename... Args> static void Register(Args &&...args) {
     services[typeid(T)] = std::make_shared<T>(std::forward<Args>(args)...);
   }

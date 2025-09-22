@@ -7,15 +7,12 @@
 #include "SerializableLayer.h"
 #include "State.h"
 
-#include "ServiceLocator/ServiceLocator.h"
-
 class ViewportLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
-  ServiceLocator *m_Services = nullptr;
 
 public:
-  explicit ViewportLayer(State *state, ServiceLocator *services);
+  explicit ViewportLayer(State *state);
 
   virtual void OnAttach() override;
 

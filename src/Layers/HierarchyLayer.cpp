@@ -1,13 +1,13 @@
 #include "HierarchyLayer.h"
 
 #include "Application/Rigger.h"
+#include "ServiceLocator/ServiceLocator.h"
 
-HierarchyLayer::HierarchyLayer(State *state, ServiceLocator *services)
-    : m_State(state), m_Services(services) {}
+HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 
 void HierarchyLayer::OnAttach() {
 
-  auto rigger = m_Services->Get<Rigger>();
+  auto rigger = ServiceLocator::Get<Rigger>();
 
   m_ContextMenu.Register({
       .id = "contextMenu",

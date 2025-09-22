@@ -15,14 +15,12 @@ int main(int argc, char **argv) {
 
   State state;
 
-  ServiceLocator services;
-
-  services.Register<Rigger>();
+  ServiceLocator::Register<Rigger>();
 
   std::vector<std::shared_ptr<SerializableLayer>> layers = {
-      state.Register(std::make_shared<ViewportLayer>(&state, &services)),
-      state.Register(std::make_shared<HierarchyLayer>(&state, &services)),
-      state.Register(std::make_shared<AssetLayer>(&state, &services)),
+      state.Register(std::make_shared<ViewportLayer>(&state)),
+      state.Register(std::make_shared<HierarchyLayer>(&state)),
+      state.Register(std::make_shared<AssetLayer>(&state)),
   };
 
   while (state.IsApplicationRunning()) {
@@ -159,7 +157,7 @@ int main(int argc, char **argv) {
     window.Run();
   }
 
-  services.Unregister<Rigger>();
+  ServiceLocator::Unregister<Rigger>();
 
   return 0;
 }
