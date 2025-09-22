@@ -82,7 +82,7 @@ public:
    * This method also deletes the entity itself.
    */
   template <typename... T> void Free() {
-    (m_Registry->free<T>(m_Id), ...);
+    (m_Registry->Free<T>(m_Id), ...);
     delete this;
   }
 

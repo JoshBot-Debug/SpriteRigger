@@ -2,18 +2,23 @@
 
 #include "imgui.h"
 
+#include "Window/Window.h"
+
+#include "Components/ContextMenu.h"
 #include "SerializableLayer.h"
 #include "State.h"
-#include "Window/Window.h"
-#include "Components/ContextMenu.h"
+
+#include "ServiceLocator/ServiceLocator.h"
 
 class HierarchyLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
+  ServiceLocator *m_Services = nullptr;
+
   ContextMenu m_ContextMenu;
 
 public:
-  explicit HierarchyLayer(State *state);
+  explicit HierarchyLayer(State *state, ServiceLocator *services);
 
   virtual void OnAttach() override;
 

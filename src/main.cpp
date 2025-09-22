@@ -6,16 +6,23 @@
 #include "Layers/InitializeLayer.h"
 #include "Layers/ViewportLayer.h"
 
+#include "Application/Rigger.h"
+#include "ServiceLocator/ServiceLocator.h"
+
 #include "Utility.h"
 
 int main(int argc, char **argv) {
 
   State state;
 
+  ServiceLocator services;
+
+  services.Register<Rigger>();
+
   std::vector<std::shared_ptr<SerializableLayer>> layers = {
-      state.Register(std::make_shared<ViewportLayer>(&state)),
-      state.Register(std::make_shared<HierarchyLayer>(&state)),
-      state.Register(std::make_shared<AssetLayer>(&state)),
+      state.Register(std::make_shared<ViewportLayer>(&state, &services)),
+      state.Register(std::make_shared<HierarchyLayer>(&state, &services)),
+      state.Register(std::make_shared<AssetLayer>(&state, &services)),
   };
 
   while (state.IsApplicationRunning()) {
@@ -151,6 +158,8 @@ int main(int argc, char **argv) {
 
     window.Run();
   }
+
+  services.Unregister<Rigger>();
 
   return 0;
 }

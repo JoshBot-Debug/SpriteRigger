@@ -141,7 +141,7 @@ public:
   /**
    * Frees all components of a specified type across all entities.
    */
-  template <typename... T> void free() {
+  template <typename... T> void Free() {
     for (const auto [eid, components] : m_Storage)
       (Free<T>(eid), ...);
   }

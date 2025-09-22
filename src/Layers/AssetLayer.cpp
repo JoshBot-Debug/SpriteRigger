@@ -1,6 +1,6 @@
 #include "AssetLayer.h"
 
-AssetLayer::AssetLayer(State *state) : m_State(state) {}
+AssetLayer::AssetLayer(State *state, ServiceLocator *services) : m_State(state), m_Services(services) {}
 
 void AssetLayer::OnAttach() {}
 

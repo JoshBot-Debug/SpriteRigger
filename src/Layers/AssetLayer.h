@@ -6,12 +6,15 @@
 #include "State.h"
 #include "Window/Window.h"
 
+#include "ServiceLocator/ServiceLocator.h"
+
 class AssetLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
+  ServiceLocator *m_Services = nullptr;
 
 public:
-  explicit AssetLayer(State *state);
+  explicit AssetLayer(State *state, ServiceLocator *services);
 
   virtual void OnAttach() override;
 

@@ -2,7 +2,7 @@
 
 #include "Utility.h"
 
-ViewportLayer::ViewportLayer(State *state) : m_State(state) {}
+ViewportLayer::ViewportLayer(State *state, ServiceLocator *services) : m_State(state), m_Services(services) {}
 
 void ViewportLayer::OnAttach() {}
 

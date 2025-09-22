@@ -2,16 +2,20 @@
 
 #include "imgui.h"
 
+#include "Window/Window.h"
+
 #include "SerializableLayer.h"
 #include "State.h"
-#include "Window/Window.h"
+
+#include "ServiceLocator/ServiceLocator.h"
 
 class ViewportLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
+  ServiceLocator *m_Services = nullptr;
 
 public:
-  explicit ViewportLayer(State *state);
+  explicit ViewportLayer(State *state, ServiceLocator *services);
 
   virtual void OnAttach() override;
 
