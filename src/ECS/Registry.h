@@ -5,15 +5,11 @@
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
-
-// This is called all so it's easy to undersand when looking at the
-// intellisense for methods, basically it's the initial value which is zero.
-// all ids start from 1
-const int ALL = 0;
+#include <stdint.h>
 
 class Entity;
 
-using EntityID = int;
+using EntityID = uint32_t;
 
 /**
  * Registry is a container for managing entities and their associated
@@ -22,7 +18,7 @@ using EntityID = int;
  */
 class Registry {
 private:
-  EntityID m_EID = ALL; ///< The next available entity ID.
+  EntityID m_EID = 0; ///< The next available entity ID.
   std::vector<std::shared_ptr<Entity>>
       m_Entities; ///< List of all entities in the registry.
   std::unordered_map<EntityID,

@@ -224,3 +224,13 @@ static std::string AddFileExtension(const std::string &filepath,
     p.replace_extension(extension);
   return p.string();
 }
+
+static void *ToVoidPtr(uint32_t value)
+{
+  return reinterpret_cast<void *>(static_cast<uintptr_t>(value));
+}
+
+static uint32_t ToInt32(void *value)
+{
+  return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(value));
+}

@@ -7,6 +7,7 @@
 #include "Layers/ViewportLayer.h"
 
 #include "Application/Rigger.h"
+#include "Components/Hierarchy.h"
 #include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 

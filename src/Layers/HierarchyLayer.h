@@ -14,9 +14,9 @@
 class HierarchyLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
-  std::shared_ptr<Registry> m_Registry = nullptr;
-
+  
   ContextMenu m_ContextMenu;
+  ContextMenu m_BoneContextMenu;
   Hierarchy m_Hierarchy;
 
 public:

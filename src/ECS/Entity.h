@@ -2,8 +2,9 @@
 
 #include "Registry.h"
 #include <string>
+#include <stdint.h>
 
-using EntityID = int;
+using EntityID = uint32_t;
 
 /**
  * Entity represents an object within the ECS.

@@ -4,42 +4,53 @@
 #include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
-#include "Application/Components/Render.h"
-
 HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 
 void HierarchyLayer::OnAttach() {
 
-  m_Registry = ServiceLocator::Get<Registry>();
+  m_Hierarchy.OnRenderItem([&](Hierarchy::Item *item) {
+    std::string ctxId = ("bcm:" + std::to_string(item->id)).c_str();
+    m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
+  });
 
-  auto rigger = ServiceLocator::Get<Rigger>();
-
-  m_ContextMenu.Register({
-      .id = "contextMenu",
+  m_BoneContextMenu.Register({
+      .renderOn = ContextMenu::PopupContext::ITEM,
       .items = {{
-          .name = "New bone",
-          .shortcut = "Ctrl B",
-          .onClick = [&rigger]() { rigger->NewBone(); },
+          .name = "New child",
+          .onClick =
+              [hierarchy = &m_Hierarchy](void *data) {
+                uint32_t eid = *ServiceLocator::Get<Rigger>()->NewBone();
+                hierarchy->Add({
+                    .id = eid,
+                    .parent = ToInt32(data),
+                    .label = "Bone " + std::to_string(eid),
+                });
+              },
       }},
   });
 
-  m_Hierarchy.Add(0, {
-    .id = 1,
-    .label = "Child 1",
-  });
-  m_Hierarchy.Add(0, {
-    .id = 2,
-    .label = "Child 2",
-  });
-  m_Hierarchy.Add(2, {
-    .id = 3,
-    .label = "Child of child 2",
+  auto onNewBone = [hierarchy = &m_Hierarchy](void *data) {
+    uint32_t eid = *ServiceLocator::Get<Rigger>()->NewBone();
+    hierarchy->Add({
+        .id = eid,
+        .parent = 0,
+        .label = "Bone " + std::to_string(eid),
+    });
+  };
+
+  m_ContextMenu.Register({
+      .renderOn = ContextMenu::PopupContext::WINDOW,
+      .items = {{
+          .name = "New bone",
+          .shortcut = "Ctrl B",
+          .onClick = onNewBone,
+      }},
   });
 
   Window::RegisterShortcut({
       .ctrl = true,
       .key = ImGuiKey_B,
-      .callback = [&rigger](Window *window) { rigger->NewBone(); },
+      .callback = onNewBone,
   });
 }
 
@@ -50,14 +61,9 @@ void HierarchyLayer::OnRender() {
 
   ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_None);
 
-  m_ContextMenu.Render();
+  m_ContextMenu.Render("cm");
 
-  m_Hierarchy.Render("HierarchyLayer");
-
-  auto [renders] = m_Registry->Collect<CRender>();
-
-  for (const auto &render : renders)
-    render->RenderHierarchyItem();
+  m_Hierarchy.Render("Hierarchy");
 
   ImGui::End();
 }
