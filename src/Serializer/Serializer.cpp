@@ -82,6 +82,7 @@ void Serializer::Write(const std::filesystem::path &filepath) {
   // Write the chunks
   file.write(reinterpret_cast<const char *>(m_Chunks.data()), m_Chunks.size());
 
+  // Clear data
   Clear();
 }
 
@@ -93,10 +94,14 @@ void Serializer::Move(const std::string &from, const std::string &to) {
     std::filesystem::rename(from, to);
   }
 
+  // Clear data
   Clear();
 }
 
 bool Serializer::Load(const std::string &filepath) {
+  // Clear any previous data
+  Clear();
+
   std::ifstream file(filepath, std::ios::binary);
 
   if (!file.is_open()) {

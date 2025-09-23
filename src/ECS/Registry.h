@@ -1,6 +1,7 @@
 #pragma once
 
 #include <any>
+#include <map>
 #include <memory>
 #include <stdint.h>
 #include <typeindex>
@@ -21,9 +22,8 @@ private:
   EntityId m_EID = 0; ///< The next available entity ID.
   std::vector<std::shared_ptr<Entity>>
       m_Entities; ///< List of all entities in the registry.
-  std::unordered_map<EntityId,
-                     std::unordered_map<std::type_index, std::shared_ptr<void>>>
-      m_Storage; ///< Storage of components indexed by entity ID.
+  std::map<EntityId, std::unordered_map<std::type_index, std::shared_ptr<void>>>
+      m_Components; ///< Components indexed by entity ID.
 
   std::unordered_map<std::type_index, bool> m_Dirty;
 
@@ -34,11 +34,14 @@ public:
    * Creates a new entity with a given name.
    *
    * @param name The name of the entity.
+   * @param id The id the entity (optional).
    * @return A pointer to the newly created entity.
    */
-  Entity *CreateEntity(const std::string &name) {
-    ++m_EID;
-    auto entity = std::make_shared<Entity>(m_EID, name, this);
+  Entity *CreateEntity(const std::string &name, EntityId id = 0) {
+    if (id > m_EID)
+      m_EID = id;
+    uint32_t eid = id ? id : ++m_EID;
+    auto entity = std::make_shared<Entity>(eid, name, this);
     m_Entities.push_back(entity);
     return entity.get();
   };
@@ -53,8 +56,8 @@ public:
   template <typename T, typename... Args>
   T *Add(EntityId entity, Args &&...args) {
     auto component = std::make_shared<T>(std::forward<Args>(args)...);
-    m_Storage[entity][typeid(T)] = component;
-    MarkChanged<T>(); 
+    m_Components[entity][typeid(T)] = component;
+    MarkChanged<T>();
     return component.get();
   }
 
@@ -65,7 +68,7 @@ public:
    * @return True if the entity has the component, false otherwise.
    */
   template <typename T> bool Has(EntityId entity) {
-    return (m_Storage.find(entity) != m_Storage.end());
+    return (m_Components.find(entity) != m_Components.end());
   }
 
   /**
@@ -86,11 +89,23 @@ public:
    */
   template <typename T> T *Get(EntityId entity) {
     try {
-      return std::static_pointer_cast<T>(m_Storage.at(entity).at(typeid(T)))
+      return std::static_pointer_cast<T>(m_Components.at(entity).at(typeid(T)))
           .get();
     } catch (const std::exception &e) {
     }
     return nullptr;
+  }
+
+  /**
+   * Retrieves all entities
+   *
+   * @return A vector of pointers to the entity.
+   */
+  const std::vector<Entity *> GetEntities() {
+    std::vector<Entity *> results;
+    for (auto &entity : m_Entities)
+      results.push_back(entity.get());
+    return results;
   }
 
   /**
@@ -110,7 +125,7 @@ public:
   template <typename T> std::vector<T *> Get() {
     std::vector<T *> result;
 
-    for (const auto &[eid, components] : m_Storage)
+    for (const auto &[eid, components] : m_Components)
       try {
         result.push_back(
             std::static_pointer_cast<T>(components.at(typeid(T))).get());
@@ -138,7 +153,7 @@ public:
    * @param entity The entity ID from which to free the component.
    */
   template <typename T> void Free(EntityId entity) {
-    m_Storage.at(entity).erase(typeid(T));
+    m_Components.at(entity).erase(typeid(T));
     m_Dirty.erase(typeid(T));
   }
 
@@ -146,7 +161,7 @@ public:
    * Frees all components of a specified type across all entities.
    */
   template <typename... T> void Free() {
-    for (auto [eid, components] : m_Storage)
+    for (auto [eid, components] : m_Components)
       (components.erase(typeid(T)), ...);
     (m_Dirty.erase(typeid(T)), ...);
   }

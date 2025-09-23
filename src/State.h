@@ -10,6 +10,7 @@
 class State {
 private:
   Serializer m_Serializer;
+  Serializer m_RecentSerializer;
 
   bool m_IsInitialized = false;
   bool m_ApplicationRunning = true;

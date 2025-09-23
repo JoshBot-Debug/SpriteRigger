@@ -36,6 +36,13 @@ public:
   EntityId GetId() { return m_Id; }
 
   /**
+   * Retrieves the entity's name.
+   *
+   * @return The entity's name.
+   */
+  const std::string &GetName() { return m_Name; }
+
+  /**
    * Adds a component of type T to this entity.
    *
    * @param args Constructor arguments for the component.

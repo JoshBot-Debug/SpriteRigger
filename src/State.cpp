@@ -5,11 +5,21 @@
 
 #include "Utility.h"
 
+#include "Application/Components.h"
+#include "ECS/Entity.h"
+#include "ServiceLocator/ServiceLocator.h"
+
+#include <cstring>
+
 inline const std::string RECENT = GetHomeDirectory() + "/.spriterigger/.sprig";
 
 inline const unsigned int MAX_RECENT = 20;
 
-State::State() : m_Serializer({.magic = "SPRIG", .version = 1}) {
+inline const Serializer::Options serializerOptions = {.magic = "SPRIG",
+                                                      .version = 1};
+
+State::State()
+    : m_Serializer(serializerOptions), m_RecentSerializer(serializerOptions) {
   SyncRecentProjects();
 }
 
@@ -54,28 +64,88 @@ bool State::Open() {
 }
 
 bool State::Open(const std::string &filepath) {
+
   if (!m_Serializer.Load(filepath)) {
     SyncRecentProjects(filepath, true);
     return false;
   }
 
+  SyncRecentProjects(filepath);
+
   for (auto &layer : m_Layers)
     layer->Restore(m_Serializer);
-
-  m_Serializer.Clear();
 
   m_ProjectFile = filepath;
 
   m_IsInitialized = true;
 
-  SyncRecentProjects(filepath);
+  // Load the ECS state
+  const auto &registry = ServiceLocator::Get<Registry>();
+
+  std::vector<std::vector<uint8_t>> entities =
+      m_Serializer.GetAll("entity:bone");
+
+  LOG("Entities loaded:", entities.size());
+
+  for (auto &buffer : entities) {
+    size_t offset = 0;
+
+    uint8_t *ptr = buffer.data();
+
+    // Read the id
+    uint32_t id;
+    std::memcpy(&id, ptr, sizeof(id));
+    ptr += sizeof(id);
+
+    Entity *bone = registry->CreateEntity("bone", id);
+
+    CTransform *transform = bone->Add<CTransform>();
+    CHierarchy *hierarchy = bone->Add<CHierarchy>();
+
+    // Read transform
+    std::memcpy(transform, ptr, sizeof(CTransform));
+    ptr += sizeof(CTransform);
+
+    // Read hierarchy
+    std::memcpy(hierarchy, ptr, sizeof(CHierarchy));
+  }
+
+  m_Serializer.Clear();
 
   return true;
 }
 
 void State::Save() {
+  m_Serializer.Clear();
+
   for (auto &layer : m_Layers)
     layer->Save(m_Serializer);
+
+  // Save the ECS state
+  const auto &registry = ServiceLocator::Get<Registry>();
+
+  auto serialize = [](std::vector<uint8_t> &buffer, const void *data,
+                      uint32_t size) {
+    const uint8_t *ptr = reinterpret_cast<const uint8_t *>(data);
+    buffer.insert(buffer.end(), ptr, ptr + size);
+  };
+
+  // Serialize bone entity
+  for (auto &entity : registry->GetEntities()) {
+    if (!entity->Is("bone"))
+      continue;
+
+    const auto &[transform, hierarchy] =
+        entity->Collect<CTransform, CHierarchy>();
+
+    std::vector<uint8_t> buffer;
+    uint32_t id = entity->GetId();
+    serialize(buffer, &id, sizeof(uint32_t));
+    serialize(buffer, transform, sizeof(CTransform));
+    serialize(buffer, hierarchy, sizeof(CHierarchy));
+
+    m_Serializer.Stage("entity:bone", buffer.data(), buffer.size());
+  }
 
   m_Serializer.Write(m_ProjectFile);
 }
@@ -83,34 +153,34 @@ void State::Save() {
 void State::SaveAs() {
   const char *filter[] = {"*.sprig"};
 
-  const char *file = tinyfd_openFileDialog("Save as", "", 1,
-                                           filter, "SpriteRigger files", 0);
+  const char *file =
+      tinyfd_openFileDialog("Save as", "", 1, filter, "SpriteRigger files", 0);
 
   if (!file)
     return;
 
   std::string filepath = AddFileExtension(file, ".sprig");
 
-  m_Serializer.Write(filepath);
+  SyncRecentProjects(filepath);
 
   m_ProjectFile = filepath;
 
-  SyncRecentProjects(filepath);
+  Save();
 }
 
 void State::SyncRecentProjects() {
   // Load recent projects from disk
-  m_Serializer.Load(RECENT);
+  m_RecentSerializer.Load(RECENT);
 
   m_RecentProjects.clear();
 
   // Read all recent projects
-  for (auto &bytes : m_Serializer.GetAll("recent"))
+  for (auto &bytes : m_RecentSerializer.GetAll("recent"))
     m_RecentProjects.emplace_back(
         std::string(reinterpret_cast<char *>(bytes.data()), bytes.size()));
 
   // Clear loaded data
-  m_Serializer.Clear();
+  m_RecentSerializer.Clear();
 }
 
 void State::SyncRecentProjects(const std::string &filepath, bool remove) {
@@ -135,10 +205,13 @@ void State::SyncRecentProjects(const std::string &filepath, bool remove) {
   if (remove == false)
     m_RecentProjects.insert(m_RecentProjects.begin(), filepath);
 
+  // Clear any previous data
+  m_RecentSerializer.Clear();
+
   // Stage all recent projects
   for (auto &r : m_RecentProjects)
-    m_Serializer.Stage("recent", r.c_str(), r.size());
+    m_RecentSerializer.Stage("recent", r.c_str(), r.size());
 
   // Write recent projects to disk
-  m_Serializer.Write(RECENT);
+  m_RecentSerializer.Write(RECENT);
 }

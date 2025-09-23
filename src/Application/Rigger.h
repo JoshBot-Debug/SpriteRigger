@@ -5,8 +5,7 @@
 #include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
-#include "Application/Components/Hierarchy.h"
-#include "Application/Components/Transform.h"
+#include "Application/Components.h"
 
 class Rigger {
 private:

@@ -1,6 +1,6 @@
 #include "HierarchyLayer.h"
 
-#include "Application/Components/Hierarchy.h"
+#include "Application/Components.h"
 #include "Application/Rigger.h"
 #include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
