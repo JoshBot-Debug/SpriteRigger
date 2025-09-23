@@ -159,9 +159,9 @@ int main(int argc, char **argv) {
 
     window.Run();
   }
-
-  ServiceLocator::Unregister<Rigger>();
+  
   ServiceLocator::Unregister<Registry>();
+  ServiceLocator::Unregister<Rigger>();
 
   return 0;
 }

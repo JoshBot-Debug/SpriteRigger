@@ -85,14 +85,11 @@ bool State::Open(const std::string &filepath) {
   std::vector<std::vector<uint8_t>> entities =
       m_Serializer.GetAll("entity:bone");
 
-  LOG("Entities loaded:", entities.size());
-
   for (auto &buffer : entities) {
     size_t offset = 0;
 
     uint8_t *ptr = buffer.data();
 
-    // Read the id
     uint32_t id;
     std::memcpy(&id, ptr, sizeof(id));
     ptr += sizeof(id);
@@ -102,11 +99,9 @@ bool State::Open(const std::string &filepath) {
     CTransform *transform = bone->Add<CTransform>();
     CHierarchy *hierarchy = bone->Add<CHierarchy>();
 
-    // Read transform
     std::memcpy(transform, ptr, sizeof(CTransform));
     ptr += sizeof(CTransform);
 
-    // Read hierarchy
     std::memcpy(hierarchy, ptr, sizeof(CHierarchy));
   }
 
