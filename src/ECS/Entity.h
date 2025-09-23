@@ -4,7 +4,7 @@
 #include <string>
 #include <stdint.h>
 
-using EntityID = uint32_t;
+using EntityId = uint32_t;
 
 /**
  * Entity represents an object within the ECS.
@@ -13,7 +13,7 @@ using EntityID = uint32_t;
  */
 class Entity {
 private:
-  EntityID m_Id;        ///< Unique identifier for the entity.
+  EntityId m_Id;        ///< Unique identifier for the entity.
   std::string m_Name;   ///< Name of the entity.
   Registry *m_Registry; ///< Pointer to the Registry managing this entity.
 
@@ -25,7 +25,7 @@ public:
    * @param id The unique identifier for the entity.
    * @param registry A pointer to the Registry managing this entity.
    */
-  Entity(EntityID id, const std::string &name, Registry *registry)
+  Entity(EntityId id, const std::string &name, Registry *registry)
       : m_Id(id), m_Name(name), m_Registry(registry){};
 
   /**
@@ -33,7 +33,7 @@ public:
    *
    * @return The entity's ID.
    */
-  EntityID GetId() { return m_Id; }
+  EntityId GetId() { return m_Id; }
 
   /**
    * Adds a component of type T to this entity.
@@ -96,9 +96,9 @@ public:
   bool operator==(const Entity &other) const { return m_Id == other.m_Id; };
 
   /**
-   * Implicit conversion operator to convert Entity to EntityID.
+   * Implicit conversion operator to convert Entity to EntityId.
    *
    * @return The entity's ID.
    */
-  operator EntityID() const { return m_Id; }
+  operator EntityId() const { return m_Id; }
 };

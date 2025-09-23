@@ -1,6 +1,7 @@
 #include "HierarchyLayer.h"
 
 #include "Application/Rigger.h"
+#include "Application/Components/Hierarchy.h"
 #include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
@@ -14,12 +15,13 @@ void HierarchyLayer::OnAttach() {
           .name = "New child",
           .onClick =
               [hierarchy = &m_Hierarchy](void *data) {
-                uint32_t eid = *ServiceLocator::Get<Rigger>()->NewBone();
-                hierarchy->Add({
-                    .id = eid,
-                    .parent = ToInt32(data),
-                    .label = "Bone " + std::to_string(eid),
-                });
+                ServiceLocator::Get<Rigger>()->NewBone(ToInt32(data));
+                // uint32_t eid = *ServiceLocator::Get<Rigger>()->NewBone();
+                // hierarchy->Add({
+                //     .id = eid,
+                //     .parent = ToInt32(data),
+                //     .label = "Bone " + std::to_string(eid),
+                // });
               },
       }},
   });
@@ -30,12 +32,13 @@ void HierarchyLayer::OnAttach() {
   });
 
   auto onNewBone = [hierarchy = &m_Hierarchy](void *data) {
-    uint32_t eid = *ServiceLocator::Get<Rigger>()->NewBone();
-    hierarchy->Add({
-        .id = eid,
-        .parent = 0,
-        .label = "Bone " + std::to_string(eid),
-    });
+    ServiceLocator::Get<Rigger>()->NewBone(0);
+    // uint32_t eid = *ServiceLocator::Get<Rigger>()->NewBone();
+    // hierarchy->Add({
+    //     .id = eid,
+    //     .parent = 0,
+    //     .label = "Bone " + std::to_string(eid),
+    // });
   };
 
   m_ContextMenu.Register({
@@ -54,7 +57,13 @@ void HierarchyLayer::OnAttach() {
   });
 }
 
-void HierarchyLayer::OnUpdate(float deltaTime) {}
+void HierarchyLayer::OnUpdate(float deltaTime) {
+  auto registry = ServiceLocator::Get<Registry>();
+
+  const auto &[components] = registry->Collect<CHierarchy>();
+
+  
+}
 
 void HierarchyLayer::OnRender() {
   ImGui::ShowDemoWindow();

@@ -6,23 +6,24 @@
 #include "ServiceLocator/ServiceLocator.h"
 
 #include "Application/Components/Transform.h"
+#include "Application/Components/Hierarchy.h"
 
 class Rigger {
 private:
 public:
   Rigger() = default;
 
-  Entity *NewBone() {
-
+  void NewBone(EntityId parent) {
     auto registry = ServiceLocator::Get<Registry>();
 
     Entity *bone = registry->CreateEntity("bone");
 
     CTransform *transform = bone->Add<CTransform>();
+    CHierarchy *hierarchy = bone->Add<CHierarchy>();
 
     transform->size.x = 10;
     transform->size.y = 50;
 
-    return bone;
+    hierarchy->parent = parent;
   }
 };

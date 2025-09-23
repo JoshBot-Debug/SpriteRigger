@@ -9,7 +9,7 @@
 
 class Entity;
 
-using EntityID = uint32_t;
+using EntityId = uint32_t;
 
 /**
  * Registry is a container for managing entities and their associated
@@ -18,10 +18,10 @@ using EntityID = uint32_t;
  */
 class Registry {
 private:
-  EntityID m_EID = 0; ///< The next available entity ID.
+  EntityId m_EID = 0; ///< The next available entity ID.
   std::vector<std::shared_ptr<Entity>>
       m_Entities; ///< List of all entities in the registry.
-  std::unordered_map<EntityID,
+  std::unordered_map<EntityId,
                      std::unordered_map<std::type_index, std::shared_ptr<void>>>
       m_Storage; ///< Storage of components indexed by entity ID.
 
@@ -49,7 +49,7 @@ public:
    * @return A pointer to the newly created component.
    */
   template <typename T, typename... Args>
-  T *Add(EntityID entity, Args &&...args) {
+  T *Add(EntityId entity, Args &&...args) {
     auto component = std::make_shared<T>(std::forward<Args>(args)...);
     m_Storage[entity][typeid(T)] = component;
     return component.get();
@@ -61,7 +61,7 @@ public:
    * @param entity The entity ID to check.
    * @return True if the entity has the component, false otherwise.
    */
-  template <typename T> bool Has(EntityID entity) {
+  template <typename T> bool Has(EntityId entity) {
     return (m_Storage.find(entity) != m_Storage.end());
   }
 
@@ -71,7 +71,7 @@ public:
    * @param entity The entity ID from which to collect components.
    * @return A tuple containing pointers to the components.
    */
-  template <typename... T> std::tuple<T *...> Collect(EntityID entity) {
+  template <typename... T> std::tuple<T *...> Collect(EntityId entity) {
     return std::make_tuple(Get<T>(entity)...);
   }
 
@@ -81,7 +81,7 @@ public:
    * @param entity The entity ID from which to retrieve the component.
    * @return A pointer to the component, or nullptr if not found.
    */
-  template <typename T> T *Get(EntityID entity) {
+  template <typename T> T *Get(EntityId entity) {
     try {
       return std::static_pointer_cast<T>(m_Storage.at(entity).at(typeid(T)))
           .get();
@@ -134,7 +134,7 @@ public:
    *
    * @param entity The entity ID from which to free the component.
    */
-  template <typename T> void Free(EntityID entity) {
+  template <typename T> void Free(EntityId entity) {
     m_Storage.at(entity).erase(typeid(T));
   }
 
