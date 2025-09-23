@@ -32,6 +32,8 @@ private:
     std::vector<Node *> children = {};
 
     void Add(const Item &item) {
+      if (Find(item.id, this))
+        return;
       Node *node = Find(item.parent, this);
       if (node == nullptr)
         throw std::runtime_error("Invalid parent id: " +

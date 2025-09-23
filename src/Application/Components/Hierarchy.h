@@ -4,5 +4,6 @@
 
 struct CHierarchy
 {
-  uint32_t parent;
+  uint32_t id = 0;
+  uint32_t parent = 0;
 };

@@ -1,7 +1,7 @@
 #include "HierarchyLayer.h"
 
-#include "Application/Rigger.h"
 #include "Application/Components/Hierarchy.h"
+#include "Application/Rigger.h"
 #include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
@@ -14,14 +14,8 @@ void HierarchyLayer::OnAttach() {
       .items = {{
           .name = "New child",
           .onClick =
-              [hierarchy = &m_Hierarchy](void *data) {
+              [](void *data) {
                 ServiceLocator::Get<Rigger>()->NewBone(ToInt32(data));
-                // uint32_t eid = *ServiceLocator::Get<Rigger>()->NewBone();
-                // hierarchy->Add({
-                //     .id = eid,
-                //     .parent = ToInt32(data),
-                //     .label = "Bone " + std::to_string(eid),
-                // });
               },
       }},
   });
@@ -31,14 +25,8 @@ void HierarchyLayer::OnAttach() {
     m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
   });
 
-  auto onNewBone = [hierarchy = &m_Hierarchy](void *data) {
+  auto onNewBone = [](void *data) {
     ServiceLocator::Get<Rigger>()->NewBone(0);
-    // uint32_t eid = *ServiceLocator::Get<Rigger>()->NewBone();
-    // hierarchy->Add({
-    //     .id = eid,
-    //     .parent = 0,
-    //     .label = "Bone " + std::to_string(eid),
-    // });
   };
 
   m_ContextMenu.Register({
@@ -60,9 +48,21 @@ void HierarchyLayer::OnAttach() {
 void HierarchyLayer::OnUpdate(float deltaTime) {
   auto registry = ServiceLocator::Get<Registry>();
 
-  const auto &[components] = registry->Collect<CHierarchy>();
+  if (registry->HasChanged<CHierarchy>()) {
+    registry->ClearChanged<CHierarchy>();
 
-  
+    const auto &[components] = registry->Collect<CHierarchy>();
+
+    for (size_t i = 0; i < components.size(); i++) {
+      uint32_t id = components[i]->id;
+      uint32_t parent = components[i]->parent;
+      m_Hierarchy.Add({
+          .id = id,
+          .parent = parent,
+          .label = "Bone " + std::to_string(id),
+      });
+    }
+  }
 }
 
 void HierarchyLayer::OnRender() {

@@ -2,10 +2,10 @@
 
 #include <any>
 #include <memory>
+#include <stdint.h>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
-#include <stdint.h>
 
 class Entity;
 
@@ -24,6 +24,8 @@ private:
   std::unordered_map<EntityId,
                      std::unordered_map<std::type_index, std::shared_ptr<void>>>
       m_Storage; ///< Storage of components indexed by entity ID.
+
+  std::unordered_map<std::type_index, bool> m_Dirty;
 
 public:
   Registry() = default;
@@ -52,6 +54,7 @@ public:
   T *Add(EntityId entity, Args &&...args) {
     auto component = std::make_shared<T>(std::forward<Args>(args)...);
     m_Storage[entity][typeid(T)] = component;
+    MarkChanged<T>(); 
     return component.get();
   }
 
@@ -136,6 +139,7 @@ public:
    */
   template <typename T> void Free(EntityId entity) {
     m_Storage.at(entity).erase(typeid(T));
+    m_Dirty.erase(typeid(T));
   }
 
   /**
@@ -144,5 +148,46 @@ public:
   template <typename... T> void Free() {
     for (auto [eid, components] : m_Storage)
       (components.erase(typeid(T)), ...);
+    (m_Dirty.erase(typeid(T)), ...);
   }
+
+  /**
+   * @brief Mark the given component type as changed.
+   *
+   * Sets the "changed" flag for the specified component type to true.
+   *
+   * @tparam T Component type to mark.
+   */
+  template <typename T> void MarkChanged() { m_Dirty[typeid(T)] = true; }
+
+  /**
+   * @brief Check whether a specific component type has been marked as changed.
+   *
+   * @tparam T Component type to query.
+   * @return true if the component type T is marked as changed, false otherwise.
+   */
+  template <typename T> bool HasChanged() {
+    return m_Dirty.contains(typeid(T)) && m_Dirty.at(typeid(T));
+  }
+
+  /**
+   * @brief Check whether multiple component types have been marked as changed.
+   *
+   * Expands to a tuple of booleans, where each element corresponds to the
+   * result of HasChanged for the given component type.
+   *
+   * @return std::tuple<bool, bool, ...> with one entry per queried type.
+   */
+  template <typename T, typename U, typename... Rest>
+  std::tuple<bool> HasChanged() {
+    return std::tuple_cat(std::make_tuple(HasChanged<T>()),
+                          HasChanged<U, Rest...>());
+  }
+
+  /**
+   * @brief Clear the "changed" flag for a given component type.
+   *
+   * @tparam T Component type to reset.
+   */
+  template <typename T> void ClearChanged() { m_Dirty[typeid(T)] = false; }
 };

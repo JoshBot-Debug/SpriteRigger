@@ -5,8 +5,8 @@
 #include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
-#include "Application/Components/Transform.h"
 #include "Application/Components/Hierarchy.h"
+#include "Application/Components/Transform.h"
 
 class Rigger {
 private:
@@ -24,6 +24,7 @@ public:
     transform->size.x = 10;
     transform->size.y = 50;
 
+    hierarchy->id = bone->GetId();
     hierarchy->parent = parent;
   }
 };
