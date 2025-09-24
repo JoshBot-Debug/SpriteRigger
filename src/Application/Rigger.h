@@ -19,6 +19,7 @@ public:
 
     CTransform *transform = bone->Add<CTransform>();
     CHierarchy *hierarchy = bone->Add<CHierarchy>();
+    CFlags *flags = bone->Add<CFlags>();
 
     transform->size.x = 10;
     transform->size.y = 50;

@@ -34,7 +34,7 @@ void HierarchyLayer::OnAttach() {
                      if (ImGui::MenuItem(item->name, item->shortcut,
                                          item->selected, item->enabled))
                        ServiceLocator::Get<Registry>()
-                           ->Get<CHierarchy>(ToInt32(data))
+                           ->Get<CFlags>(ToInt32(data))
                            ->rename = true;
                    },
            },
@@ -49,13 +49,14 @@ void HierarchyLayer::OnAttach() {
     auto registry = ServiceLocator::Get<Registry>();
 
     CHierarchy *cHierarchy = registry->Get<CHierarchy>(item->id);
+    CFlags *cFlags = registry->Get<CFlags>(item->id);
 
     if (!cHierarchy)
       return;
 
     ImGui::SameLine(0.0f, 0.0f);
     ImGui::SetItemAllowOverlap();
-    if (!cHierarchy->rename)
+    if (!cFlags->rename)
       ImGui::TextUnformatted(cHierarchy->name);
     else {
       ImGui::SetKeyboardFocusHere();
@@ -63,7 +64,7 @@ void HierarchyLayer::OnAttach() {
                        IM_ARRAYSIZE(cHierarchy->name),
                        ImGuiInputTextFlags_EnterReturnsTrue);
       if (ImGui::IsItemDeactivated())
-        cHierarchy->rename = false;
+        cFlags->rename = false;
     }
   });
 

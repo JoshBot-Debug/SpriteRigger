@@ -13,5 +13,9 @@ struct CHierarchy
   uint32_t id = 0;
   uint32_t parent = 0;
   char name[255] = "";
+};
+
+struct CFlags
+{
   bool rename = false;
 };

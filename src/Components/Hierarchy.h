@@ -24,9 +24,9 @@ private:
       ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_FramePadding;
 
   static const ImGuiTableFlags s_TableFlags =
-      ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH |
+      ImGuiTableFlags_NoBordersInBody |
       ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg |
-      ImGuiTableFlags_NoBordersInBody;
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX;
 
   struct Node {
     Item item;
