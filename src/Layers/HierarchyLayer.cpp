@@ -11,23 +11,21 @@ void HierarchyLayer::OnAttach() {
 
   m_BoneContextMenu.Register({
       .renderOn = ContextMenu::PopupContext::ITEM,
-      .items =
-          {
-              {
-                  .name = "Add child",
-                  .onClick =
-                      [](void *data) {
-                        ServiceLocator::Get<Rigger>()->NewBone(ToInt32(data));
-                      },
-              },
-              {
-                  .name = "Remove child",
-                  .onClick =
-                      [](void *data) {
-                        ServiceLocator::Get<Rigger>()->RemoveBone(ToInt32(data));
-                      },
-              },
-          },
+      .items = {{
+                    .name = "Add child",
+                    .onClick =
+                        [](void *data) {
+                          ServiceLocator::Get<Rigger>()->NewBone(ToInt32(data));
+                        },
+                },
+                {
+                    .name = "Remove child",
+                    .onClick =
+                        [](void *data) {
+                          ServiceLocator::Get<Rigger>()->RemoveBone(
+                              ToInt32(data));
+                        },
+                }},
   });
 
   m_Hierarchy.OnRenderItem([&](Hierarchy::Item *item) {
@@ -64,7 +62,7 @@ void HierarchyLayer::OnUpdate(float deltaTime) {
     const auto &[components] = registry->Collect<CHierarchy>();
 
     m_Hierarchy.Clear();
-    
+
     for (size_t i = 0; i < components.size(); i++) {
       uint32_t id = components[i]->id;
       uint32_t parent = components[i]->parent;
