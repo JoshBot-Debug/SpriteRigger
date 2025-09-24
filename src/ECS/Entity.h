@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Registry.h"
-#include <string>
 #include <stdint.h>
+#include <string>
 
 using EntityId = uint32_t;
 
@@ -13,9 +13,10 @@ using EntityId = uint32_t;
  */
 class Entity {
 private:
-  EntityId m_Id;        ///< Unique identifier for the entity.
-  std::string m_Name;   ///< Name of the entity.
-  Registry *m_Registry; ///< Pointer to the Registry managing this entity.
+  EntityId m_Id = 0;  ///< Unique identifier for the entity.
+  std::string m_Name; ///< Name of the entity.
+  Registry *m_Registry =
+      nullptr; ///< Pointer to the Registry managing this entity.
 
 public:
   /**
@@ -27,6 +28,11 @@ public:
    */
   Entity(EntityId id, const std::string &name, Registry *registry)
       : m_Id(id), m_Name(name), m_Registry(registry){};
+
+  ~Entity() {
+    m_Id = 0;
+    m_Registry = nullptr;
+  }
 
   /**
    * Retrieves the entity's unique identifier.
@@ -84,15 +90,17 @@ public:
   bool Is(const std::string &name) { return m_Name == name; }
 
   /**
-   * Frees components of specified types from this entity
-   * or all components for the entity if none are specified.
+   * Compares the id of this entity with a given id.
    *
-   * This method also deletes the entity itself.
+   * @param id The id to compare against.
+   * @return True if the id match, false otherwise.
    */
-  template <typename... T> void Free() {
-    (m_Registry->Free<T>(m_Id), ...);
-    delete this;
-  }
+  bool Is(EntityId id) { return m_Id == id; }
+
+  /**
+   * Frees components of specified types from this entity.
+   */
+  template <typename... T> void Free() { (m_Registry->Free<T>(m_Id), ...); }
 
   /**
    * Equality operator to compare two entities by their IDs.

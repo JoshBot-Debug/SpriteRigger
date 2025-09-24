@@ -24,8 +24,7 @@ private:
 public:
   State();
 
-  std::shared_ptr<SerializableLayer>
-  Register(const std::shared_ptr<SerializableLayer> &layer);
+  std::shared_ptr<SerializableLayer> Register(const std::shared_ptr<SerializableLayer> &layer);
 
   bool New();
 

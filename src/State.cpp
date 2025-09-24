@@ -82,6 +82,8 @@ bool State::Open(const std::string &filepath) {
   // Load the ECS state
   const auto &registry = ServiceLocator::Get<Registry>();
 
+  registry->Free();
+
   std::vector<std::vector<uint8_t>> entities =
       m_Serializer.GetAll("entity:bone");
 

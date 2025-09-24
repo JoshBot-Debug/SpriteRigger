@@ -30,6 +30,8 @@ private:
 public:
   Registry() = default;
 
+  ~Registry() { Free(); };
+
   /**
    * Creates a new entity with a given name.
    *
@@ -142,28 +144,48 @@ public:
    */
   std::vector<Entity *> Entities() {
     std::vector<Entity *> entities(m_Entities.size());
-    for (auto entity : m_Entities)
+    for (auto &entity : m_Entities)
       entities.push_back(entity.get());
     return entities;
-  }
-
-  /**
-   * Frees a specific component type from the specified entity.
-   *
-   * @param entity The entity ID from which to free the component.
-   */
-  template <typename T> void Free(EntityId entity) {
-    m_Components.at(entity).erase(typeid(T));
-    m_Dirty.erase(typeid(T));
   }
 
   /**
    * Frees all components of a specified type across all entities.
    */
   template <typename... T> void Free() {
-    for (auto [eid, components] : m_Components)
+    for (auto &[eid, components] : m_Components)
       (components.erase(typeid(T)), ...);
-    (m_Dirty.erase(typeid(T)), ...);
+  }
+
+  /**
+   * Frees all components of a specified type for the entity specified.
+   */
+  template <typename... T> void Free(EntityId entity) {
+    (m_Components.at(entity).erase(typeid(T)), ...);
+  }
+
+  /**
+   * Frees the entity & all it's components.
+   */
+  void Free(EntityId entity) {
+
+    auto it = std::find_if(m_Entities.begin(), m_Entities.end(),
+                           [&](auto e) { return e->Is(entity); });
+
+    if (it == m_Entities.end())
+      return;
+
+    m_Entities.erase(it);
+    m_Components.erase(entity);
+  }
+
+  /**
+   * Frees all entities & components
+   */
+  void Free() {
+    m_EID = 0;
+    m_Entities.clear();
+    m_Components.clear();
   }
 
   /**
