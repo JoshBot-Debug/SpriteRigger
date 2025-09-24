@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     };
 
     Window::Options options = {
-        .title = "State",
+        .title = "Sprite Rigger",
         .darkMode = IsDarkMode(),
     };
 
