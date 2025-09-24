@@ -54,6 +54,12 @@ void HierarchyLayer::OnAttach() {
     if (!cHierarchy)
       return;
 
+    if (ImGui::IsItemClicked()) {
+      for (auto &flag : registry->Get<CFlags>())
+        flag->selected = false;
+      cFlags->selected = true;
+    }
+
     ImGui::SameLine(0.0f, 0.0f);
     ImGui::SetItemAllowOverlap();
     if (!cFlags->rename)
@@ -66,6 +72,11 @@ void HierarchyLayer::OnAttach() {
       if (ImGui::IsItemDeactivated())
         cFlags->rename = false;
     }
+
+    if (cFlags->selected)
+      item->flags = ImGuiTreeNodeFlags_Selected;
+    else
+      item->flags = ImGuiTreeNodeFlags_None;
   });
 
   auto onNewBone = [](void *data) {
@@ -112,7 +123,7 @@ void HierarchyLayer::OnUpdate(float deltaTime) {
 void HierarchyLayer::OnRender() {
   ImGui::ShowDemoWindow();
 
-  ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_None);
+  ImGui::Begin("Hierarchy");
 
   m_ContextMenu.Render("cm");
 

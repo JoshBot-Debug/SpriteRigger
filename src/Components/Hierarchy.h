@@ -15,6 +15,7 @@ public:
     NodeId id = 0;
     NodeId parent = 0;
     std::string label;
+    ImGuiTreeNodeFlags flags;
     std::function<void(Item *item)> onRenderItem = nullptr;
   };
 
@@ -24,9 +25,9 @@ private:
       ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_FramePadding;
 
   static const ImGuiTableFlags s_TableFlags =
-      ImGuiTableFlags_NoBordersInBody |
       ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX;
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_NoPadInnerX |
+      ImGuiTableFlags_NoPadOuterX;
 
   struct Node {
     Item item;
@@ -67,7 +68,7 @@ private:
 
       bool hasChildren = children.size() > 0;
 
-      ImGuiTreeNodeFlags treeFlags = s_TreeNodeBaseFlags;
+      ImGuiTreeNodeFlags treeFlags = s_TreeNodeBaseFlags | item.flags;
 
       if (!hasChildren)
         treeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet |

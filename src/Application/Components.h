@@ -18,4 +18,5 @@ struct CHierarchy
 struct CFlags
 {
   bool rename = false;
+  bool selected = false;
 };
