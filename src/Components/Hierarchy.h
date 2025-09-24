@@ -12,8 +12,8 @@ public:
   using NodeId = uint32_t;
 
   struct Item {
-    NodeId id;
-    NodeId parent;
+    NodeId id = 0;
+    NodeId parent = 0;
     std::string label;
   };
 
@@ -72,7 +72,8 @@ private:
         treeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet |
                      ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-      bool opened = ImGui::TreeNodeEx(item.label.c_str(), treeFlags);
+      std::string label = (item.label.size() == 0 ? ("##HierarchyItem:" + std::to_string(item.id)) : label);
+      bool opened = ImGui::TreeNodeEx(label.c_str(), treeFlags);
 
       renderItem(&item);
 

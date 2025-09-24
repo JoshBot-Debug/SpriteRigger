@@ -25,6 +25,7 @@ public:
 
     hierarchy->id = bone->GetId();
     hierarchy->parent = parent;
+    std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %u", bone->GetId());
   }
 
   void RemoveBone(EntityId id) { ServiceLocator::Get<Registry>()->Free(id); }

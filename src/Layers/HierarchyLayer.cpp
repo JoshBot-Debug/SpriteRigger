@@ -25,12 +25,43 @@ void HierarchyLayer::OnAttach() {
                           ServiceLocator::Get<Rigger>()->RemoveBone(
                               ToInt32(data));
                         },
+                },
+                {
+                    .name = "Rename",
+                    .onClick =
+                        [](void *data) {
+                          ServiceLocator::Get<Registry>()
+                              ->Get<CHierarchy>(ToInt32(data))
+                              ->rename = true;
+                        },
                 }},
   });
 
   m_Hierarchy.OnRenderItem([&](Hierarchy::Item *item) {
+    std::string inputId = ("##ID:" + std::to_string(item->id)).c_str();
     std::string ctxId = ("bcm:" + std::to_string(item->id)).c_str();
+
     m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
+
+    auto registry = ServiceLocator::Get<Registry>();
+
+    CHierarchy *cHierarchy = registry->Get<CHierarchy>(item->id);
+
+    if (!cHierarchy)
+      return;
+
+    ImGui::SameLine(0.0f, 0.0f);
+    ImGui::SetItemAllowOverlap();
+    if (!cHierarchy->rename)
+      ImGui::TextUnformatted(cHierarchy->name);
+    else {
+      ImGui::SetKeyboardFocusHere();
+      ImGui::InputText(inputId.c_str(), cHierarchy->name,
+                       IM_ARRAYSIZE(cHierarchy->name),
+                       ImGuiInputTextFlags_EnterReturnsTrue);
+      if (ImGui::IsItemDeactivated())
+        cHierarchy->rename = false;
+    }
   });
 
   auto onNewBone = [](void *data) {
@@ -69,7 +100,6 @@ void HierarchyLayer::OnUpdate(float deltaTime) {
       m_Hierarchy.Add({
           .id = id,
           .parent = parent,
-          .label = "Bone " + std::to_string(id),
       });
     }
   }
