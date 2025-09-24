@@ -123,6 +123,7 @@ void HierarchyLayer::OnUpdate(float deltaTime) {
 void HierarchyLayer::OnRender() {
   ImGui::ShowDemoWindow();
 
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2({0, 0}));
   ImGui::Begin("Hierarchy");
 
   m_ContextMenu.Render("cm");
@@ -130,6 +131,7 @@ void HierarchyLayer::OnRender() {
   m_Hierarchy.Render("Hierarchy");
 
   ImGui::End();
+  ImGui::PopStyleVar();
 }
 
 void HierarchyLayer::OnDetach() { m_State = nullptr; }

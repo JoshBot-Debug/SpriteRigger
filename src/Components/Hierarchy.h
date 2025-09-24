@@ -63,6 +63,7 @@ private:
     };
 
     void Render(const std::function<void(Item *item)> &renderItem) {
+      ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
 
@@ -90,6 +91,8 @@ private:
 
         ImGui::TreePop();
       }
+
+      ImGui::PopStyleVar();
     }
   };
 
