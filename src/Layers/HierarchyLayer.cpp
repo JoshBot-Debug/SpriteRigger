@@ -9,33 +9,36 @@ HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 
 void HierarchyLayer::OnAttach() {
 
-  m_BoneContextMenu.Register({
-      .renderOn = ContextMenu::PopupContext::ITEM,
-      .items = {{
-                    .name = "Add child",
-                    .onClick =
-                        [](void *data) {
-                          ServiceLocator::Get<Rigger>()->NewBone(ToInt32(data));
-                        },
-                },
-                {
-                    .name = "Remove child",
-                    .onClick =
-                        [](void *data) {
-                          ServiceLocator::Get<Rigger>()->RemoveBone(
-                              ToInt32(data));
-                        },
-                },
-                {
-                    .name = "Rename",
-                    .onClick =
-                        [](void *data) {
-                          ServiceLocator::Get<Registry>()
-                              ->Get<CHierarchy>(ToInt32(data))
-                              ->rename = true;
-                        },
-                }},
-  });
+  m_BoneContextMenu.Register(
+      {.renderOn = ContextMenu::PopupContext::ITEM,
+       .items = {
+           {
+               .name = "Add child",
+               .onClick =
+                   [](void *data) {
+                     ServiceLocator::Get<Rigger>()->NewBone(ToInt32(data));
+                   },
+           },
+           {
+               .name = "Remove child",
+               .onClick =
+                   [](void *data) {
+                     ServiceLocator::Get<Rigger>()->RemoveBone(ToInt32(data));
+                   },
+           },
+           {
+               .name = "Rename",
+               .onRenderItem =
+                   [](ContextMenu::Item *item, void *data) {
+                     ImGui::Separator();
+                     if (ImGui::MenuItem(item->name, item->shortcut,
+                                         item->selected, item->enabled))
+                       ServiceLocator::Get<Registry>()
+                           ->Get<CHierarchy>(ToInt32(data))
+                           ->rename = true;
+                   },
+           },
+       }});
 
   m_Hierarchy.OnRenderItem([&](Hierarchy::Item *item) {
     std::string inputId = ("##ID:" + std::to_string(item->id)).c_str();

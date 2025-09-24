@@ -15,6 +15,7 @@ public:
     NodeId id = 0;
     NodeId parent = 0;
     std::string label;
+    std::function<void(Item *item)> onRenderItem = nullptr;
   };
 
 private:
@@ -72,10 +73,15 @@ private:
         treeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet |
                      ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-      std::string label = (item.label.size() == 0 ? ("##HierarchyItem:" + std::to_string(item.id)) : label);
+      std::string label = (item.label.size() == 0
+                               ? ("##HierarchyItem:" + std::to_string(item.id))
+                               : label);
       bool opened = ImGui::TreeNodeEx(label.c_str(), treeFlags);
 
-      renderItem(&item);
+      if (item.onRenderItem)
+        item.onRenderItem(&item);
+      else
+        renderItem(&item);
 
       if (hasChildren && opened) {
         for (auto *child : children)

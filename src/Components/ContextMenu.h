@@ -12,6 +12,7 @@ public:
     const char *shortcut = nullptr;
     bool *selected = nullptr;
     bool enabled = true;
+    std::function<void(Item *item, void *)> onRenderItem = nullptr;
     std::function<void(void *)> onClick = nullptr;
   };
 
@@ -32,10 +33,13 @@ private:
 
 private:
   void RenderItems() {
-    for (auto &item : m_Options.items)
-      if (ImGui::MenuItem(item.name, item.shortcut, item.selected,
-                          item.enabled))
+    for (auto &item : m_Options.items) {
+      if (item.onRenderItem)
+        item.onRenderItem(&item, m_Data);
+      else if (ImGui::MenuItem(item.name, item.shortcut, item.selected,
+                               item.enabled))
         item.onClick(m_Data);
+    }
   }
 
 public:
