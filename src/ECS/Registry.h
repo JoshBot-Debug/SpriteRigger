@@ -131,7 +131,7 @@ public:
       try {
         result.push_back(
             std::static_pointer_cast<T>(components.at(typeid(T))).get());
-      } catch (const std::bad_any_cast &e) {
+      } catch (const std::exception &e) {
       }
 
     return result;
@@ -153,8 +153,10 @@ public:
    * Frees all components of a specified type across all entities.
    */
   template <typename... T> void Free() {
-    for (auto &[eid, components] : m_Components)
+    for (auto &[eid, components] : m_Components) {
       (components.erase(typeid(T)), ...);
+      (m_Dirty.insert_or_assign(typeid(T), true), ...);
+    }
   }
 
   /**
@@ -162,6 +164,7 @@ public:
    */
   template <typename... T> void Free(EntityId entity) {
     (m_Components.at(entity).erase(typeid(T)), ...);
+    (m_Dirty.insert_or_assign(typeid(T), true), ...);
   }
 
   /**
@@ -174,6 +177,9 @@ public:
 
     if (it == m_Entities.end())
       return;
+
+    for (auto &[typeId, component] : m_Components.at(entity))
+      m_Dirty[typeId] = true;
 
     m_Entities.erase(it);
     m_Components.erase(entity);

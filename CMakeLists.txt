@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(ssrd)
 
 # === Options ===
-option(ENABLE_STL_DEBUG "Enable STL debug mode and DEBUG macro." OFF)
+option(ENABLE_STL_DEBUG "Enable STL debug mode." OFF)
 option(ENABLE_THREAD_SANITIZER "Enable ThreadSanitizer (disables AddressSanitizer)" OFF)
 
 # === Compiler Flags ===
@@ -62,7 +62,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-DDEBUG -D_GLIBCXX_DEBUG)
 
   if(ENABLE_STL_DEBUG)
-    target_compile_options(ssrd PRIVATE
+    target_compile_options(SpriteRigger PRIVATE
       -Wall
       -Wextra
       -Wpedantic
@@ -75,7 +75,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       -Wunused
     )
 
-    message(STATUS "STL debug mode and DEBUG macro is ENABLED.")
+    message(STATUS "STL debug mode is ENABLED.")
 
     if(ENABLE_THREAD_SANITIZER)
       set(SANITIZE_FLAGS "-fsanitize=thread")
@@ -88,7 +88,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 ${SANITIZE_FLAGS}")
     set(CMAKE_LINKER_FLAGS_DEBUG "${SANITIZE_FLAGS}")
   else()
-    message(STATUS "STL debug mode and DEBUG macro is DISABLED.")
+    message(STATUS "Debug is ENABLED.")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
   endif()
 endif()
 

@@ -191,9 +191,7 @@ std::vector<std::vector<uint8_t>> Serializer::GetAll(const std::string &key) {
     std::memcpy(&kSize, ptr, sizeof(uint64_t));
     ptr += sizeof(uint64_t);
 
-    std::string k("", kSize);
-
-    std::memcpy(k.data(), ptr, kSize);
+    std::string k(reinterpret_cast<char*>(ptr), kSize);
     ptr += kSize;
 
     if (k == key) {

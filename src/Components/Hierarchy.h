@@ -31,6 +31,12 @@ private:
     Item item;
     std::vector<Node *> children = {};
 
+    ~Node() {
+      for (auto *child : children)
+        delete child;
+      children.clear();
+    }
+
     void Add(const Item &item) {
       if (Find(item.id, this))
         return;
@@ -88,7 +94,13 @@ public:
 
   void Add(const Item &item) { m_Root->Add(item); }
 
-  void Remove(NodeId id){};
+  void Remove(NodeId id) { delete m_Root->Find(id, m_Root); };
+
+  void Clear() {
+    for (auto *child : m_Root->children)
+      delete child;
+    m_Root->children.clear();
+  };
 
   void OnRenderItem(const std::function<void(Item *item)> &callback) {
     m_RenderItem = callback;

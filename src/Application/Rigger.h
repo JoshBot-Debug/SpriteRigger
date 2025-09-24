@@ -26,4 +26,6 @@ public:
     hierarchy->id = bone->GetId();
     hierarchy->parent = parent;
   }
+
+  void RemoveBone(EntityId id) { ServiceLocator::Get<Registry>()->Free(id); }
 };
