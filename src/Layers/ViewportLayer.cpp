@@ -121,7 +121,7 @@ void ViewportLayer::OnRender() {
 
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
   glViewport(0, 0, viewportSize.x, viewportSize.y);
-  glClearColor(0.1f, 0.1f, 1.1f, 1.0f);
+  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
   // Upload instance data
