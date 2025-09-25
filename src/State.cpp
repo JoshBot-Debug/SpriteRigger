@@ -96,15 +96,15 @@ bool State::Open(const std::string &filepath) {
     std::memcpy(&id, ptr, sizeof(id));
     ptr += sizeof(id);
 
-    Entity *bone = registry->CreateEntity("bone", id);
+    Entity *entity = registry->CreateEntity("bone", id);
 
-    CTransform *transform = bone->Add<CTransform>();
-    CHierarchy *hierarchy = bone->Add<CHierarchy>();
-    CFlags *flags = bone->Add<CFlags>();
+    CBone *bone = entity->Add<CBone>();
+    CHierarchy *hierarchy = entity->Add<CHierarchy>();
+    CFlags *flags = entity->Add<CFlags>();
 
-    std::memcpy(transform, ptr, sizeof(CTransform));
-    ptr += sizeof(CTransform);
-    
+    std::memcpy(bone, ptr, sizeof(CBone));
+    ptr += sizeof(CBone);
+
     std::memcpy(hierarchy, ptr, sizeof(CHierarchy));
     ptr += sizeof(CHierarchy);
 
@@ -136,14 +136,14 @@ void State::Save() {
     if (!entity->Is("bone"))
       continue;
 
-    const auto &[transform, hierarchy, flags] =
-        entity->Collect<CTransform, CHierarchy, CFlags>();
+    const auto &[bone, hierarchy, flags] =
+        entity->Collect<CBone, CHierarchy, CFlags>();
 
     std::vector<uint8_t> buffer;
     uint32_t id = entity->GetId();
-    
+
     serialize(buffer, &id, sizeof(uint32_t));
-    serialize(buffer, transform, sizeof(CTransform));
+    serialize(buffer, bone, sizeof(CBone));
     serialize(buffer, hierarchy, sizeof(CHierarchy));
     serialize(buffer, flags, sizeof(CFlags));
 

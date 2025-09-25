@@ -7,6 +7,7 @@
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 class Entity;
 
@@ -109,6 +110,13 @@ public:
       results.push_back(entity.get());
     return results;
   }
+
+  /**
+   * Retrieves all entities by name
+   *
+   * @return A vector of pointers to the entity.
+   */
+  const std::vector<Entity *> GetEntities(const std::string &name);
 
   /**
    * Collects all components of specified types across all entities.

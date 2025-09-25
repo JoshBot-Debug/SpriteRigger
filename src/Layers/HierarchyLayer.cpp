@@ -125,13 +125,13 @@ void HierarchyLayer::OnRender() {
 
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2({0, 0}));
   ImGui::Begin("Hierarchy");
+  ImGui::PopStyleVar();
 
   m_ContextMenu.Render("cm");
 
   m_Hierarchy.Render("Hierarchy");
 
   ImGui::End();
-  ImGui::PopStyleVar();
 }
 
 void HierarchyLayer::OnDetach() { m_State = nullptr; }
