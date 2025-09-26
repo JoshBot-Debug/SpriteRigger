@@ -18,8 +18,7 @@ uniform mat4 u_proj;// optional
 // helper: convert pixel space (0..width, 0..height) to NDC (-1..1).
 vec2 pixelToNDC(vec2 p){
   float y=u_screenSize.y-p.y;// flip Y
-  return vec2((p.x/u_screenSize.x)*2.-1.,
-  (y/u_screenSize.y)*2.-1.);
+  return vec2((p.x/u_screenSize.x)*2.-1.,(y/u_screenSize.y)*2.-1.);
 }
 
 void emitVertexNDC(vec2 pos_ndc,vec2 uv,vec4 color){

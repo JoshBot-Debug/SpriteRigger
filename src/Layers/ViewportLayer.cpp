@@ -38,7 +38,6 @@ void ViewportLayer::OnAttach() {
   // Now create the per-instance buffer
   glGenBuffers(1, &boneInstanceVBO);
   glBindBuffer(GL_ARRAY_BUFFER, boneInstanceVBO);
-  // allocate no data yet; we'll bufferSubData later
   glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
 
   // layout(location = 0) in vec2 a_start;
