@@ -97,7 +97,8 @@ inline unsigned int createShaderProgram(const std::vector<unsigned int> &link) {
 }
 
 Shader::~Shader() {
-  glUseProgram(0);
+  if (program)
+    glUseProgram(0);
   program = 0;
 }
 
@@ -114,10 +115,9 @@ void Shader::create(ShaderProgram sp, bool force) {
   std::vector<unsigned int> shaderIDs;
 
   if (sp.vertex) {
-    const unsigned int vID =
-        (!force && vertexShaders[sp.vertex])
-            ? vertexShaders[sp.vertex]
-            : compileShader(sp.vertex, GL_VERTEX_SHADER);
+    const unsigned int vID = (!force && vertexShaders[sp.vertex])
+                                 ? vertexShaders[sp.vertex]
+                                 : compileShader(sp.vertex, GL_VERTEX_SHADER);
     shaderIDs.push_back(vID);
     vertexShaders[sp.vertex] = vID;
   }
@@ -153,7 +153,8 @@ void Shader::bind(const std::string &name) {
 }
 
 void Shader::unbind() {
-  glUseProgram(0);
+  if (program)
+    glUseProgram(0);
   program = 0;
 }
 
