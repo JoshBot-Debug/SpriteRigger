@@ -1,16 +1,8 @@
 #pragma once
 
-#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <string>
 #include <unordered_map>
-#include <vector>
-
-enum class ShaderType : unsigned int {
-  VERTEX_SHADER = GL_VERTEX_SHADER,
-  FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
-  GEOMETRY_SHADER = GL_GEOMETRY_SHADER,
-};
 
 struct ShaderProgram {
   std::string name;

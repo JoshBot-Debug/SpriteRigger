@@ -7,6 +7,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "glad/glad.h"
+
 #include "Utility.h"
 
 inline const char *readFile(const std::string &filepath) {
@@ -31,7 +33,7 @@ inline const char *readFile(const std::string &filepath) {
 }
 
 inline unsigned int compileShader(const char *filepath,
-                                  const ShaderType &type) {
+                                  const unsigned int &type) {
   const char *source = readFile(filepath);
 
   if (!source)
@@ -115,7 +117,7 @@ void Shader::create(ShaderProgram sp, bool force) {
     const unsigned int vID =
         (!force && vertexShaders[sp.vertex])
             ? vertexShaders[sp.vertex]
-            : compileShader(sp.vertex, ShaderType::VERTEX_SHADER);
+            : compileShader(sp.vertex, GL_VERTEX_SHADER);
     shaderIDs.push_back(vID);
     vertexShaders[sp.vertex] = vID;
   }
@@ -124,7 +126,7 @@ void Shader::create(ShaderProgram sp, bool force) {
     const unsigned int fID =
         (!force && fragmentShaders[sp.fragment])
             ? fragmentShaders[sp.fragment]
-            : compileShader(sp.fragment, ShaderType::FRAGMENT_SHADER);
+            : compileShader(sp.fragment, GL_FRAGMENT_SHADER);
     shaderIDs.push_back(fID);
     fragmentShaders[sp.fragment] = fID;
   }
@@ -133,7 +135,7 @@ void Shader::create(ShaderProgram sp, bool force) {
     const unsigned int fID =
         (!force && geometryShaders[sp.geometry])
             ? geometryShaders[sp.geometry]
-            : compileShader(sp.geometry, ShaderType::GEOMETRY_SHADER);
+            : compileShader(sp.geometry, GL_GEOMETRY_SHADER);
     shaderIDs.push_back(fID);
     geometryShaders[sp.geometry] = fID;
   }

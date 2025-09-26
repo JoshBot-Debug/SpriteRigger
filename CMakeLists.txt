@@ -22,20 +22,16 @@ file(GLOB_RECURSE GLAD_SRC ${CMAKE_SOURCE_DIR}/vendor/glad/src/*.c)
 add_executable(SpriteRigger ${SRC} ${GLAD_SRC})
 
 # === Libraries ===
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(OPENGL REQUIRED opengl)
-pkg_check_modules(GLFW3 REQUIRED glfw3)
-pkg_check_modules(GLEW REQUIRED glew)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
 
 message(STATUS "OPENGL_LIBRARIES = ${OPENGL_LIBRARIES}")
 message(STATUS "GLFW3_LIBRARIES = ${GLFW3_LIBRARIES}")
-message(STATUS "GLEW_LIBRARIES = ${GLEW_LIBRARIES}")
 
 # === Libraries ===
 target_link_libraries(SpriteRigger PRIVATE
   ${OPENGL_LIBRARIES}
   ${GLFW3_LIBRARIES}
-  ${GLEW_LIBRARIES}
   imgui
   tinyfiledialogs
 )

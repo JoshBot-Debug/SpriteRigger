@@ -34,12 +34,14 @@ static void SetFrameBufferSize(GLFWwindow *window, int w, int h) {
 }
 
 static void glDebug() {
+#ifdef DEBUG
   glEnable(GL_DEBUG_OUTPUT);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
   glDebugMessageCallback(DebugCallback, nullptr);
   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                         GL_TRUE);
+#endif
 }
 
 void Window::Run() {
@@ -211,19 +213,20 @@ Window::Window(const Window::Options &options) : m_Options(options) {
   }
 
   glfwMakeContextCurrent(s_Window);
+
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    std::cerr << "Failed to initialize GLAD\n";
+    glfwTerminate();
+    return;
+  }
+
+  std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+
   glfwSetFramebufferSizeCallback(s_Window, SetFrameBufferSize);
 
   int w = 0, h = 0;
   glfwGetFramebufferSize(s_Window, &w, &h);
   glViewport(0, 0, w, h);
-
-  const unsigned int init = glewInit();
-
-  if (init != GLEW_OK)
-    std::cerr << "GLEW initialization failed! Error code: " << init
-              << std::endl;
-
-  std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
   glDebug();
 
