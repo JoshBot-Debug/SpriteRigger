@@ -17,14 +17,16 @@ private:
 
   Shader m_Shader;
 
-  GLuint boneVAO = 0;
-  GLuint boneInstanceVBO = 0;
+  GLuint m_VAO = 0;
+  GLuint m_InstanceVBO = 0;
 
-  GLuint fbo = 0;
-  GLuint colorTex = 0;
-  GLuint depthRBO = 0;
+  GLuint m_FrameBuffer = 0;
+  GLuint m_ColorAttachment = 0;
+  GLuint m_DepthBuffer = 0;
 
   std::vector<CBone> m_Bones;
+
+  ImVec2 m_ViewportSize{0, 0};
 
 public:
   explicit ViewportLayer(State *state);

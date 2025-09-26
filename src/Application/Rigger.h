@@ -25,7 +25,7 @@ public:
     float cy = 300.0f;
     bone->start = glm::vec2(cx - 50.0f, cy);
     bone->end = glm::vec2(cx + 50.0f, cy);
-    bone->thickness = 4.0f;
+    bone->thickness = 10.0f;
 
     hierarchy->id = entity->GetId();
     hierarchy->parent = parent;

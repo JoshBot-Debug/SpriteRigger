@@ -102,6 +102,9 @@ public:
   static bool GetKey(const KeyboardKey &key, const KeyAction &action);
   static bool GetMouseButton(const MouseButton &key, const KeyAction &action);
   static GLFWwindow *GetWindow() { return s_Window; };
-  
+
   static void RegisterShortcut(const ShortcutManager::Shortcut &shortcut);
+
+  static void GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
+                                  GLuint &depthBuffer, GLuint &colorAttachment);
 };

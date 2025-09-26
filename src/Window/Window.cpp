@@ -180,6 +180,44 @@ void Window::RegisterShortcut(const ShortcutManager::Shortcut &shortcut) {
   ShortcutManager::Instance().Register(shortcut);
 }
 
+void Window::GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
+                                 GLuint &depthBuffer, GLuint &colorAttachment) {
+  if (frameBuffer != 0)
+    glDeleteFramebuffers(1, &frameBuffer);
+
+  if (colorAttachment != 0)
+    glDeleteTextures(1, &colorAttachment);
+
+  if (depthBuffer != 0)
+    glDeleteRenderbuffers(1, &depthBuffer);
+
+  glGenFramebuffers(1, &frameBuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+  // Color attachment
+  glGenTextures(1, &colorAttachment);
+  glBindTexture(GL_TEXTURE_2D, colorAttachment);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, viewport.x, viewport.y, 0, GL_RGBA,
+               GL_UNSIGNED_BYTE, nullptr);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                         colorAttachment, 0);
+
+  // Depth buffer
+  glGenRenderbuffers(1, &depthBuffer);
+  glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, viewport.x,
+                        viewport.y);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+                            GL_RENDERBUFFER, depthBuffer);
+
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    std::cerr << "Framebuffer not complete!" << std::endl;
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 Window::Window(const Window::Options &options) : m_Options(options) {
   ShortcutManager::Instance().SetWindow(this);
 

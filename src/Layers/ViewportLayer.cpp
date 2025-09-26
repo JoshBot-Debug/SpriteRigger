@@ -15,56 +15,56 @@ void ViewportLayer::OnAttach() {
       .name = "default",
       .vertex = (EXE_DIRECTORY + "/../src/Assets/Shaders/bone.vert").c_str(),
       .fragment = (EXE_DIRECTORY + "/../src/Assets/Shaders/bone.frag").c_str(),
-      .geometry = (EXE_DIRECTORY + "/../src/Assets/Shaders/bone.geom").c_str(),
   });
 
   // Create and bind the VAO
-  glGenVertexArrays(1, &boneVAO);
-  glBindVertexArray(boneVAO);
+  glGenVertexArrays(1, &m_VAO);
+  glBindVertexArray(m_VAO);
 
-  // one small VBO used only to feed a single vertex (we call
-  // glDrawArraysInstanced)
-  GLuint dummyVBO;
-  glGenBuffers(1, &dummyVBO);
-  glBindBuffer(GL_ARRAY_BUFFER, dummyVBO);
-  float dummy = 0.0f;
-  glBufferData(GL_ARRAY_BUFFER, sizeof(dummy), &dummy, GL_STATIC_DRAW);
+  float quadVerts[8] = {0.0f, -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f};
 
-  // attribute 0: a placeholder vertex attribute (vec2/vacant)
+  GLuint quadVBO;
+  glGenBuffers(1, &quadVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), quadVerts, GL_STATIC_DRAW);
+
+  // layout(location = 0) in vec2 a_corner;
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, (void *)0);
-  glVertexAttribDivisor(0, 0); // per-vertex
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+  glVertexAttribDivisor(0, 0);
 
-  // Now create the per-instance buffer
-  glGenBuffers(1, &boneInstanceVBO);
-  glBindBuffer(GL_ARRAY_BUFFER, boneInstanceVBO);
+  // Now create the per-instance buffer (CBone instances)
+  glGenBuffers(1, &m_InstanceVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
   glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
 
-  // layout(location = 0) in vec2 a_start;
+  // layout(location = 1) in vec2 a_start;
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(CBone),
                         (void *)offsetof(CBone, start));
   glVertexAttribDivisor(1, 1);
 
-  // layout(location = 1) in vec2 a_end;
+  // layout(location = 2) in vec2 a_end;
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(CBone),
                         (void *)offsetof(CBone, end));
   glVertexAttribDivisor(2, 1);
 
-  // location = 2 thickness
+  // layout(location = 3) in float a_thickness;
   glEnableVertexAttribArray(3);
   glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(CBone),
                         (void *)offsetof(CBone, thickness));
   glVertexAttribDivisor(3, 1);
 
-  // location = 3 color (vec4)
+  // layout(location = 4) in vec4 a_color;
   glEnableVertexAttribArray(4);
   glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(CBone),
                         (void *)offsetof(CBone, color));
   glVertexAttribDivisor(4, 1);
 
+  // Clean up
   glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ViewportLayer::OnUpdate(float deltaTime) {
@@ -87,63 +87,40 @@ void ViewportLayer::OnUpdate(float deltaTime) {
 void ViewportLayer::OnRender() {
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_None);
 
-  ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+  ImVec2 viewport = ImGui::GetContentRegionAvail();
 
-  // Create the framebuffer
-  if (fbo == 0) {
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+  // Prepare the framebuffer
+  if (m_FrameBuffer == 0 || viewport.x != m_ViewportSize.x ||
+      viewport.y != m_ViewportSize.y)
+    Window::GenerateFrameBuffer(viewport, m_FrameBuffer, m_DepthBuffer,
+                                m_ColorAttachment);
 
-    // create color attachment
-    glGenTextures(1, &colorTex);
-    glBindTexture(GL_TEXTURE_2D, colorTex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, viewportSize.x, viewportSize.y, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                           colorTex, 0);
-
-    // create depth buffer
-    glGenRenderbuffers(1, &depthRBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthRBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, viewportSize.x,
-                          viewportSize.y);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                              GL_RENDERBUFFER, depthRBO);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-      std::cerr << "Framebuffer not complete!\n";
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  }
-
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-  glViewport(0, 0, viewportSize.x, viewportSize.y);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
+  glViewport(0, 0, (GLsizei)viewport.x, (GLsizei)viewport.y);
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // Upload instance data
-  glBindBuffer(GL_ARRAY_BUFFER, boneInstanceVBO);
+  // Upload buffer
+  glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
   glBufferData(GL_ARRAY_BUFFER, m_Bones.size() * sizeof(CBone), m_Bones.data(),
                GL_DYNAMIC_DRAW);
 
-  // draw
-  glBindVertexArray(boneVAO);
+  glBindVertexArray(m_VAO);
 
-  // set uniforms
+  // Set uniforms
   m_Shader.bind("default");
-  m_Shader.setUniform2f("u_screenSize",
-                        glm::vec2(viewportSize.x, viewportSize.y));
+  m_Shader.setUniform2f("u_screenSize", glm::vec2(viewport.x, viewport.y));
 
-  // draw single point instanced per bone
-  glDrawArraysInstanced(GL_POINTS, 0, 1, (GLsizei)m_Bones.size());
+  // Draw
+  GLsizei instanceCount = (GLsizei)m_Bones.size();
+  if (instanceCount > 0)
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, instanceCount);
 
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glBindVertexArray(0);
   m_Shader.unbind();
+  glBindVertexArray(0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  ImGui::Image((void *)(intptr_t)colorTex, viewportSize);
+  ImGui::Image((void *)(intptr_t)m_ColorAttachment, viewport);
 
   ImGui::End();
 }
