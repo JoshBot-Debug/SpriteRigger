@@ -19,7 +19,8 @@
 #include <immintrin.h>
 #include <thread>
 
-namespace fs = std::filesystem;
+#include "Window/Window.h"
+#include "Camera/OrthographicCamera.h"
 
 template <typename... Args>
 inline void Log(const char *file, int line, const char *functionName,
@@ -53,6 +54,8 @@ inline void LogVec4(const char *file, int line, const char *functionName,
 template <typename... Args>
 inline void LogToFile(const char *file, int line, const char *functionName,
                       const std::string &outputFile, const Args &...args) {
+  namespace fs = std::filesystem;
+
   const std::string logDir = "logs/";
   fs::create_directories(logDir);
 
@@ -131,7 +134,7 @@ inline void EndTimer(const char *file, int line, const char *functionName,
 #define LOG_TO_FILE(...)
 #endif
 
-static std::string GetHomeDirectory() {
+inline std::string GetHomeDirectory() {
   const char *home = std::getenv("HOME");
   if (home)
     return home;
@@ -139,7 +142,7 @@ static std::string GetHomeDirectory() {
   return pw ? pw->pw_dir : "";
 }
 
-static std::string GetExecutableDirectory() {
+inline std::string GetExecutableDirectory() {
   char result[PATH_MAX];
   ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
   return std::filesystem::path(
@@ -151,7 +154,7 @@ static std::string GetExecutableDirectory() {
 
 enum class EllipsizeType { START, END };
 
-static std::string Ellipsize(const std::string &text, float maxWidth,
+inline std::string Ellipsize(const std::string &text, float maxWidth,
                              EllipsizeType type = EllipsizeType::END) {
   std::string truncatedText = text;
 
@@ -183,7 +186,7 @@ static std::string Ellipsize(const std::string &text, float maxWidth,
   return truncatedText;
 }
 
-static std::string ExecCommand(const char *cmd) {
+inline std::string ExecCommand(const char *cmd) {
   std::array<char, 128> buffer;
   std::string result;
   FILE *pipe = popen(cmd, "r");
@@ -195,13 +198,13 @@ static std::string ExecCommand(const char *cmd) {
   return result;
 }
 
-static bool IsDarkMode() {
+inline bool IsDarkMode() {
   std::string theme =
       ExecCommand("gsettings get org.gnome.desktop.interface gtk-theme");
   return theme.find("dark") != std::string::npos;
 }
 
-static std::string RelativeHomePath(const std::filesystem::path &p) {
+inline std::string RelativeHomePath(const std::filesystem::path &p) {
   const char *home = std::getenv("HOME");
   if (!home)
     return p.string();
@@ -217,7 +220,7 @@ static std::string RelativeHomePath(const std::filesystem::path &p) {
   return abs.string();
 }
 
-static std::string AddFileExtension(const std::string &filepath,
+inline std::string AddFileExtension(const std::string &filepath,
                                     const std::string &extension) {
   std::filesystem::path p(filepath);
   if (p.extension() != extension)
@@ -225,12 +228,35 @@ static std::string AddFileExtension(const std::string &filepath,
   return p.string();
 }
 
-static void *ToVoidPtr(uint32_t value)
-{
+inline void *ToVoidPtr(uint32_t value) {
   return reinterpret_cast<void *>(static_cast<uintptr_t>(value));
 }
 
-static uint32_t ToInt32(void *value)
-{
+inline uint32_t ToInt32(void *value) {
   return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(value));
+}
+
+inline ImVec2 GetViewportMouse(const OrthographicCamera &camera) {
+  ImVec2 viewport = ImGui::GetContentRegionAvail();
+  ImVec2 windowPos = ImGui::GetWindowPos();
+  ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+  ImVec2 origin = windowPos + contentMin;
+
+  ImVec2 mouseScreen = ImGui::GetMousePos();
+  ImVec2 mouseInViewport = mouseScreen - origin;
+
+  float aspect = (float)camera.ViewportWidth / camera.ViewportHeight;
+  float halfWidth = aspect * camera.Zoom;
+  float halfHeight = 1.0f * camera.Zoom;
+
+  float left = camera.Position.x - halfWidth;
+  float right = camera.Position.x + halfWidth;
+  float bottom = camera.Position.y - halfHeight;
+  float top = camera.Position.y + halfHeight;
+
+  float worldX = left + (mouseInViewport.x / viewport.x) * (right - left);
+  float worldY =
+      bottom + ((viewport.y - mouseInViewport.y) / viewport.y) * (top - bottom);
+
+  return ImVec2(worldX, worldY);
 }

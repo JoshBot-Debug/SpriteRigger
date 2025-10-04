@@ -9,7 +9,7 @@ layout(location=4)in vec4 a_color;// per-instance
 out vec2 v_localUV;
 out vec4 v_color;
 
-uniform vec2 u_screenSize;// in pixels
+uniform mat4 u_ViewProjection;
 
 void main(){
   // compute bone direction and perpendicular
@@ -25,12 +25,7 @@ void main(){
   float halfThick=a_thickness*.5;
   vec2 pos=mix(a_start,a_end,t)+perp*(a_corner.y*halfThick);
   
-  // convert pixel pos to NDC (OpenGL origin at bottom-left; ImGui + typical GL window use same)
-  vec2 ndc=(pos/u_screenSize)*2.-1.;
-  // flip Y if your screen coord has origin top-left (ImGui content region: y increases downwards)
-  ndc.y=-ndc.y;
-  
-  gl_Position=vec4(ndc,0.,1.);
+  gl_Position=u_ViewProjection*vec4(pos,0.,1.);
   
   // Provide a simple uv: x=t along bone, y across (-1..1 -> 0..1)
   v_localUV=vec2(t,a_corner.y*.5+.5);

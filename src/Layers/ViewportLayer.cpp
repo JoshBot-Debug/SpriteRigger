@@ -68,59 +68,165 @@ void ViewportLayer::OnAttach() {
 }
 
 void ViewportLayer::OnUpdate(float deltaTime) {
+  m_Camera.Update();
 
-  auto registry = ServiceLocator::Get<Registry>();
+  // Update the instance buffer
+  {
+    auto registry = ServiceLocator::Get<Registry>();
 
-  if (!registry->HasChanged<CBone>())
-    return;
+    if (!registry->HasChanged<CBone>())
+      return;
 
-  registry->ClearChanged<CBone>();
+    registry->ClearChanged<CBone>();
 
-  std::vector<CBone *> bones = registry->Get<CBone>();
+    std::vector<CBone *> bones = registry->Get<CBone>();
 
-  m_Bones.resize(bones.size());
+    m_Bones.resize(bones.size());
 
-  for (auto &bone : bones)
-    m_Bones.emplace_back(*bone);
+    for (auto &bone : bones)
+      m_Bones.emplace_back(*bone);
+  }
 }
 
 void ViewportLayer::OnRender() {
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_None);
+  ImGui::PopStyleVar();
 
   ImVec2 viewport = ImGui::GetContentRegionAvail();
 
-  // Prepare the framebuffer
-  if (m_FrameBuffer == 0 || viewport.x != m_ViewportSize.x ||
-      viewport.y != m_ViewportSize.y)
-    Window::GenerateFrameBuffer(viewport, m_FrameBuffer, m_DepthBuffer,
-                                m_ColorAttachment);
+  m_Camera.OnResize((uint32_t)viewport.x, (uint32_t)viewport.y);
+  m_Camera.Update();
 
-  glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
-  glViewport(0, 0, (GLsizei)viewport.x, (GLsizei)viewport.y);
-  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  if (ImGui::IsWindowFocused()) {
+    if (ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) {
+      ImGuiIO &io = ImGui::GetIO();
+      m_Camera.Translate(-io.MouseDelta.x * 0.01f, io.MouseDelta.y * 0.01f,
+                         0.0f);
+    }
 
-  // Upload buffer
-  glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
-  glBufferData(GL_ARRAY_BUFFER, m_Bones.size() * sizeof(CBone), m_Bones.data(),
-               GL_DYNAMIC_DRAW);
+    if (Window::GetMouseScroll().y != 0.0f)
+      m_Camera.Zoom *= (1.0f - Window::GetMouseScroll().y * 0.1f);
+  }
 
-  glBindVertexArray(m_VAO);
+  // Draw instances
+  {
+    // Prepare the framebuffer
+    if (m_FrameBuffer == 0 || viewport != m_ViewportSize) {
+      Window::GenerateFrameBuffer(viewport, m_FrameBuffer, m_DepthBuffer,
+                                  m_ColorAttachment);
 
-  // Set uniforms
-  m_Shader.bind("default");
-  m_Shader.setUniform2f("u_screenSize", glm::vec2(viewport.x, viewport.y));
+      glViewport(0, 0, (GLsizei)viewport.x, (GLsizei)viewport.y);
+    }
 
-  // Draw
-  GLsizei instanceCount = (GLsizei)m_Bones.size();
-  if (instanceCount > 0)
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, instanceCount);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  m_Shader.unbind();
-  glBindVertexArray(0);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // Upload buffer
+    glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, m_Bones.size() * sizeof(CBone),
+                 m_Bones.data(), GL_DYNAMIC_DRAW);
 
-  ImGui::Image((void *)(intptr_t)m_ColorAttachment, viewport);
+    glBindVertexArray(m_VAO);
+
+    // Set uniforms
+    m_Shader.bind("default");
+    m_Shader.setUniformMatrix4fv("u_ViewProjection",
+                                 m_Camera.GetViewProjectionMatrix());
+
+    // Draw
+    GLsizei instanceCount = (GLsizei)m_Bones.size();
+    if (instanceCount > 0)
+      glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, instanceCount);
+
+    m_Shader.unbind();
+    glBindVertexArray(0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    ImGui::Image((void *)(intptr_t)m_ColorAttachment, viewport);
+  }
+
+  {
+    ImGui::PushFont(Window::GetFont("RobotoLight"), 14.0f);
+
+    ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+    ImVec2 windowPos = ImGui::GetWindowPos();
+    ImGui::SetCursorScreenPos(windowPos + contentMin + ImVec2(16, 16));
+
+    ImGui::Text("Camera (%.2f, %.2f, %.2f)", m_Camera.Position.x,
+                m_Camera.Position.y, m_Camera.Zoom);
+
+    ImVec2 mousePos = GetViewportMouse(m_Camera);
+    ImGui::SetCursorScreenPos(ImGui::GetCursorScreenPos() + ImVec2(16, 0));
+    ImGui::Text("Mouse (%.2f, %.2f)", mousePos.x, mousePos.y);
+
+    ImGui::PopFont();
+  }
+
+  {
+    // Draw grid
+    ImDrawList *drawList = ImGui::GetWindowDrawList();
+    ImVec2 windowPos = ImGui::GetWindowPos();
+    ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+    ImVec2 origin = windowPos + contentMin;
+
+    float fontSize = 14.0f;
+    ImFont *font = Window::GetFont("RobotoLight");
+
+    float aspect = (float)m_Camera.ViewportWidth / m_Camera.ViewportHeight;
+    float halfWidth = aspect * m_Camera.Zoom;
+    float halfHeight = 1.0f * m_Camera.Zoom;
+
+    float left = m_Camera.Position.x - halfWidth;
+    float right = m_Camera.Position.x + halfWidth;
+    float bottom = m_Camera.Position.y - halfHeight;
+    float top = m_Camera.Position.y + halfHeight;
+
+    float gridSpacing = 1.0f; // 1 world unit
+
+    ImU32 defaultColor = IM_COL32(100, 100, 100, 100);
+    ImU32 centerColor = IM_COL32(255, 255, 255, 255);
+
+    // Convert world coordinates to screen pixels
+    auto WorldToScreen = [&](float x, float y) -> ImVec2 {
+      float sx = ((x - left) / (right - left)) * viewport.x;
+      float sy = ((y - bottom) / (top - bottom)) * viewport.y;
+      return ImVec2(origin.x + sx, origin.y + viewport.y - sy);
+    };
+
+    // Vertical lines
+    float firstX = std::floor(left / gridSpacing) * gridSpacing;
+    for (float x = firstX; x <= right; x += gridSpacing) {
+      ImVec2 p0 = WorldToScreen(x, bottom);
+      ImVec2 p1 = WorldToScreen(x, top);
+
+      ImU32 color = (x == 0.0f) ? centerColor : defaultColor;
+
+      drawList->AddLine(p0, p1, color, 1.0f);
+
+      char buf[16];
+      snprintf(buf, sizeof(buf), "%.0f", x);
+      ImVec2 textPos = ImVec2(p0.x + 4, p0.y - fontSize - 4); // adjust offset
+      drawList->AddText(font, fontSize, textPos, centerColor, buf);
+    }
+
+    // Horizontal lines
+    float firstY = std::floor(bottom / gridSpacing) * gridSpacing;
+    for (float y = firstY; y <= top; y += gridSpacing) {
+      ImVec2 p0 = WorldToScreen(left, y);
+      ImVec2 p1 = WorldToScreen(right, y);
+
+      ImU32 color = (y == 0.0f) ? centerColor : defaultColor;
+
+      drawList->AddLine(p0, p1, color, 1.0f);
+
+      char buf[16];
+      snprintf(buf, sizeof(buf), "%.0f", y);
+      drawList->AddText(font, fontSize, ImVec2(p0.x + 4, p0.y + 4), centerColor,
+                        buf);
+    }
+  }
 
   ImGui::End();
 }

@@ -9,6 +9,7 @@
 #include "State.h"
 
 #include "Application/Components.h"
+#include "Camera/OrthographicCamera.h"
 #include <vector>
 
 class ViewportLayer : public SerializableLayer {
@@ -27,6 +28,8 @@ private:
   std::vector<CBone> m_Bones;
 
   ImVec2 m_ViewportSize{0, 0};
+
+  OrthographicCamera m_Camera;
 
 public:
   explicit ViewportLayer(State *state);

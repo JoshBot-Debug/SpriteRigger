@@ -227,9 +227,10 @@ Window::Window(const Window::Options &options) : m_Options(options) {
     std::cerr << "GLFW initialization failed!" << std::endl;
 
   const char *glsl_version = "#version 330 core";
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
   glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);

@@ -79,23 +79,14 @@ void HierarchyLayer::OnAttach() {
       item->flags = ImGuiTreeNodeFlags_None;
   });
 
-  auto onNewBone = [](void *data) {
-    ServiceLocator::Get<Rigger>()->NewBone(0);
-  };
-
   m_ContextMenu.Register({
       .renderOn = ContextMenu::PopupContext::WINDOW,
       .items = {{
           .name = "New bone",
           .shortcut = "Ctrl B",
-          .onClick = onNewBone,
+          .onClick =
+              [](void *data) { ServiceLocator::Get<Rigger>()->NewBone(0); },
       }},
-  });
-
-  Window::RegisterShortcut({
-      .ctrl = true,
-      .key = ImGuiKey_B,
-      .callback = onNewBone,
   });
 }
 
