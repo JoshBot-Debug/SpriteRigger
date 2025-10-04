@@ -6,6 +6,9 @@
 
 #include "Utility.h"
 
+#include <cstring>
+#include <glm/gtc/type_ptr.hpp>
+
 const std::string EXE_DIRECTORY = GetExecutableDirectory();
 
 ViewportLayer::ViewportLayer(State *state) : m_State(state) {}
@@ -68,8 +71,6 @@ void ViewportLayer::OnAttach() {
 }
 
 void ViewportLayer::OnUpdate(float deltaTime) {
-  m_Camera.Update();
-
   // Update the instance buffer
   {
     auto registry = ServiceLocator::Get<Registry>();
@@ -98,7 +99,8 @@ void ViewportLayer::OnRender() {
   ImVec2 contentMax = ImGui::GetWindowContentRegionMax();
   ImVec2 windowPos = ImGui::GetWindowPos();
 
-  if (ImGui::IsMouseHoveringRect(contentMin, contentMax)) {
+  if (ImGui::IsMouseHoveringRect(windowPos + contentMin,
+                                 windowPos + contentMax)) {
     if (ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) {
       ImGuiIO &io = ImGui::GetIO();
       float dx = -io.MouseDelta.x * m_Camera.Zoom * 2.0f / viewport.x;
@@ -250,6 +252,29 @@ void ViewportLayer::OnRender() {
 
 void ViewportLayer::OnDetach() { m_State = nullptr; }
 
-void ViewportLayer::Save(Serializer &serializer) {}
+void ViewportLayer::Save(Serializer &serializer) {
+  std::vector<uint8_t> buffer(sizeof(m_Camera.Position) +
+                              sizeof(m_Camera.Zoom));
 
-void ViewportLayer::Restore(Serializer &serializer) {}
+  std::memcpy(buffer.data(), glm::value_ptr(m_Camera.Position),
+              sizeof(m_Camera.Position));
+  std::memcpy(buffer.data() + sizeof(m_Camera.Position), &m_Camera.Zoom,
+              sizeof(m_Camera.Zoom));
+
+  serializer.Stage("camera", buffer.data(),
+                   static_cast<uint64_t>(buffer.size()));
+
+  LOG(m_Camera.Position.x, m_Camera.Position.y, m_Camera.Zoom);
+}
+
+void ViewportLayer::Restore(Serializer &serializer) {
+  std::vector<uint8_t> buffer = serializer.Get("camera");
+
+  if (buffer.size() == 0)
+    return;
+
+  std::memcpy(glm::value_ptr(m_Camera.Position), buffer.data(),
+              sizeof(m_Camera.Position));
+  std::memcpy(&m_Camera.Zoom, buffer.data() + sizeof(m_Camera.Position),
+              sizeof(m_Camera.Zoom));
+}

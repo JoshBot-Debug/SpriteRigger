@@ -24,7 +24,8 @@ private:
 public:
   State();
 
-  std::shared_ptr<SerializableLayer> Register(const std::shared_ptr<SerializableLayer> &layer);
+  std::shared_ptr<SerializableLayer>
+  Register(const std::shared_ptr<SerializableLayer> &layer);
 
   bool New();
 
@@ -47,4 +48,6 @@ public:
   void Quit() { m_ApplicationRunning = false; }
 
   std::vector<std::string> GetRecentProjects() { return m_RecentProjects; };
+
+  void Unregister() { m_Layers.clear(); }
 };

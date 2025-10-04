@@ -7,8 +7,8 @@ void OrthographicCamera::Update() {
   m_Projection =
       glm::ortho(-Aspect * Zoom, Aspect * Zoom, -Zoom, Zoom, -1.0f, 1.0f);
 
-  m_View = glm::translate(glm::mat4(1.0f),
-                          glm::vec3(-Position.x, Position.y, 0.0f));
+  m_View =
+      glm::translate(glm::mat4(1.0f), glm::vec3(-Position.x, Position.y, 0.0f));
 
   m_ViewProjection = m_Projection * m_View;
 }
