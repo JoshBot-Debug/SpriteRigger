@@ -178,8 +178,7 @@ void ViewportLayer::OnRender() {
     float fontSize = 14.0f;
     ImFont *font = Window::GetFont("RobotoLight");
 
-    float aspect = (float)m_Camera.ViewportWidth / m_Camera.ViewportHeight;
-    float halfWidth = aspect * m_Camera.Zoom;
+    float halfWidth = m_Camera.Aspect * m_Camera.Zoom;
     float halfHeight = 1.0f * m_Camera.Zoom;
 
     float left = m_Camera.Position.x - halfWidth;
@@ -189,19 +188,17 @@ void ViewportLayer::OnRender() {
 
     float gridSpacing = 1.0f; // 1 world unit
 
+    ImU32 defaultColor = IM_COL32(100, 100, 100, 100);
+    ImU32 centerColor = IM_COL32(200, 200, 200, 200);
+
     // compute approximate pixels per world unit
     float pixelsPerUnitX = viewport.x / (right - left);
     float pixelsPerUnitY = viewport.y / (top - bottom);
 
     // minimum pixels between labels
-    float minLabelSpacing = 50.0f;
-
-    ImU32 defaultColor = IM_COL32(100, 100, 100, 100);
-    ImU32 centerColor = IM_COL32(200, 200, 200, 200);
-    float labelStepX =
-        std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitX));
-    float labelStepY =
-        std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitY));
+    float minLabelSpacing = 25.0f;
+    float labelStepX = std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitX));
+    float labelStepY = std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitY));
 
     // Convert world coordinates to screen pixels
     auto WorldToScreen = [&](float x, float y) -> ImVec2 {
@@ -213,6 +210,9 @@ void ViewportLayer::OnRender() {
     // Vertical lines
     float firstX = std::floor(left / gridSpacing) * gridSpacing;
     for (float x = firstX; x <= right; x += gridSpacing) {
+      if (std::fmod(x, labelStepX) != 0.0f)
+        continue;
+
       ImVec2 p0 = WorldToScreen(x, bottom);
       ImVec2 p1 = WorldToScreen(x, top);
 
@@ -220,17 +220,18 @@ void ViewportLayer::OnRender() {
 
       drawList->AddLine(p0, p1, color, 1.0f);
 
-      if (std::fmod(x, labelStepX) == 0.0f) {
-        char buf[16];
-        snprintf(buf, sizeof(buf), "%.0f", x);
-        ImVec2 textPos = ImVec2(p0.x + 4, p0.y - fontSize - 4); // adjust offset
-        drawList->AddText(font, fontSize, textPos, centerColor, buf);
-      }
+      char buf[16];
+      snprintf(buf, sizeof(buf), "%.0f", x);
+      ImVec2 textPos = ImVec2(p0.x + 4, p0.y - fontSize - 4);
+      drawList->AddText(font, fontSize, textPos, centerColor, buf);
     }
 
     // Horizontal lines
     float firstY = std::floor(bottom / gridSpacing) * gridSpacing;
     for (float y = firstY; y <= top; y += gridSpacing) {
+      if (std::fmod(y, labelStepY) != 0.0f)
+        continue;
+
       ImVec2 p0 = WorldToScreen(left, y);
       ImVec2 p1 = WorldToScreen(right, y);
 
@@ -238,12 +239,10 @@ void ViewportLayer::OnRender() {
 
       drawList->AddLine(p0, p1, color, 1.0f);
 
-      if (std::fmod(y, labelStepY) == 0.0f) {
-        char buf[16];
-        snprintf(buf, sizeof(buf), "%.0f", y);
-        drawList->AddText(font, fontSize, ImVec2(p0.x + 4, p0.y + 4),
-                          centerColor, buf);
-      }
+      char buf[16];
+      snprintf(buf, sizeof(buf), "%.0f", y);
+      drawList->AddText(font, fontSize, ImVec2(p0.x + 4, p0.y + 4), centerColor,
+                        buf);
     }
   }
 
