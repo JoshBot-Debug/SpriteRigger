@@ -94,24 +94,24 @@ void ViewportLayer::OnRender() {
   ImGui::PopStyleVar();
 
   ImVec2 viewport = ImGui::GetContentRegionAvail();
+  ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+  ImVec2 contentMax = ImGui::GetWindowContentRegionMax();
+  ImVec2 windowPos = ImGui::GetWindowPos();
 
-  m_Camera.OnResize((uint32_t)viewport.x, (uint32_t)viewport.y);
-  m_Camera.Update();
-
-  if (ImGui::IsWindowFocused()) {
+  if (ImGui::IsMouseHoveringRect(contentMin, contentMax)) {
     if (ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) {
       ImGuiIO &io = ImGui::GetIO();
-      float dx = -io.MouseDelta.x * m_Camera.Zoom * 2.0f /
-                 ImGui::GetContentRegionAvail().x;
-      float dy = io.MouseDelta.y * m_Camera.Zoom * 2.0f /
-                 ImGui::GetContentRegionAvail().y;
-
+      float dx = -io.MouseDelta.x * m_Camera.Zoom * 2.0f / viewport.x;
+      float dy = io.MouseDelta.y * m_Camera.Zoom * 2.0f / viewport.y;
       m_Camera.Translate(dx, dy);
     }
 
     if (Window::GetMouseScroll().y != 0.0f)
       m_Camera.Zoom *= (1.0f - Window::GetMouseScroll().y * 0.1f);
   }
+
+  m_Camera.OnResize((uint32_t)viewport.x, (uint32_t)viewport.y);
+  m_Camera.Update();
 
   // Draw instances
   {
@@ -151,11 +151,10 @@ void ViewportLayer::OnRender() {
     ImGui::Image((void *)(intptr_t)m_ColorAttachment, viewport);
   }
 
+  // Draw info
   {
     ImGui::PushFont(Window::GetFont("RobotoLight"), 14.0f);
 
-    ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
-    ImVec2 windowPos = ImGui::GetWindowPos();
     ImGui::SetCursorScreenPos(windowPos + contentMin + ImVec2(16, 16));
 
     ImGui::Text("Camera (%.2f, %.2f, %.2f)", m_Camera.Position.x,
@@ -168,11 +167,9 @@ void ViewportLayer::OnRender() {
     ImGui::PopFont();
   }
 
+  // Draw grid
   {
-    // Draw grid
     ImDrawList *drawList = ImGui::GetWindowDrawList();
-    ImVec2 windowPos = ImGui::GetWindowPos();
-    ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
     ImVec2 origin = windowPos + contentMin;
 
     float fontSize = 14.0f;
@@ -197,8 +194,10 @@ void ViewportLayer::OnRender() {
 
     // minimum pixels between labels
     float minLabelSpacing = 25.0f;
-    float labelStepX = std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitX));
-    float labelStepY = std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitY));
+    float labelStepX =
+        std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitX));
+    float labelStepY =
+        std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitY));
 
     // Convert world coordinates to screen pixels
     auto WorldToScreen = [&](float x, float y) -> ImVec2 {
@@ -222,8 +221,8 @@ void ViewportLayer::OnRender() {
 
       char buf[16];
       snprintf(buf, sizeof(buf), "%.0f", x);
-      ImVec2 textPos = ImVec2(p0.x + 4, p0.y - fontSize - 4);
-      drawList->AddText(font, fontSize, textPos, centerColor, buf);
+      drawList->AddText(font, fontSize, ImVec2(p0.x + 4, p0.y - fontSize - 4),
+                        centerColor, buf);
     }
 
     // Horizontal lines

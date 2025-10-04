@@ -12,7 +12,7 @@ private:
 public:
   glm::vec2 Position{0.0f, 0.0f};
 
-  float Zoom = 1.0f;
+  float Zoom = 5.0f;
   float Aspect = 0.0f;
 
   uint32_t ViewportWidth = 0;
