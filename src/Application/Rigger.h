@@ -21,11 +21,9 @@ public:
     CHierarchy *hierarchy = entity->Add<CHierarchy>();
     CFlags *flags = entity->Add<CFlags>();
 
-    float cx = 400.0f;
-    float cy = 300.0f;
-    bone->start = glm::vec2(cx - 50.0f, cy);
-    bone->end = glm::vec2(cx + 50.0f, cy);
-    bone->thickness = 10.0f;
+    bone->start = glm::vec2(0.0f, -5.0f);
+    bone->end = glm::vec2(0.0f, 5.0f);
+    bone->thickness = 1.0f;
 
     hierarchy->id = entity->GetId();
     hierarchy->parent = parent;

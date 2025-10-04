@@ -26,7 +26,7 @@ void main(){
   vec2 pos=mix(a_start,a_end,t)+perp*(a_corner.y*halfThick);
   
   gl_Position=u_ViewProjection*vec4(pos,0.,1.);
-  
+
   // Provide a simple uv: x=t along bone, y across (-1..1 -> 0..1)
   v_localUV=vec2(t,a_corner.y*.5+.5);
   v_color=a_color;

@@ -101,8 +101,12 @@ void ViewportLayer::OnRender() {
   if (ImGui::IsWindowFocused()) {
     if (ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) {
       ImGuiIO &io = ImGui::GetIO();
-      m_Camera.Translate(-io.MouseDelta.x * 0.01f, io.MouseDelta.y * 0.01f,
-                         0.0f);
+      float dx = -io.MouseDelta.x * m_Camera.Zoom * 2.0f /
+                 ImGui::GetContentRegionAvail().x;
+      float dy = io.MouseDelta.y * m_Camera.Zoom * 2.0f /
+                 ImGui::GetContentRegionAvail().y;
+
+      m_Camera.Translate(dx, dy);
     }
 
     if (Window::GetMouseScroll().y != 0.0f)
@@ -185,8 +189,19 @@ void ViewportLayer::OnRender() {
 
     float gridSpacing = 1.0f; // 1 world unit
 
+    // compute approximate pixels per world unit
+    float pixelsPerUnitX = viewport.x / (right - left);
+    float pixelsPerUnitY = viewport.y / (top - bottom);
+
+    // minimum pixels between labels
+    float minLabelSpacing = 50.0f;
+
     ImU32 defaultColor = IM_COL32(100, 100, 100, 100);
-    ImU32 centerColor = IM_COL32(255, 255, 255, 255);
+    ImU32 centerColor = IM_COL32(200, 200, 200, 200);
+    float labelStepX =
+        std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitX));
+    float labelStepY =
+        std::max(1.0f, std::ceil(minLabelSpacing / pixelsPerUnitY));
 
     // Convert world coordinates to screen pixels
     auto WorldToScreen = [&](float x, float y) -> ImVec2 {
@@ -205,10 +220,12 @@ void ViewportLayer::OnRender() {
 
       drawList->AddLine(p0, p1, color, 1.0f);
 
-      char buf[16];
-      snprintf(buf, sizeof(buf), "%.0f", x);
-      ImVec2 textPos = ImVec2(p0.x + 4, p0.y - fontSize - 4); // adjust offset
-      drawList->AddText(font, fontSize, textPos, centerColor, buf);
+      if (std::fmod(x, labelStepX) == 0.0f) {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%.0f", x);
+        ImVec2 textPos = ImVec2(p0.x + 4, p0.y - fontSize - 4); // adjust offset
+        drawList->AddText(font, fontSize, textPos, centerColor, buf);
+      }
     }
 
     // Horizontal lines
@@ -221,10 +238,12 @@ void ViewportLayer::OnRender() {
 
       drawList->AddLine(p0, p1, color, 1.0f);
 
-      char buf[16];
-      snprintf(buf, sizeof(buf), "%.0f", y);
-      drawList->AddText(font, fontSize, ImVec2(p0.x + 4, p0.y + 4), centerColor,
-                        buf);
+      if (std::fmod(y, labelStepY) == 0.0f) {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%.0f", y);
+        drawList->AddText(font, fontSize, ImVec2(p0.x + 4, p0.y + 4),
+                          centerColor, buf);
+      }
     }
   }
 

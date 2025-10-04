@@ -6,8 +6,8 @@
 struct CBone {
   glm::vec2 start = glm::vec2(0.0f);
   glm::vec2 end = glm::vec2(0.0f);
-  float thickness = 0.0f;
   glm::vec4 color = glm::vec4(1.0f);
+  float thickness = 0.0f;
 };
 
 struct CHierarchy
