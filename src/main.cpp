@@ -23,12 +23,6 @@ int main(int argc, char **argv) {
   while (state.IsApplicationRunning()) {
     bool initialized = state.IsInitialized();
 
-    std::vector<std::shared_ptr<SerializableLayer>> layers = {
-        state.Register(std::make_shared<ViewportLayer>(&state)),
-        state.Register(std::make_shared<HierarchyLayer>(&state)),
-        state.Register(std::make_shared<AssetLayer>(&state)),
-    };
-
     Window::Options options = {
         .title = "Sprite Rigger",
         .darkMode = IsDarkMode(),
@@ -150,9 +144,12 @@ int main(int argc, char **argv) {
 
     if (!initialized)
       window.PushLayer<InitializeLayer>(&state);
-    else
-      for (auto &layer : layers)
-        window.PushLayer(layer);
+    else {
+      window.PushLayer(state.Register(std::make_shared<ViewportLayer>(&state)));
+      window.PushLayer(state.Register(std::make_shared<HierarchyLayer>(&state)));
+      window.PushLayer(state.Register(std::make_shared<AssetLayer>(&state)));
+      state.Restore();
+    }
 
     ImGuiStyle &style = ImGui::GetStyle();
     style.WindowMenuButtonPosition = ImGuiDir_None;

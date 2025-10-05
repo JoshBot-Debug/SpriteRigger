@@ -25,12 +25,14 @@ State::State()
 
 std::shared_ptr<SerializableLayer>
 State::Register(const std::shared_ptr<SerializableLayer> &layer) {
-  for (auto &existing : m_Layers)
-    if (typeid(*existing) == typeid(*layer))
-      return existing;
+  auto it = std::find_if(m_Layers.begin(), m_Layers.end(), [&layer](auto &i) {
+    return typeid(*layer) == typeid(*i);
+  });
 
-  m_Layers.emplace_back(layer);
-  return layer;
+  if (it != m_Layers.end())
+    m_Layers.erase(it);
+
+  return m_Layers.emplace_back(layer);
 }
 
 bool State::New() {
@@ -76,12 +78,16 @@ bool State::Open(const std::string &filepath) {
 
   SyncRecentProjects(filepath);
 
-  for (auto &layer : m_Layers)
-    layer->Restore(m_Serializer);
-
   m_ProjectFile = filepath;
 
   m_IsInitialized = true;
+
+  return true;
+}
+
+void State::Restore() {
+  for (auto &layer : m_Layers)
+    layer->Restore(m_Serializer);
 
   // Load the ECS state
   const auto &registry = ServiceLocator::Get<Registry>();
@@ -116,8 +122,6 @@ bool State::Open(const std::string &filepath) {
   }
 
   m_Serializer.Clear();
-
-  return true;
 }
 
 void State::Save() {

@@ -33,6 +33,8 @@ public:
 
   bool Open(const std::string &filepath);
 
+  void Restore();
+
   void Save();
 
   void SaveAs();
