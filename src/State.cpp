@@ -25,6 +25,10 @@ State::State()
 
 std::shared_ptr<SerializableLayer>
 State::Register(const std::shared_ptr<SerializableLayer> &layer) {
+  for (auto &existing : m_Layers)
+    if (typeid(*existing) == typeid(*layer))
+      return existing;
+
   m_Layers.emplace_back(layer);
   return layer;
 }

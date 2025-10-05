@@ -11,7 +11,8 @@
 
 const std::string EXE_DIRECTORY = GetExecutableDirectory();
 
-ViewportLayer::ViewportLayer(State *state) : m_State(state), m_Grid(&m_Camera) {}
+ViewportLayer::ViewportLayer(State *state)
+    : m_State(state), m_Grid(&m_Camera) {}
 
 void ViewportLayer::OnAttach() {
   m_Shader.create({
@@ -155,8 +156,6 @@ void ViewportLayer::Save(Serializer &serializer) {
 
   serializer.Stage("camera", buffer.data(),
                    static_cast<uint64_t>(buffer.size()));
-
-  LOG(m_Camera.Position.x, m_Camera.Position.y, m_Camera.Zoom);
 }
 
 void ViewportLayer::Restore(Serializer &serializer) {
@@ -169,6 +168,4 @@ void ViewportLayer::Restore(Serializer &serializer) {
               sizeof(m_Camera.Position));
   std::memcpy(&m_Camera.Zoom, buffer.data() + sizeof(m_Camera.Position),
               sizeof(m_Camera.Zoom));
-
-  LOG(m_Camera.Position.x, m_Camera.Position.y, m_Camera.Zoom);
 }

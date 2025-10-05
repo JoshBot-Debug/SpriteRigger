@@ -48,6 +48,4 @@ public:
   void Quit() { m_ApplicationRunning = false; }
 
   std::vector<std::string> GetRecentProjects() { return m_RecentProjects; };
-
-  void Unregister() { m_Layers.clear(); }
 };

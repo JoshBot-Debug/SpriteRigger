@@ -158,7 +158,6 @@ int main(int argc, char **argv) {
     style.WindowMenuButtonPosition = ImGuiDir_None;
 
     window.Run();
-    state.Unregister();
   }
 
   ServiceLocator::Unregister<Registry>();
