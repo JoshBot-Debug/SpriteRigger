@@ -10,11 +10,10 @@ private:
   glm::mat4 m_ViewProjection{1.0f};
 
 public:
+  float Zoom = 5.0f;
   glm::vec2 Position{0.0f, 0.0f};
 
-  float Zoom = 5.0f;
   float Aspect = 0.0f;
-
   uint32_t ViewportWidth = 0;
   uint32_t ViewportHeight = 0;
 

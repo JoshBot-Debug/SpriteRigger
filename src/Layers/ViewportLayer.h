@@ -10,6 +10,7 @@
 
 #include "Application/Components.h"
 #include "Camera/OrthographicCamera.h"
+#include "Camera/Components/Grid.h"
 #include <vector>
 
 class ViewportLayer : public SerializableLayer {
@@ -30,6 +31,8 @@ private:
   ImVec2 m_ViewportSize{0, 0};
 
   OrthographicCamera m_Camera;
+  
+  Grid m_Grid;
 
 public:
   explicit ViewportLayer(State *state);

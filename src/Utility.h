@@ -235,28 +235,3 @@ inline void *ToVoidPtr(uint32_t value) {
 inline uint32_t ToInt32(void *value) {
   return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(value));
 }
-
-inline ImVec2 GetViewportMouse(const OrthographicCamera &camera) {
-  ImVec2 viewport = ImGui::GetContentRegionAvail();
-  ImVec2 windowPos = ImGui::GetWindowPos();
-  ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
-  ImVec2 origin = windowPos + contentMin;
-
-  ImVec2 mouseScreen = ImGui::GetMousePos();
-  ImVec2 mouseInViewport = mouseScreen - origin;
-
-  float aspect = (float)camera.ViewportWidth / camera.ViewportHeight;
-  float halfWidth = aspect * camera.Zoom;
-  float halfHeight = 1.0f * camera.Zoom;
-
-  float left = camera.Position.x - halfWidth;
-  float right = camera.Position.x + halfWidth;
-  float bottom = camera.Position.y - halfHeight;
-  float top = camera.Position.y + halfHeight;
-
-  float worldX = left + (mouseInViewport.x / viewport.x) * (right - left);
-  float worldY =
-      bottom + ((viewport.y - mouseInViewport.y) / viewport.y) * (top - bottom);
-
-  return ImVec2(worldX, worldY);
-}

@@ -21,7 +21,8 @@ bool OrthographicCamera::OnResize(uint32_t width, uint32_t height) {
 }
 
 void OrthographicCamera::SetPosition(float x, float y) {
-  Position = glm::vec2(x, y);
+  Position.x = x;
+  Position.y = y;
 }
 
 void OrthographicCamera::Translate(float dx, float dy) {
