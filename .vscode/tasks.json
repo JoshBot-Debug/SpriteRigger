@@ -9,21 +9,16 @@
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": [
-        "$gcc"
-      ]
+      "problemMatcher": ["$gcc"]
     },
     {
       "label": "Build Debug \\w STL",
       "type": "shell",
       "command": "cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_STL_DEBUG=ON && cmake --build build",
       "group": {
-        "kind": "build",
-        "isDefault": true
+        "kind": "build"
       },
-      "problemMatcher": [
-        "$gcc"
-      ]
+      "problemMatcher": ["$gcc"]
     },
     {
       "label": "Clear Logs",
@@ -36,12 +31,9 @@
       "type": "shell",
       "command": "cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build",
       "group": {
-        "kind": "build",
-        "isDefault": false
+        "kind": "build"
       },
-      "problemMatcher": [
-        "$gcc"
-      ]
+      "problemMatcher": ["$gcc"]
     },
     {
       "label": "valgrind",
@@ -55,21 +47,16 @@
         "${workspaceFolder}/build/SpriteRigger"
       ],
       "group": {
-        "kind": "build",
-        "isDefault": true
+        "kind": "build"
       },
-      "dependsOn": [
-        "Build Debug"
-      ],
-      "problemMatcher": [
-        "$gcc"
-      ],
+      "dependsOn": ["Build Debug"],
+      "problemMatcher": ["$gcc"],
       "presentation": {
         "reveal": "always",
         "clear": true,
         "panel": "dedicated",
         "showReuseMessage": false
-      },
+      }
     }
   ]
 }
