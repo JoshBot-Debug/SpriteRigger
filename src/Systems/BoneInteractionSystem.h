@@ -19,7 +19,9 @@ public:
   double deltaTime;
   ImVec2 mouse;
 
-  void OnAttach(ECS::Registry *registry) { m_Registry = registry; };
+  ~BoneInteractionSystem() { m_Registry = nullptr; }
+
+  void Initialize(ECS::Registry *registry) { m_Registry = registry; };
 
   void Update() override {
     auto bones = m_Registry->Get<CBone>();

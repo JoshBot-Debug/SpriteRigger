@@ -17,14 +17,15 @@
 int main(int argc, char **argv) {
 
   Window::Init();
-  
+
   State state;
 
   ServiceLocator::Register<Rigger>();
   ServiceLocator::Register<ECS::Registry>();
-  ServiceLocator::Register<ECS::SystemManager>();
 
   while (state.IsApplicationRunning()) {
+    ServiceLocator::Register<ECS::SystemManager>();
+
     bool initialized = state.IsInitialized();
 
     Window::Options options = {
@@ -167,9 +168,9 @@ int main(int argc, char **argv) {
     style.WindowMenuButtonPosition = ImGuiDir_None;
 
     window.Run();
+    ServiceLocator::Unregister<ECS::SystemManager>();
   }
 
-  ServiceLocator::Unregister<ECS::SystemManager>();
   ServiceLocator::Unregister<ECS::Registry>();
   ServiceLocator::Unregister<Rigger>();
 

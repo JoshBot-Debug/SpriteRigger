@@ -20,40 +20,32 @@
 #include "Systems/BoneInteractionSystem.h"
 #include "Systems/BoneRenderSystem.h"
 
-#include "State.h"
 #include "SerializableLayer.h"
-
-struct Viewport {
-  ImVec2 size{0, 0};
-  ImVec2 min{0, 0};
-  ImVec2 max{0, 0};
-};
+#include "State.h"
 
 class ViewportLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
+
   std::shared_ptr<ECS::Registry> m_Registry = nullptr;
   std::shared_ptr<ECS::SystemManager> m_System = nullptr;
 
   std::shared_ptr<BoneInteractionSystem> m_BoneInteractionSystem = nullptr;
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
 
-  Shader m_Shader;
-
-  GLuint m_VAO = 0;
-  GLuint m_InstanceVBO = 0;
-
   GLuint m_FrameBuffer = 0;
   GLuint m_ColorAttachment = 0;
   GLuint m_DepthBuffer = 0;
 
-  std::vector<CBone> m_Bones;
-
-  Viewport m_Viewport;
-
+  Grid m_Grid;
+  Shader m_Shader;
   OrthographicCamera m_Camera;
 
-  Grid m_Grid;
+  struct Viewport {
+    ImVec2 size{0, 0};
+    ImVec2 min{0, 0};
+    ImVec2 max{0, 0};
+  } m_Viewport;
 
 public:
   explicit ViewportLayer(State *state);

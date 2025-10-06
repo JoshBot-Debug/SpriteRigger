@@ -20,8 +20,8 @@ void ViewportLayer::OnAttach() {
   m_BoneInteractionSystem = m_System->Register<BoneInteractionSystem>();
   m_BoneRenderSystem = m_System->Register<BoneRenderSystem>();
 
-  m_BoneInteractionSystem->OnAttach(m_Registry.get());
-  m_BoneRenderSystem->OnAttach(m_Registry.get(), &m_Shader, &m_Camera);
+  m_BoneInteractionSystem->Initialize(m_Registry.get());
+  m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
 }
 
 void ViewportLayer::OnRender() {

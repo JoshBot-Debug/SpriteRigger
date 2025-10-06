@@ -22,21 +22,29 @@ const std::string EXE_DIRECTORY = GetExecutableDirectory();
 
 class BoneRenderSystem : public ECS::System {
 private:
-  GLuint m_VAO, m_VBO;
-  Shader *m_Shader;
-  ECS::Registry *m_Registry;
-  OrthographicCamera *m_Camera;
+  GLuint m_VAO = 0, m_VBO = 0;
+  Shader *m_Shader = nullptr;
+  ECS::Registry *m_Registry = nullptr;
+  OrthographicCamera *m_Camera = nullptr;
   std::vector<CBone> m_Buffer;
 
 public:
-  void OnAttach(ECS::Registry *registry, Shader *shader,
-                OrthographicCamera *camera) {
+  ~BoneRenderSystem() {
+    m_VAO = 0;
+    m_VBO = 0;
+    m_Shader = nullptr;
+    m_Registry = nullptr;
+    m_Camera = nullptr;
+  }
+
+  void Initialize(ECS::Registry *registry, Shader *shader,
+                  OrthographicCamera *camera) {
     m_Registry = registry;
     m_Shader = shader;
     m_Camera = camera;
 
     m_Shader->create({
-        .name = "default",
+        .name = "bone",
         .vertex = (EXE_DIRECTORY + "/../src/Assets/Shaders/bone.vert").c_str(),
         .fragment =
             (EXE_DIRECTORY + "/../src/Assets/Shaders/bone.frag").c_str(),
@@ -110,7 +118,7 @@ public:
 
     glBindVertexArray(m_VAO);
 
-    m_Shader->bind("default");
+    m_Shader->bind("bone");
 
     m_Shader->setUniformMatrix4fv("u_ViewProjection",
                                   m_Camera->GetViewProjectionMatrix());
