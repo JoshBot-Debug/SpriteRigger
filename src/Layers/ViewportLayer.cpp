@@ -146,26 +146,26 @@ void ViewportLayer::OnRender() {
 void ViewportLayer::OnDetach() { m_State = nullptr; }
 
 void ViewportLayer::Save(Serializer &serializer) {
-  std::vector<uint8_t> buffer(sizeof(m_Camera.Position) +
-                              sizeof(m_Camera.Zoom));
+  // std::vector<uint8_t> buffer(sizeof(m_Camera.Position) +
+  //                             sizeof(m_Camera.Zoom));
 
-  std::memcpy(buffer.data(), glm::value_ptr(m_Camera.Position),
-              sizeof(m_Camera.Position));
-  std::memcpy(buffer.data() + sizeof(m_Camera.Position), &m_Camera.Zoom,
-              sizeof(m_Camera.Zoom));
+  // std::memcpy(buffer.data(), glm::value_ptr(m_Camera.Position),
+  //             sizeof(m_Camera.Position));
+  // std::memcpy(buffer.data() + sizeof(m_Camera.Position), &m_Camera.Zoom,
+  //             sizeof(m_Camera.Zoom));
 
-  serializer.Stage("camera", buffer.data(),
-                   static_cast<uint64_t>(buffer.size()));
+  // serializer.Stage("camera", buffer.data(),
+  //                  static_cast<uint64_t>(buffer.size()));
 }
 
 void ViewportLayer::Restore(Serializer &serializer) {
-  std::vector<uint8_t> buffer = serializer.Get("camera");
+  // std::vector<uint8_t> buffer = serializer.Get("camera");
 
-  if (buffer.size() == 0)
-    return;
+  // if (buffer.size() == 0)
+  //   return;
 
-  std::memcpy(glm::value_ptr(m_Camera.Position), buffer.data(),
-              sizeof(m_Camera.Position));
-  std::memcpy(&m_Camera.Zoom, buffer.data() + sizeof(m_Camera.Position),
-              sizeof(m_Camera.Zoom));
+  // std::memcpy(glm::value_ptr(m_Camera.Position), buffer.data(),
+  //             sizeof(m_Camera.Position));
+  // std::memcpy(&m_Camera.Zoom, buffer.data() + sizeof(m_Camera.Position),
+  //             sizeof(m_Camera.Zoom));
 }

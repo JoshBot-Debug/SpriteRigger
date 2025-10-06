@@ -102,6 +102,7 @@ private:
 
 public:
   Hierarchy() = default;
+  ~Hierarchy() { delete m_Root; }
 
   void Add(const Item &item) { m_Root->Add(item); }
 

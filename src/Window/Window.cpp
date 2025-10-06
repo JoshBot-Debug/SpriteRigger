@@ -57,7 +57,7 @@ void Window::Run() {
 
   auto &shortcutManager = ShortcutManager::Instance();
 
-  while (!glfwWindowShouldClose(s_Window) && m_Running) {
+  while (m_Running) {
 
     glfwPollEvents();
 
@@ -344,14 +344,11 @@ Window::~Window() {
     layer->OnDetach();
 
   m_Layers.clear();
-
   s_Fonts.clear();
-
   m_Menubar = nullptr;
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
-
   ImGui::DestroyContext();
 
   glfwDestroyWindow(s_Window);
