@@ -9,6 +9,7 @@
 #include "Application/Rigger.h"
 #include "Components/Hierarchy.h"
 #include "ECS/Entity.h"
+#include "ECS/System.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 #include "Utility.h"
@@ -21,6 +22,7 @@ int main(int argc, char **argv) {
 
   ServiceLocator::Register<Rigger>();
   ServiceLocator::Register<ECS::Registry>();
+  ServiceLocator::Register<ECS::SystemManager>();
 
   while (state.IsApplicationRunning()) {
     bool initialized = state.IsInitialized();
@@ -167,6 +169,7 @@ int main(int argc, char **argv) {
     window.Run();
   }
 
+  ServiceLocator::Unregister<ECS::SystemManager>();
   ServiceLocator::Unregister<ECS::Registry>();
   ServiceLocator::Unregister<Rigger>();
 
