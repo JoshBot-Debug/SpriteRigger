@@ -107,6 +107,13 @@ public:
 
   static void GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
                                   GLuint &depthBuffer, GLuint &colorAttachment);
+
+  static void Init() {
+    if (!glfwInit())
+      throw std::runtime_error("GLFW initialization failed!");
+  };
+
+  static void Shutdown() { glfwTerminate(); }
 };
 
 inline ImVec2 operator+(const ImVec2 &lhs, const ImVec2 &rhs) {

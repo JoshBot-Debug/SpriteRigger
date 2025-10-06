@@ -100,6 +100,7 @@ void ViewportLayer::OnRender() {
   ImVec2 viewportMin = windowPosition + ImGui::GetWindowContentRegionMin();
   ImVec2 viewportMax = windowPosition + ImGui::GetWindowContentRegionMax();
 
+  m_Grid.Update(viewport, viewportMin, viewportMax);
   m_Camera.OnResize((uint32_t)viewport.x, (uint32_t)viewport.y);
   m_Camera.Update();
 
@@ -137,7 +138,6 @@ void ViewportLayer::OnRender() {
     ImGui::Image((void *)(intptr_t)m_ColorAttachment, viewport);
   }
 
-  m_Grid.Update(viewport, viewportMin, viewportMax);
   m_Grid.Render(viewport, viewportMin);
 
   ImGui::End();
@@ -161,7 +161,7 @@ void ViewportLayer::Save(Serializer &serializer) {
 void ViewportLayer::Restore(Serializer &serializer) {
   std::vector<uint8_t> buffer = serializer.Get("camera");
 
-  if (buffer.size() == 0)
+  if (buffer.size() < sizeof(m_Camera.Position) + sizeof(m_Camera.Zoom))
     return;
 
   std::memcpy(glm::value_ptr(m_Camera.Position), buffer.data(),

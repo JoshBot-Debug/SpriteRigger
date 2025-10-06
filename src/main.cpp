@@ -15,6 +15,8 @@
 
 int main(int argc, char **argv) {
 
+  Window::Init();
+  
   State state;
 
   ServiceLocator::Register<Rigger>();
@@ -168,5 +170,6 @@ int main(int argc, char **argv) {
   ServiceLocator::Unregister<Registry>();
   ServiceLocator::Unregister<Rigger>();
 
+  Window::Shutdown();
   return 0;
 }

@@ -221,9 +221,6 @@ void Window::GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
 Window::Window(const Window::Options &options) : m_Options(options) {
   ShortcutManager::Instance().SetWindow(this);
 
-  if (!glfwInit())
-    std::cerr << "GLFW initialization failed!" << std::endl;
-
   const char *glsl_version = "#version 330 core";
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -246,15 +243,14 @@ Window::Window(const Window::Options &options) : m_Options(options) {
                               options.title.c_str(), nullptr, nullptr);
   if (!s_Window) {
     glfwTerminate();
-    return;
+    throw std::runtime_error("Failed to create a window!");
   }
 
   glfwMakeContextCurrent(s_Window);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cerr << "Failed to initialize GLAD\n";
     glfwTerminate();
-    return;
+    throw std::runtime_error("Failed to initialize GLAD");
   }
 
   std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
@@ -346,7 +342,6 @@ Window::~Window() {
   ImGui::DestroyContext();
 
   glfwDestroyWindow(s_Window);
-  glfwTerminate();
 
   s_Window = nullptr;
   s_Scroll = glm::vec2(0.0f);

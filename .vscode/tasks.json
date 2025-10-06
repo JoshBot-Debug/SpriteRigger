@@ -43,7 +43,6 @@
         "--show-leak-kinds=all",
         "--leak-check=full",
         "--track-origins=yes",
-        "--suppressions=/usr/share/valgrind/default.supp",
         "${workspaceFolder}/build/SpriteRigger"
       ],
       "group": {
