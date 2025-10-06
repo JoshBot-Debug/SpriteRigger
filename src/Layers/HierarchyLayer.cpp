@@ -33,7 +33,7 @@ void HierarchyLayer::OnAttach() {
                      ImGui::Separator();
                      if (ImGui::MenuItem(item->name, item->shortcut,
                                          item->selected, item->enabled))
-                       ServiceLocator::Get<Registry>()
+                       ServiceLocator::Get<ECS::Registry>()
                            ->Get<CFlags>(ToInt32(data))
                            ->rename = true;
                    },
@@ -46,7 +46,7 @@ void HierarchyLayer::OnAttach() {
 
     m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
 
-    auto registry = ServiceLocator::Get<Registry>();
+    auto registry = ServiceLocator::Get<ECS::Registry>();
 
     CHierarchy *cHierarchy = registry->Get<CHierarchy>(item->id);
     CFlags *cFlags = registry->Get<CFlags>(item->id);
@@ -91,7 +91,7 @@ void HierarchyLayer::OnAttach() {
 }
 
 void HierarchyLayer::OnUpdate(float deltaTime) {
-  auto registry = ServiceLocator::Get<Registry>();
+  auto registry = ServiceLocator::Get<ECS::Registry>();
 
   if (registry->HasChanged<CHierarchy>()) {
     registry->ClearChanged<CHierarchy>();

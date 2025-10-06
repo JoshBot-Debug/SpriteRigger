@@ -25,7 +25,7 @@ struct Viewport {
 class ViewportLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
-  std::shared_ptr<Registry> m_Registry = nullptr;
+  std::shared_ptr<ECS::Registry> m_Registry = nullptr;
 
   Shader m_Shader;
 

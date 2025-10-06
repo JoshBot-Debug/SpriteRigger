@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <any>
 #include <map>
 #include <memory>
@@ -7,8 +8,8 @@
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
-#include <algorithm>
 
+namespace ECS {
 class Entity;
 
 using EntityId = uint32_t;
@@ -242,3 +243,4 @@ public:
    */
   template <typename T> void ClearChanged() { m_Dirty[typeid(T)] = false; }
 };
+} // namespace ECS

@@ -8,13 +8,15 @@
 #include <cstring>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "ECS/Utility.h"
+
 const std::string EXE_DIRECTORY = GetExecutableDirectory();
 
 ViewportLayer::ViewportLayer(State *state)
     : m_State(state), m_Grid(&m_Camera) {}
 
 void ViewportLayer::OnAttach() {
-  m_Registry = ServiceLocator::Get<Registry>();
+  m_Registry = ServiceLocator::Get<ECS::Registry>();
 
   m_Shader.create({
       .name = "default",
@@ -76,31 +78,32 @@ void ViewportLayer::OnUpdate() {
 
   float deltaTime = static_cast<float>(Window::GetDeltaTime());
   float animationSpeed = 6.0f;
+  float lerp = animationSpeed * deltaTime;
 
   m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
   m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
-
-  // Update the instance buffer
-  if (m_Registry->HasChanged<CBone>()) {
-    m_Registry->ClearChanged<CBone>();
-  }
 
   const ImVec2 &mouse = m_Grid.GetMouseCoords();
 
   auto bones = m_Registry->Get<CBone>();
 
-  m_Bones.clear();
-  m_Bones.reserve(bones.size());
-
-  for (auto b : bones) {
+  for (auto b : bones)
     if (b->Intersects(mouse.x, mouse.y))
-      b->color = glm::mix(b->color, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
-                          animationSpeed * deltaTime);
+      ECS::Mutate<CBone, glm::vec4>(
+          m_Registry.get(), b->color,
+          glm::mix(b->color, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), lerp));
     else
-      b->color =
-          glm::mix(b->color, glm::vec4(1.0f), animationSpeed * deltaTime);
+      ECS::Mutate<CBone, glm::vec4>(m_Registry.get(), b->color,
+                               glm::mix(b->color, glm::vec4(1.0f), lerp));
 
-    m_Bones.emplace_back(*b);
+  // Update the instance buffer
+  if (m_Registry->HasChanged<CBone>()) {
+    m_Registry->ClearChanged<CBone>();
+    auto bones = m_Registry->Get<CBone>();
+    m_Bones.clear();
+    m_Bones.reserve(bones.size());
+    for (auto b : bones)
+      m_Bones.emplace_back(*b);
   }
 }
 

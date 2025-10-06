@@ -90,7 +90,7 @@ void State::Restore() {
     layer->Restore(m_Serializer);
 
   // Load the ECS state
-  const auto &registry = ServiceLocator::Get<Registry>();
+  const auto &registry = ServiceLocator::Get<ECS::Registry>();
 
   registry->Free();
 
@@ -106,7 +106,7 @@ void State::Restore() {
     std::memcpy(&id, ptr, sizeof(id));
     ptr += sizeof(id);
 
-    Entity *entity = registry->CreateEntity("bone", id);
+    ECS::Entity *entity = registry->CreateEntity("bone", id);
 
     CBone *bone = entity->Add<CBone>();
     CHierarchy *hierarchy = entity->Add<CHierarchy>();
@@ -131,7 +131,7 @@ void State::Save() {
     layer->Save(m_Serializer);
 
   // Save the ECS state
-  const auto &registry = ServiceLocator::Get<Registry>();
+  const auto &registry = ServiceLocator::Get<ECS::Registry>();
 
   auto serialize = [](std::vector<uint8_t> &buffer, const void *data,
                       uint32_t size) {

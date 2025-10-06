@@ -12,10 +12,10 @@ private:
 public:
   Rigger() = default;
 
-  void NewBone(EntityId parent) {
-    auto registry = ServiceLocator::Get<Registry>();
+  void NewBone(ECS::EntityId parent) {
+    auto registry = ServiceLocator::Get<ECS::Registry>();
 
-    Entity *entity = registry->CreateEntity("bone");
+    ECS::Entity *entity = registry->CreateEntity("bone");
 
     CBone *bone = entity->Add<CBone>();
     CHierarchy *hierarchy = entity->Add<CHierarchy>();
@@ -31,5 +31,5 @@ public:
                   entity->GetId());
   }
 
-  void RemoveBone(EntityId id) { ServiceLocator::Get<Registry>()->Free(id); }
+  void RemoveBone(ECS::EntityId id) { ServiceLocator::Get<ECS::Registry>()->Free(id); }
 };

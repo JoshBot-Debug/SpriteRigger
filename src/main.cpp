@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
   State state;
 
   ServiceLocator::Register<Rigger>();
-  ServiceLocator::Register<Registry>();
+  ServiceLocator::Register<ECS::Registry>();
 
   while (state.IsApplicationRunning()) {
     bool initialized = state.IsInitialized();
@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
     window.Run();
   }
 
-  ServiceLocator::Unregister<Registry>();
+  ServiceLocator::Unregister<ECS::Registry>();
   ServiceLocator::Unregister<Rigger>();
 
   Window::Shutdown();

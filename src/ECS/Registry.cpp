@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 
+namespace ECS {
 const std::vector<Entity *> Registry::GetEntities(const std::string &name) {
   std::vector<Entity *> results;
   for (auto &entity : m_Entities)
@@ -9,3 +10,4 @@ const std::vector<Entity *> Registry::GetEntities(const std::string &name) {
       results.push_back(entity.get());
   return results;
 }
+} // namespace ECS

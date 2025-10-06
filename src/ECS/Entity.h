@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <string>
 
+namespace ECS {
 using EntityId = uint32_t;
 
 /**
@@ -117,3 +118,4 @@ public:
    */
   operator EntityId() const { return m_Id; }
 };
+} // namespace ECS
