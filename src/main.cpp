@@ -87,6 +87,51 @@ int main(int argc, char **argv) {
                 state.Quit();
               },
       });
+
+      window.SetMenubar([&state, &window]() {
+        if (ImGui::BeginMenu("File")) {
+
+          if (ImGui::MenuItem("New", "Crtl N"))
+            if (state.New())
+              window.Quit();
+
+          if (ImGui::MenuItem("Open", "Crtl O"))
+            if (state.Open())
+              window.Quit();
+
+          if (ImGui::BeginMenu("Recent")) {
+
+            for (const auto &project : state.GetRecentProjects()) {
+              std::filesystem::path filePath = project;
+              if (ImGui::MenuItem(Ellipsize(RelativeHomePath(project), 400,
+                                            EllipsizeType::START)
+                                      .c_str())) {
+                state.Open(project);
+                window.Quit();
+              }
+            }
+
+            ImGui::EndMenu();
+          }
+
+          ImGui::Separator();
+
+          if (ImGui::MenuItem("Save", "Crtl S"))
+            state.Save();
+
+          if (ImGui::MenuItem("Save As", "Shift Crtl S"))
+            state.SaveAs();
+
+          ImGui::Separator();
+
+          if (ImGui::MenuItem("Quit", "Crtl Q")) {
+            window.Quit();
+            state.Quit();
+          }
+
+          ImGui::EndMenu();
+        }
+      });
     }
 
     glfwSetWindowUserPointer(Window::GetWindow(), &state);
@@ -97,56 +142,20 @@ int main(int argc, char **argv) {
       state->Quit();
     });
 
-    window.SetMenubar([&state, &window]() {
-      if (ImGui::BeginMenu("File")) {
-
-        if (ImGui::MenuItem("New", "Crtl N"))
-          if (state.New())
-            window.Quit();
-
-        if (ImGui::MenuItem("Open", "Crtl O"))
-          if (state.Open())
-            window.Quit();
-
-        if (ImGui::BeginMenu("Recent")) {
-
-          for (const auto &project : state.GetRecentProjects()) {
-            std::filesystem::path filePath = project;
-            if (ImGui::MenuItem(Ellipsize(RelativeHomePath(project), 400,
-                                          EllipsizeType::START)
-                                    .c_str())) {
-              state.Open(project);
-              window.Quit();
-            }
-          }
-
-          ImGui::EndMenu();
-        }
-
-        ImGui::Separator();
-
-        if (ImGui::MenuItem("Save", "Crtl S"))
-          state.Save();
-
-        if (ImGui::MenuItem("Save As", "Shift Crtl S"))
-          state.SaveAs();
-
-        ImGui::Separator();
-
-        if (ImGui::MenuItem("Quit", "Crtl Q")) {
-          window.Quit();
-          state.Quit();
-        }
-
-        ImGui::EndMenu();
-      }
-    });
-
-    if (!initialized)
+    if (!initialized) {
+      Window::RegisterShortcut({
+          .key = ImGuiKey_Escape,
+          .callback =
+              [&state](Window *window) {
+                window->Quit();
+                state.Quit();
+              },
+      });
       window.PushLayer<InitializeLayer>(&state);
-    else {
+    } else {
       window.PushLayer(state.Register(std::make_shared<ViewportLayer>(&state)));
-      window.PushLayer(state.Register(std::make_shared<HierarchyLayer>(&state)));
+      window.PushLayer(
+          state.Register(std::make_shared<HierarchyLayer>(&state)));
       window.PushLayer(state.Register(std::make_shared<AssetLayer>(&state)));
       state.Restore();
     }
