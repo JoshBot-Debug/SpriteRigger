@@ -57,7 +57,7 @@ void Window::Run() {
 
   auto &shortcutManager = ShortcutManager::Instance();
 
-  while (m_Running) {
+  while (!glfwWindowShouldClose(s_Window) && m_Running) {
 
     glfwPollEvents();
 
@@ -221,8 +221,6 @@ void Window::GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
 Window::Window(const Window::Options &options) : m_Options(options) {
   ShortcutManager::Instance().SetWindow(this);
 
-  glfwSetErrorCallback(ErrorCallback);
-
   if (!glfwInit())
     std::cerr << "GLFW initialization failed!" << std::endl;
 
@@ -236,11 +234,10 @@ Window::Window(const Window::Options &options) : m_Options(options) {
   glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-  if (!options.enableTitleBar)
-    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+  glfwWindowHint(GLFW_DECORATED,
+                 options.enableTitleBar ? GLFW_TRUE : GLFW_FALSE);
 
-  if (options.MSAA)
-    glfwWindowHint(GLFW_SAMPLES, options.MSAA);
+  glfwWindowHint(GLFW_SAMPLES, options.MSAA);
 
   const GLFWvidmode *screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
@@ -263,10 +260,6 @@ Window::Window(const Window::Options &options) : m_Options(options) {
   std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
   glfwSetFramebufferSizeCallback(s_Window, SetFrameBufferSize);
-
-  int w = 0, h = 0;
-  glfwGetFramebufferSize(s_Window, &w, &h);
-  glViewport(0, 0, w, h);
 
   glDebug();
 
@@ -346,6 +339,7 @@ Window::~Window() {
   m_Layers.clear();
   s_Fonts.clear();
   m_Menubar = nullptr;
+  ShortcutManager::Instance().Free();
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
@@ -356,6 +350,4 @@ Window::~Window() {
 
   s_Window = nullptr;
   s_Scroll = glm::vec2(0.0f);
-
-  ShortcutManager::Instance().Free();
 }

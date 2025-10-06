@@ -138,7 +138,6 @@ int main(int argc, char **argv) {
 
     glfwSetWindowCloseCallback(Window::GetWindow(), [](GLFWwindow *window) {
       auto *state = static_cast<State *>(glfwGetWindowUserPointer(window));
-      state->Save();
       state->Quit();
     });
 
