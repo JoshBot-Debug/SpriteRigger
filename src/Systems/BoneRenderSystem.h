@@ -21,15 +21,14 @@
 const std::string EXE_DIRECTORY = GetExecutableDirectory();
 
 class BoneRenderSystem : public ECS::System {
-public:
+private:
   GLuint m_VAO, m_VBO;
-
   Shader *m_Shader;
   ECS::Registry *m_Registry;
   OrthographicCamera *m_Camera;
-
   std::vector<CBone> m_Buffer;
 
+public:
   void OnAttach(ECS::Registry *registry, Shader *shader,
                 OrthographicCamera *camera) {
     m_Registry = registry;
