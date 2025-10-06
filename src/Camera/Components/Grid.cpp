@@ -56,13 +56,13 @@ void Grid::Render(ImVec2 viewportSize, ImVec2 viewportMin) {
     ImGui::PushFont(m_Font, m_FontSize);
 
     ImGui::SetCursorScreenPos(
-        ImVec2(viewportMin.x + 16.0f, viewportMin.y + 16.0f));
+        ImVec2(viewportMin.x + 16.0f + 4.0f, viewportMin.y + 16.0f + 4.0f));
 
     ImGui::Text("Camera (%.2f, %.2f, %.2f)", m_Camera->Position.x,
                 m_Camera->Position.y, m_Camera->Zoom);
 
     ImVec2 cursor = ImGui::GetCursorScreenPos();
-    ImGui::SetCursorScreenPos(ImVec2(cursor.x + 16.0f, cursor.y));
+    ImGui::SetCursorScreenPos(ImVec2(cursor.x + 16.0f + 4.0f, cursor.y + 4.0f));
     ImGui::Text("Mouse (%.2f, %.2f)", m_Mouse.x, m_Mouse.y);
 
     ImGui::PopFont();
