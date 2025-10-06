@@ -21,11 +21,6 @@ public:
     return system;
   }
 
-  void Update() {
-    for (auto &[id, system] : m_Systems)
-      system->Update();
-  }
-
   template <typename T> void Update() {
     m_Systems.at(typeid(T))->Update();
   }
