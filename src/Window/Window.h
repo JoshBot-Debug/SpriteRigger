@@ -48,7 +48,7 @@ private:
 
   bool m_Running = false;
 
-  double m_TimeStep = 0.0;
+  static inline double s_TimeStep = 0.0;
   double m_FrameTime = 0.0;
   double m_LastFrameTime = 0.0;
 
@@ -114,6 +114,8 @@ public:
   };
 
   static void Shutdown() { glfwTerminate(); }
+
+  static double GetDeltaTime() { return s_TimeStep; };
 };
 
 inline ImVec2 operator+(const ImVec2 &lhs, const ImVec2 &rhs) {

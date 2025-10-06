@@ -1,7 +1,6 @@
 #include "ViewportLayer.h"
 
 #include "Application/Components.h"
-#include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 #include "Utility.h"
@@ -15,6 +14,8 @@ ViewportLayer::ViewportLayer(State *state)
     : m_State(state), m_Grid(&m_Camera) {}
 
 void ViewportLayer::OnAttach() {
+  m_Registry = ServiceLocator::Get<Registry>();
+
   m_Shader.create({
       .name = "default",
       .vertex = (EXE_DIRECTORY + "/../src/Assets/Shaders/bone.vert").c_str(),
@@ -71,22 +72,35 @@ void ViewportLayer::OnAttach() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void ViewportLayer::OnUpdate(float deltaTime) {
+void ViewportLayer::OnUpdate() {
+
+  float deltaTime = static_cast<float>(Window::GetDeltaTime());
+  float animationSpeed = 6.0f;
+
+  m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
+  m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
+
   // Update the instance buffer
-  {
-    auto registry = ServiceLocator::Get<Registry>();
+  if (m_Registry->HasChanged<CBone>()) {
+    m_Registry->ClearChanged<CBone>();
+  }
 
-    if (!registry->HasChanged<CBone>())
-      return;
+  const ImVec2 &mouse = m_Grid.GetMouseCoords();
 
-    registry->ClearChanged<CBone>();
+  auto bones = m_Registry->Get<CBone>();
 
-    std::vector<CBone *> bones = registry->Get<CBone>();
+  m_Bones.clear();
+  m_Bones.reserve(bones.size());
 
-    m_Bones.resize(bones.size());
+  for (auto b : bones) {
+    if (b->Intersects(mouse.x, mouse.y))
+      b->color = glm::mix(b->color, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
+                          animationSpeed * deltaTime);
+    else
+      b->color =
+          glm::mix(b->color, glm::vec4(1.0f), animationSpeed * deltaTime);
 
-    for (auto &bone : bones)
-      m_Bones.emplace_back(*bone);
+    m_Bones.emplace_back(*b);
   }
 }
 
@@ -97,24 +111,23 @@ void ViewportLayer::OnRender() {
 
   ImVec2 viewport = ImGui::GetContentRegionAvail();
   ImVec2 windowPosition = ImGui::GetWindowPos();
-  ImVec2 viewportMin = windowPosition + ImGui::GetWindowContentRegionMin();
-  ImVec2 viewportMax = windowPosition + ImGui::GetWindowContentRegionMax();
 
-  m_Grid.Update(viewport, viewportMin, viewportMax);
-  m_Camera.OnResize((uint32_t)viewport.x, (uint32_t)viewport.y);
-  m_Camera.Update();
+  m_Viewport.min = windowPosition + ImGui::GetWindowContentRegionMin();
+  m_Viewport.max = windowPosition + ImGui::GetWindowContentRegionMax();
+
+  OnUpdate();
 
   // Draw instances
   {
-    if (m_FrameBuffer == 0 || viewport != m_ViewportSize) {
+    if (m_FrameBuffer == 0 || viewport != m_Viewport.size) {
       Window::GenerateFrameBuffer(viewport, m_FrameBuffer, m_DepthBuffer,
                                   m_ColorAttachment);
-
       glViewport(0, 0, (GLsizei)viewport.x, (GLsizei)viewport.y);
+      m_Viewport.size = viewport;
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
@@ -134,11 +147,11 @@ void ViewportLayer::OnRender() {
     m_Shader.unbind();
     glBindVertexArray(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    ImGui::Image((void *)(intptr_t)m_ColorAttachment, viewport);
   }
 
-  m_Grid.Render(viewport, viewportMin);
+  m_Grid.Render(m_Viewport.size, m_Viewport.min);
+  ImGui::SetCursorScreenPos(m_Viewport.min);
+  ImGui::Image((void *)(intptr_t)m_ColorAttachment, m_Viewport.size);
 
   ImGui::End();
 }

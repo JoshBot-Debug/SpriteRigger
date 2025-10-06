@@ -1,7 +1,12 @@
 #include "OrthographicCamera.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-void OrthographicCamera::Update() {
+void OrthographicCamera::Update() { Update(ViewportWidth, ViewportHeight); }
+
+void OrthographicCamera::Update(uint32_t width, uint32_t height) {
+  ViewportWidth = width;
+  ViewportHeight = height;
+
   Aspect = (float)ViewportWidth / (float)ViewportHeight;
 
   m_Projection =

@@ -33,6 +33,8 @@ private:
   /// Color of origin (x=0, y=0) grid lines.
   ImU32 m_AxisColor = IM_COL32(200, 200, 200, 200);
 
+  ImVec2 m_Mouse = ImVec2(0,0);
+
 public:
   /**
    * @param camera Pointer to an OrthographicCamera instance.
@@ -90,4 +92,6 @@ public:
     m_LineColor = gridColor;
     m_AxisColor = gridOriginColor;
   };
+
+  const ImVec2 &GetMouseCoords() const { return m_Mouse; };
 };

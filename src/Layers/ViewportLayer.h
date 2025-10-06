@@ -4,18 +4,28 @@
 
 #include "Window/Window.h"
 
+#include "ECS/Entity.h"
 #include "SerializableLayer.h"
 #include "Shader/Shader.h"
 #include "State.h"
 
 #include "Application/Components.h"
-#include "Camera/OrthographicCamera.h"
 #include "Camera/Components/Grid.h"
+#include "Camera/OrthographicCamera.h"
 #include <vector>
+
+#include <memory>
+
+struct Viewport {
+  ImVec2 size{0, 0};
+  ImVec2 min{0, 0};
+  ImVec2 max{0, 0};
+};
 
 class ViewportLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
+  std::shared_ptr<Registry> m_Registry = nullptr;
 
   Shader m_Shader;
 
@@ -28,10 +38,10 @@ private:
 
   std::vector<CBone> m_Bones;
 
-  ImVec2 m_ViewportSize{0, 0};
+  Viewport m_Viewport;
 
   OrthographicCamera m_Camera;
-  
+
   Grid m_Grid;
 
 public:
@@ -39,7 +49,7 @@ public:
 
   virtual void OnAttach() override;
 
-  virtual void OnUpdate(float deltaTime) override;
+  void OnUpdate();
 
   virtual void OnRender() override;
 

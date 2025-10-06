@@ -1,5 +1,6 @@
 #include "Grid.h"
 
+#include <iostream>
 #include <stdio.h>
 
 Grid::Grid(OrthographicCamera *camera) : m_Camera(camera) {}
@@ -47,12 +48,11 @@ void Grid::Render(ImVec2 viewportSize, ImVec2 viewportMin) {
     ImVec2 mouseScreen = ImGui::GetMousePos();
     ImVec2 mouseInViewport =
         ImVec2(mouseScreen.x - viewportMin.x, mouseScreen.y - viewportMin.y);
-    float mouseWorldX =
-        left + (mouseInViewport.x / viewportSize.x) * (right - left);
-    float mouseWorldY =
+
+    m_Mouse.x = left + (mouseInViewport.x / viewportSize.x) * (right - left);
+    m_Mouse.y =
         bottom + ((viewportSize.y - mouseInViewport.y) / viewportSize.y) *
                      (top - bottom);
-
     ImGui::PushFont(m_Font, m_FontSize);
 
     ImGui::SetCursorScreenPos(
@@ -63,7 +63,7 @@ void Grid::Render(ImVec2 viewportSize, ImVec2 viewportMin) {
 
     ImVec2 cursor = ImGui::GetCursorScreenPos();
     ImGui::SetCursorScreenPos(ImVec2(cursor.x + 16.0f, cursor.y));
-    ImGui::Text("Mouse (%.2f, %.2f)", mouseWorldX, mouseWorldY);
+    ImGui::Text("Mouse (%.2f, %.2f)", m_Mouse.x, m_Mouse.y);
 
     ImGui::PopFont();
   }

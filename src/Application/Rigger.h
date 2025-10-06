@@ -23,7 +23,7 @@ public:
 
     bone->start = glm::vec2(0.0f, -1.0f);
     bone->end = glm::vec2(0.0f, 1.0f);
-    bone->thickness = 0.1f;
+    bone->thickness = 0.2f;
 
     hierarchy->id = entity->GetId();
     hierarchy->parent = parent;

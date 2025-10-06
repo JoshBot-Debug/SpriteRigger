@@ -21,6 +21,7 @@ public:
   OrthographicCamera() = default;
 
   void Update();
+  void Update(uint32_t width, uint32_t height);
   bool OnResize(uint32_t width, uint32_t height);
 
   void SetPosition(float x, float y);

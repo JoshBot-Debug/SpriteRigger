@@ -69,7 +69,7 @@ void Window::Run() {
     }
 
     for (auto &layer : m_Layers)
-      layer->OnUpdate(m_TimeStep);
+      layer->OnUpdate(s_TimeStep);
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -140,7 +140,7 @@ void Window::Run() {
 
     double time = glfwGetTime();
     m_FrameTime = time - m_LastFrameTime;
-    m_TimeStep = glm::min<double>(m_FrameTime, 0.0333f);
+    s_TimeStep = glm::min<double>(m_FrameTime, 0.0333f);
     m_LastFrameTime = time;
     s_Scroll.x = 0.0f;
     s_Scroll.y = 0.0f;
