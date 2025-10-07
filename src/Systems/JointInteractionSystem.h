@@ -17,6 +17,10 @@ private:
   Grid *m_Grid = nullptr;
   ECS::Registry *m_Registry = nullptr;
 
+  glm::vec4 GetHighlightColor(bool intersects) {
+    return intersects ? glm::vec4(1.0f, 1.0f, 0.0f, 1.0f) : glm::vec4(1.0f);
+  }
+
 public:
   ~JointInteractionSystem() { m_Registry = nullptr; }
 
@@ -32,23 +36,18 @@ public:
     auto bones = m_Registry->Get<CBone>();
 
     for (auto b : bones) {
-      if (b->IntersectsJoint(b->start, mouse.x, mouse.y))
-        ECS::Mutate<CBone, glm::vec4>(
-            m_Registry, b->sColor,
-            glm::mix(b->sColor, glm::vec4(1, 1, 0, 1), m_Speed * deltaTime));
-      else
-        ECS::Mutate<CBone, glm::vec4>(
-            m_Registry, b->sColor,
-            glm::mix(b->sColor, glm::vec4(1.0f), m_Speed * deltaTime));
+      glm::vec4 startColor =
+          GetHighlightColor(b->IntersectsJoint(b->start, mouse.x, mouse.y));
+      glm::vec4 endColor =
+          GetHighlightColor(b->IntersectsJoint(b->end, mouse.x, mouse.y));
 
-      if (b->IntersectsJoint(b->end, mouse.x, mouse.y))
-        ECS::Mutate<CBone, glm::vec4>(
-            m_Registry, b->eColor,
-            glm::mix(b->eColor, glm::vec4(1, 1, 0, 1), m_Speed * deltaTime));
-      else
-        ECS::Mutate<CBone, glm::vec4>(
-            m_Registry, b->eColor,
-            glm::mix(b->eColor, glm::vec4(1.0f), m_Speed * deltaTime));
+      ECS::Mutate<CBone, glm::vec4>(
+          m_Registry, b->sColor,
+          glm::mix(b->sColor, startColor, m_Speed * deltaTime));
+
+      ECS::Mutate<CBone, glm::vec4>(
+          m_Registry, b->eColor,
+          glm::mix(b->eColor, endColor, m_Speed * deltaTime));
     }
   }
 };

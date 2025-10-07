@@ -62,7 +62,6 @@ void ViewportLayer::OnRender() {
   m_Grid.Render(m_Viewport.size, m_Viewport.min);
   ImGui::SetCursorScreenPos(m_Viewport.min);
   ImGui::Image((void *)(intptr_t)m_ColorAttachment, m_Viewport.size);
-
   ImGui::End();
 
   m_Registry->ClearChanged<CBone>();

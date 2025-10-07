@@ -11,8 +11,12 @@ out vec4 v_Color;
 uniform mat4 u_ViewProjection;
 
 void main(){
+  // Flip coords
+  vec2 inPos=a_Position;
+  inPos*=-1.;
+  
   float radius=a_BoneThickness;
-  vec2 pos=a_Position+a_Corner*radius;
+  vec2 pos=inPos+a_Corner*radius;
   gl_Position=u_ViewProjection*vec4(pos,0.,1.);
   v_UV=a_Corner;
   v_Color=a_Color;

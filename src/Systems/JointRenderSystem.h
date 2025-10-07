@@ -115,14 +115,14 @@ public:
 
       for (auto b : bones) {
         m_Buffer.emplace_back(Joint{
-            .position = b->end,
-            .boneThickness = b->thickness,
-            .color = b->eColor,
-        });
-        m_Buffer.emplace_back(Joint{
             .position = b->start,
             .boneThickness = b->thickness,
             .color = b->sColor,
+        });
+        m_Buffer.emplace_back(Joint{
+            .position = b->end,
+            .boneThickness = b->thickness,
+            .color = b->eColor,
         });
       }
 

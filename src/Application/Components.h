@@ -12,6 +12,10 @@ struct CBone {
   float thickness = 0.0f;
 
   bool Intersects(float x, float y) {
+
+    if (IntersectsJoint(start, x, y) || IntersectsJoint(end, x, y))
+      return false;
+
     glm::vec2 point(x, y);
     glm::vec2 dir = end - start;
     float lenSquared = glm::dot(dir, dir);
@@ -30,7 +34,7 @@ struct CBone {
   bool IntersectsJoint(glm::vec2 point, float x, float y) {
     float dx = point.x - x;
     float dy = point.y - y;
-    return (dx*dx + dy*dy) <= (thickness * thickness);
+    return (dx * dx + dy * dy) <= (thickness * thickness);
   }
 };
 
