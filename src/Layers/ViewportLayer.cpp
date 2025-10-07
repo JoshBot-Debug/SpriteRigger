@@ -39,7 +39,6 @@ void ViewportLayer::OnRender() {
   m_Viewport.min = windowPosition + ImGui::GetWindowContentRegionMin();
   m_Viewport.max = windowPosition + ImGui::GetWindowContentRegionMax();
 
-  // Update
   {
     m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
     m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
@@ -49,7 +48,6 @@ void ViewportLayer::OnRender() {
 
   ResizeFramebuffer(viewport);
 
-  // Render
   {
     glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
