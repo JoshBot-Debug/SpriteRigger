@@ -18,16 +18,23 @@
 
 #include "Camera/OrthographicCamera.h"
 
-class BoneRenderSystem : public ECS::System {
+class JointRenderSystem : public ECS::System {
+private:
+  struct Joint {
+    glm::vec2 position = glm::vec2(0.0f);
+    float boneThickness = 0.0f;
+    glm::vec4 color = glm::vec4(0.0f);
+  };
+
 private:
   GLuint m_VAO = 0, m_VBO = 0;
   Shader *m_Shader = nullptr;
   ECS::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
-  std::vector<CBone> m_Buffer;
+  std::vector<Joint> m_Buffer;
 
 public:
-  ~BoneRenderSystem() {
+  ~JointRenderSystem() {
     m_VAO = 0;
     m_VBO = 0;
     m_Shader = nullptr;
@@ -44,17 +51,22 @@ public:
     const std::string EXE_DIRECTORY = GetExecutableDirectory();
 
     m_Shader->create({
-        .name = "bone",
-        .vertex = (EXE_DIRECTORY + "/../src/Assets/Shaders/bone.vert").c_str(),
+        .name = "joint",
+        .vertex = (EXE_DIRECTORY + "/../src/Assets/Shaders/joint.vert").c_str(),
         .fragment =
-            (EXE_DIRECTORY + "/../src/Assets/Shaders/bone.frag").c_str(),
+            (EXE_DIRECTORY + "/../src/Assets/Shaders/joint.frag").c_str(),
     });
 
     // Create and bind the VAO
     glGenVertexArrays(1, &m_VAO);
     glBindVertexArray(m_VAO);
 
-    float quadVerts[8] = {0.0f, -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f};
+    float quadVerts[8] = {
+        -1.0f, -1.0f, // bottom-left
+        1.0f,  -1.0f, // bottom-right
+        -1.0f, 1.0f,  // top-left
+        1.0f,  1.0f   // top-right
+    };
 
     GLuint quadVBO;
     glGenBuffers(1, &quadVBO);
@@ -67,34 +79,28 @@ public:
                           (void *)0);
     glVertexAttribDivisor(0, 0);
 
-    // Now create the per-instance buffer (CBone instances)
+    // Now create the per-instance buffer (Joint instances)
     glGenBuffers(1, &m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
 
-    // layout(location = 1) in vec2 a_start;
+    // layout(location = 1) in vec2 a_position;
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(CBone),
-                          (void *)offsetof(CBone, start));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Joint),
+                          (void *)offsetof(Joint, position));
     glVertexAttribDivisor(1, 1);
 
-    // layout(location = 2) in vec2 a_end;
+    // layout(location = 2) in float a_boneThickness;
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(CBone),
-                          (void *)offsetof(CBone, end));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Joint),
+                          (void *)offsetof(Joint, boneThickness));
     glVertexAttribDivisor(2, 1);
 
-    // layout(location = 3) in float a_thickness;
+    // layout(location = 3) in vec4 a_color;
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(CBone),
-                          (void *)offsetof(CBone, thickness));
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Joint),
+                          (void *)offsetof(Joint, color));
     glVertexAttribDivisor(3, 1);
-
-    // layout(location = 4) in vec4 a_color;
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(CBone),
-                          (void *)offsetof(CBone, color));
-    glVertexAttribDivisor(4, 1);
 
     // Clean up
     glBindVertexArray(0);
@@ -104,17 +110,29 @@ public:
   void Update() override {
     if (m_Registry->HasChanged<CBone>()) {
       auto bones = m_Registry->Get<CBone>();
+
       m_Buffer.clear();
-      for (auto b : bones)
-        m_Buffer.emplace_back(*b);
+
+      for (auto b : bones) {
+        m_Buffer.emplace_back(Joint{
+            .position = b->end,
+            .boneThickness = b->thickness,
+            .color = b->eColor,
+        });
+        m_Buffer.emplace_back(Joint{
+            .position = b->start,
+            .boneThickness = b->thickness,
+            .color = b->sColor,
+        });
+      }
 
       glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-      glBufferData(GL_ARRAY_BUFFER, m_Buffer.size() * sizeof(CBone),
+      glBufferData(GL_ARRAY_BUFFER, m_Buffer.size() * sizeof(Joint),
                    m_Buffer.data(), GL_DYNAMIC_DRAW);
     }
 
     glBindVertexArray(m_VAO);
-    m_Shader->bind("bone");
+    m_Shader->bind("joint");
 
     m_Shader->setUniformMatrix4fv("u_ViewProjection",
                                   m_Camera->GetViewProjectionMatrix());

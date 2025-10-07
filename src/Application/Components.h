@@ -7,6 +7,8 @@ struct CBone {
   glm::vec2 start = glm::vec2(0.0f);
   glm::vec2 end = glm::vec2(0.0f);
   glm::vec4 color = glm::vec4(1.0f);
+  glm::vec4 sColor = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
+  glm::vec4 eColor = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
   float thickness = 0.0f;
 
   bool Intersects(float x, float y) {

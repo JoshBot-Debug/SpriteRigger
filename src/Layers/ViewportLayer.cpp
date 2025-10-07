@@ -19,14 +19,14 @@ void ViewportLayer::OnAttach() {
 
   m_BoneInteractionSystem = m_System->Register<BoneInteractionSystem>();
   m_BoneRenderSystem = m_System->Register<BoneRenderSystem>();
+  m_JointRenderSystem = m_System->Register<JointRenderSystem>();
 
-  m_BoneInteractionSystem->Initialize(m_Registry.get());
+  m_BoneInteractionSystem->Initialize(m_Registry.get(), &m_Grid);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
+  m_JointRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
 }
 
 void ViewportLayer::OnRender() {
-  float deltaTime = static_cast<float>(Window::GetDeltaTime());
-
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_None);
   ImGui::PopStyleVar();
@@ -39,9 +39,6 @@ void ViewportLayer::OnRender() {
 
   // Update
   {
-    m_BoneInteractionSystem->deltaTime = deltaTime;
-    m_BoneInteractionSystem->mouse = m_Grid.GetMouseCoords();
-
     m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
     m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
     m_System->Update<BoneInteractionSystem>();
@@ -55,6 +52,7 @@ void ViewportLayer::OnRender() {
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_System->Update<BoneRenderSystem>();
+    m_System->Update<JointRenderSystem>();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
 
@@ -63,6 +61,8 @@ void ViewportLayer::OnRender() {
   ImGui::Image((void *)(intptr_t)m_ColorAttachment, m_Viewport.size);
 
   ImGui::End();
+
+  m_Registry->ClearChanged<CBone>();
 }
 
 void ViewportLayer::OnDetach() { m_State = nullptr; }

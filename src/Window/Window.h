@@ -108,6 +108,11 @@ public:
   static void GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
                                   GLuint &depthBuffer, GLuint &colorAttachment);
 
+  static void GenerateMSAAFrameBuffer(const ImVec2 &viewport,
+                                      GLuint &frameBuffer,
+                                      GLuint &colorAttachment,
+                                      GLuint &depthBuffer, GLuint samples = 4);
+
   static void Init() {
     if (!glfwInit())
       throw std::runtime_error("GLFW initialization failed!");

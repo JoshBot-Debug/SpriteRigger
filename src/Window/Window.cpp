@@ -218,6 +218,43 @@ void Window::GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void Window::GenerateMSAAFrameBuffer(const ImVec2 &viewport,
+                                     GLuint &frameBuffer,
+                                     GLuint &colorAttachment,
+                                     GLuint &depthBuffer, GLuint samples) {
+
+  if (frameBuffer != 0)
+    glDeleteFramebuffers(1, &frameBuffer);
+  if (colorAttachment != 0)
+    glDeleteRenderbuffers(1, &colorAttachment);
+  if (depthBuffer != 0)
+    glDeleteRenderbuffers(1, &depthBuffer);
+
+  glGenFramebuffers(1, &frameBuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+  // Multi-sampled color renderbuffer
+  glGenRenderbuffers(1, &colorAttachment);
+  glBindRenderbuffer(GL_RENDERBUFFER, colorAttachment);
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8,
+                                   viewport.x, viewport.y);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                            GL_RENDERBUFFER, colorAttachment);
+
+  // Multi-sampled depth/stencil renderbuffer
+  glGenRenderbuffers(1, &depthBuffer);
+  glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples,
+                                   GL_DEPTH24_STENCIL8, viewport.x, viewport.y);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+                            GL_RENDERBUFFER, depthBuffer);
+
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    std::cerr << "MSAA Framebuffer not complete!" << std::endl;
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 Window::Window(const Window::Options &options) : m_Options(options) {
   ShortcutManager::Instance().SetWindow(this);
 

@@ -19,6 +19,7 @@
 
 #include "Systems/BoneInteractionSystem.h"
 #include "Systems/BoneRenderSystem.h"
+#include "Systems/JointRenderSystem.h"
 
 #include "SerializableLayer.h"
 #include "State.h"
@@ -32,6 +33,7 @@ private:
 
   std::shared_ptr<BoneInteractionSystem> m_BoneInteractionSystem = nullptr;
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
+  std::shared_ptr<JointRenderSystem> m_JointRenderSystem = nullptr;
 
   GLuint m_FrameBuffer = 0;
   GLuint m_ColorAttachment = 0;
