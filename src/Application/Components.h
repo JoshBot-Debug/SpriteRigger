@@ -12,7 +12,6 @@ struct CBone {
   float thickness = 0.0f;
 
   bool Intersects(float x, float y) {
-
     if (IntersectsJoint(start, x, y) || IntersectsJoint(end, x, y))
       return false;
 
