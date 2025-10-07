@@ -39,6 +39,10 @@ public:
     ImGuiIO &io = ImGui::GetIO();
     float deltaTime = static_cast<float>(Window::GetDeltaTime());
     ImVec2 mouse = m_Grid->GetMouseCoords();
+    float deltaMouseX =
+        io.MouseDelta.x * m_Camera->Zoom * 2.0f / viewportSize.x;
+    float deltaMouseY =
+        -io.MouseDelta.y * m_Camera->Zoom * 2.0f / viewportSize.y;
 
     auto bones = m_Registry->Get<CBone>();
 
@@ -47,15 +51,14 @@ public:
       bool intersectsEnd = b->IntersectsJoint(b->end, mouse.x, mouse.y);
 
       if (intersectsStart && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-        float dx = io.MouseDelta.x * m_Camera->Zoom * 2.0f / viewportSize.x;
-        float dy = -io.MouseDelta.y * m_Camera->Zoom * 2.0f / viewportSize.y;
-        ECS::Mutate<CBone, glm::vec2>(m_Registry, b->start, b->start+glm::vec2(dx, dy));
+        ECS::Mutate<CBone, glm::vec2>(m_Registry, b->start,
+                                      b->start +
+                                          glm::vec2(deltaMouseX, deltaMouseY));
       }
 
       if (intersectsEnd && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-        float dx = io.MouseDelta.x * m_Camera->Zoom * 2.0f / viewportSize.x;
-        float dy = -io.MouseDelta.y * m_Camera->Zoom * 2.0f / viewportSize.y;
-        ECS::Mutate<CBone, glm::vec2>(m_Registry, b->end, b->start+glm::vec2(dx, dy));
+        ECS::Mutate<CBone, glm::vec2>(
+            m_Registry, b->end, b->end + glm::vec2(deltaMouseX, deltaMouseY));
       }
 
       glm::vec4 startColor = GetHighlightColor(intersectsStart);
