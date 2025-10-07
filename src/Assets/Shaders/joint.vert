@@ -11,7 +11,7 @@ out vec4 v_Color;
 uniform mat4 u_ViewProjection;
 
 void main(){
-  float radius=a_BoneThickness*.75;
+  float radius=a_BoneThickness;
   vec2 pos=a_Position+a_Corner*radius;
   gl_Position=u_ViewProjection*vec4(pos,0.,1.);
   v_UV=a_Corner;

@@ -20,10 +20,12 @@ void ViewportLayer::OnAttach() {
   m_BoneInteractionSystem = m_System->Register<BoneInteractionSystem>();
   m_BoneRenderSystem = m_System->Register<BoneRenderSystem>();
   m_JointRenderSystem = m_System->Register<JointRenderSystem>();
+  m_JointInteractionSystem = m_System->Register<JointInteractionSystem>();
 
   m_BoneInteractionSystem->Initialize(m_Registry.get(), &m_Grid);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
   m_JointRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
+  m_JointInteractionSystem->Initialize(m_Registry.get(), &m_Grid);
 }
 
 void ViewportLayer::OnRender() {
@@ -42,6 +44,7 @@ void ViewportLayer::OnRender() {
     m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
     m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
     m_System->Update<BoneInteractionSystem>();
+    m_System->Update<JointInteractionSystem>();
   }
 
   ResizeFramebuffer(viewport);

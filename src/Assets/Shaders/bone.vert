@@ -22,7 +22,7 @@ void main(){
   float t=a_Corner.x;
   
   // offset across thickness; a_Corner.y is -1 or +1
-  float halfThick=a_Thickness*.75;
+  float halfThick=a_Thickness*.5;
   vec2 pos=mix(a_Start,a_End,t)+perp*(a_Corner.y*halfThick);
   
   gl_Position=u_ViewProjection*vec4(pos,0.,1.);
