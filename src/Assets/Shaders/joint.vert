@@ -13,7 +13,7 @@ uniform mat4 u_ViewProjection;
 void main(){
   // Flip coords
   vec2 inPos=a_Position;
-  inPos*=-1.;
+  inPos.y*=-1.;
   
   float radius=a_BoneThickness;
   vec2 pos=inPos+a_Corner*radius;
