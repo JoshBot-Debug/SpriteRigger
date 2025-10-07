@@ -26,12 +26,10 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
 message(STATUS "OPENGL_LIBRARIES = ${OPENGL_LIBRARIES}")
-message(STATUS "GLFW3_LIBRARIES = ${GLFW3_LIBRARIES}")
 
 # === Libraries ===
 target_link_libraries(SpriteRigger PRIVATE
   ${OPENGL_LIBRARIES}
-  ${GLFW3_LIBRARIES}
   imgui
   tinyfiledialogs
 )
@@ -81,12 +79,13 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       message(STATUS "Using AddressSanitizer + UndefinedBehaviorSanitizer.")
     endif()
 
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 ${SANITIZE_FLAGS}")
+    set(CMAKE_CXX_FLAGS_DEBUG "${SANITIZE_FLAGS}")
     set(CMAKE_LINKER_FLAGS_DEBUG "${SANITIZE_FLAGS}")
   else()
-    message(STATUS "Debug is ENABLED.")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
   endif()
+
+  message(STATUS "Debug is ENABLED.")
+  set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 endif()
 
 # === Release Configuration ===
