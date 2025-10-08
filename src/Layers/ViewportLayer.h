@@ -19,7 +19,6 @@
 
 #include "Systems/BoneRenderSystem.h"
 #include "Systems/HoverSystem.h"
-#include "Systems/JointRenderSystem.h"
 #include "Systems/Common.h"
 
 #include "SerializableLayer.h"
@@ -33,8 +32,6 @@ private:
   std::shared_ptr<ECS::SystemManager> m_System = nullptr;
 
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
-  std::shared_ptr<JointRenderSystem> m_JointRenderSystem = nullptr;
-
   std::shared_ptr<HoverSystem> m_HoverSystem = nullptr;
 
   SystemData m_SystemData;

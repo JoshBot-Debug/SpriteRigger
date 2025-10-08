@@ -17,6 +17,7 @@
 #include "Utility.h"
 
 #include "Camera/OrthographicCamera.h"
+#include "Common.h"
 
 class BoneRenderSystem : public ECS::System {
 private:
@@ -35,6 +36,35 @@ private:
   ECS::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
   std::vector<Bone> m_Buffer;
+
+private:
+  void UpdateColor(ECS::Registry *registry, CBone *bone, CHovered *hovered,
+                   float deltaTime) {
+    auto &c = bone->color;
+    auto &s = bone->joints[CBone::StartJoint].color;
+    auto &e = bone->joints[CBone::EndJoint].color;
+
+    auto ch = Colors::DEFAULT;
+    auto sh = Colors::DEFAULT;
+    auto eh = Colors::DEFAULT;
+
+    if (hovered && hovered->target == CBone::StartJoint)
+      sh = Colors::HIGHLIGHT;
+    else if (hovered && hovered->target == CBone::EndJoint)
+      eh = Colors::HIGHLIGHT;
+    else if (hovered && hovered->target == CBone::Shaft) {
+      ch = Colors::HIGHLIGHT;
+      sh = Colors::HIGHLIGHT;
+      eh = Colors::HIGHLIGHT;
+    }
+
+    ECS::Mutate<CBone, glm::vec4>(registry, c,
+                                  glm::mix(c, ch, ANIMATION_SPEED * deltaTime));
+    ECS::Mutate<CBone, glm::vec4>(registry, s,
+                                  glm::mix(s, sh, ANIMATION_SPEED * deltaTime));
+    ECS::Mutate<CBone, glm::vec4>(registry, e,
+                                  glm::mix(e, eh, ANIMATION_SPEED * deltaTime));
+  }
 
 public:
   ~BoneRenderSystem() {
@@ -123,19 +153,29 @@ public:
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
 
-  void Update(void *data) override {
-    if (m_Registry->AnyChanged<CBone>()) {
-      auto bones = m_Registry->Get<CBone>();
+  void Update(void *d) override {
+    auto data = reinterpret_cast<SystemData *>(d);
+
+    if (m_Registry->AnyChanged<CBone, CHovered>()) {
       m_Buffer.clear();
-      for (auto b : bones)
-        m_Buffer.emplace_back(Bone{
-            .color = b->color,
-            .start = b->joints[CBone::StartJoint].position,
-            .end = b->joints[CBone::EndJoint].position,
-            .sColor = b->joints[CBone::StartJoint].color,
-            .eColor = b->joints[CBone::EndJoint].color,
-            .thickness = b->thickness,
-        });
+
+      auto [cBoneC, cHoveredC] = m_Registry->HasChanged<CBone, CHovered>();
+
+      for (auto entity : m_Registry->GetEntities("bone")) {
+        Bone &buffer = m_Buffer.emplace_back();
+
+        auto bone = entity->Get<CBone>();
+        auto hovered = entity->Get<CHovered>();
+
+        UpdateColor(m_Registry, bone, hovered, data->deltaTime);
+
+        buffer.color = bone->color;
+        buffer.start = bone->joints[CBone::StartJoint].position;
+        buffer.end = bone->joints[CBone::EndJoint].position;
+        buffer.sColor = bone->joints[CBone::StartJoint].color;
+        buffer.eColor = bone->joints[CBone::EndJoint].color;
+        buffer.thickness = bone->thickness;
+      }
 
       glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
       glBufferData(GL_ARRAY_BUFFER, m_Buffer.size() * sizeof(CBone),

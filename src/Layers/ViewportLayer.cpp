@@ -19,10 +19,8 @@ void ViewportLayer::OnAttach() {
 
   m_HoverSystem = m_System->Register<HoverSystem>();
   m_BoneRenderSystem = m_System->Register<BoneRenderSystem>();
-  m_JointRenderSystem = m_System->Register<JointRenderSystem>();
 
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
-  m_JointRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
   m_HoverSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
 }
 
@@ -58,8 +56,7 @@ void ViewportLayer::OnRender() {
     glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_System->Update<BoneRenderSystem>();
-    // m_System->Update<JointRenderSystem>();
+    m_System->Update<BoneRenderSystem>(&m_SystemData);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
 

@@ -45,14 +45,11 @@ public:
 
   void Update(void *d) override {
     auto data = reinterpret_cast<SystemData *>(d);
-
     glm::vec2 mouse = glm::vec2(data->mouse.x, data->mouse.y);
-    float lerp = ANIMATION_SPEED * data->deltaTime;
 
     auto bones = m_Registry->GetEntities("bone");
 
     for (auto bone : bones) {
-
       auto cBone = bone->Get<CBone>();
 
       CBone::Part part = HoveredPart(cBone, mouse);
@@ -66,17 +63,6 @@ public:
           bone->Add<CHovered>();
       } else
         bone->Free<CHovered>();
-
-      // auto &start = bone->joints[CBone::StartJoint];
-      // auto &end = bone->joints[CBone::EndJoint];
-
-      // bool sji = Intersect::Circle(mouse, start.position, bone->thickness);
-      // bool eji = Intersect::Circle(mouse, end.position, bone->thickness);
-      // bool li =
-      //     !sji && !eji &&
-      //     Intersect::Line(mouse, start.position, end.position,
-      //     bone->thickness);
-
     }
   }
 };
