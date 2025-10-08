@@ -33,6 +33,7 @@ private:
     return CBone::Part::None;
   }
 
+  // May want to create a ColorInterpolatingSystem to interpolate colors
   void UpdateColor(ECS::Registry *registry, CBone *bone, CHovered *hovered,
                    float deltaTime) {
     auto &c = bone->color;
