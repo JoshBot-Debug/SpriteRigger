@@ -60,8 +60,8 @@ public:
         if (cHovered)
           cHovered->target = part;
         else
-          bone->Add<CHovered>();
-      } else
+          bone->Add<CHovered>(part);
+      } else if (cHovered)
         bone->Free<CHovered>();
     }
   }

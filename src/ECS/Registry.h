@@ -220,7 +220,7 @@ public:
    * @return true if the component type T is marked as changed, false otherwise.
    */
   template <typename... T> bool AnyChanged() {
-    return ((m_Dirty.contains(typeid(T)) && m_Dirty.at(typeid(T))), ...);
+    return ((m_Dirty.find(typeid(T)) != m_Dirty.end() && m_Dirty[typeid(T)]) || ...);
   }
 
   /**
@@ -233,7 +233,7 @@ public:
    */
   template <typename... T> auto HasChanged() {
     return std::make_tuple(
-        (m_Dirty.contains(typeid(T)) && m_Dirty.at(typeid(T)))...);
+        (m_Dirty.find(typeid(T)) != m_Dirty.end() && m_Dirty[typeid(T)])...);
   }
 
   /**
@@ -241,6 +241,16 @@ public:
    *
    * @tparam T Component type to reset.
    */
-  template <typename T> void ClearChanged() { m_Dirty[typeid(T)] = false; }
+  template <typename... T> void ClearChanged() {
+    ((m_Dirty[typeid(T)] = false), ...);
+  }
+
+  /**
+   * @brief Clear the "changed" flag for a all component types.
+   */
+  void ClearChanged() {
+    for (auto &[i, dirty] : m_Dirty)
+      dirty = false;
+  }
 };
 } // namespace ECS

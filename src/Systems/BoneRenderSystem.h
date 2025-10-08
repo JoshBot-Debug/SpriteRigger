@@ -58,12 +58,15 @@ private:
       eh = Colors::HIGHLIGHT;
     }
 
-    ECS::Mutate<CBone, glm::vec4>(registry, c,
-                                  glm::mix(c, ch, ANIMATION_SPEED * deltaTime));
-    ECS::Mutate<CBone, glm::vec4>(registry, s,
-                                  glm::mix(s, sh, ANIMATION_SPEED * deltaTime));
-    ECS::Mutate<CBone, glm::vec4>(registry, e,
-                                  glm::mix(e, eh, ANIMATION_SPEED * deltaTime));
+    if (ECS::Mutate<CBone, glm::vec4>(
+            registry, c, glm::mix(c, ch, ANIMATION_SPEED * deltaTime)) &&
+        ECS::Mutate<CBone, glm::vec4>(
+            registry, s, glm::mix(s, sh, ANIMATION_SPEED * deltaTime)) &&
+        ECS::Mutate<CBone, glm::vec4>(
+            registry, e, glm::mix(e, eh, ANIMATION_SPEED * deltaTime))) {
+      if (!hovered)
+        m_Registry->ClearChanged<CHovered>();
+    }
   }
 
 public:
@@ -157,6 +160,8 @@ public:
     auto data = reinterpret_cast<SystemData *>(d);
 
     if (m_Registry->AnyChanged<CBone, CHovered>()) {
+      m_Registry->ClearChanged<CBone>();
+
       m_Buffer.clear();
 
       auto [cBoneC, cHoveredC] = m_Registry->HasChanged<CBone, CHovered>();
