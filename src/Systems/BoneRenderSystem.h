@@ -20,11 +20,21 @@
 
 class BoneRenderSystem : public ECS::System {
 private:
+  struct Bone {
+    glm::vec4 color = glm::vec4(0.0f);
+    glm::vec2 start = glm::vec2(0.0f);
+    glm::vec2 end = glm::vec2(0.0f);
+    glm::vec4 sColor = glm::vec4(0.0f);
+    glm::vec4 eColor = glm::vec4(0.0f);
+    float thickness = 0.0f;
+  };
+
+private:
   GLuint m_VAO = 0, m_VBO = 0;
   Shader *m_Shader = nullptr;
   ECS::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
-  std::vector<CBone> m_Buffer;
+  std::vector<Bone> m_Buffer;
 
 public:
   ~BoneRenderSystem() {
@@ -74,39 +84,58 @@ public:
 
     // layout(location = 1) in vec2 a_start;
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(CBone),
-                          (void *)offsetof(CBone, start));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Bone),
+                          (void *)offsetof(Bone, start));
     glVertexAttribDivisor(1, 1);
 
     // layout(location = 2) in vec2 a_end;
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(CBone),
-                          (void *)offsetof(CBone, end));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Bone),
+                          (void *)offsetof(Bone, end));
     glVertexAttribDivisor(2, 1);
 
     // layout(location = 3) in float a_thickness;
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(CBone),
-                          (void *)offsetof(CBone, thickness));
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Bone),
+                          (void *)offsetof(Bone, thickness));
     glVertexAttribDivisor(3, 1);
 
     // layout(location = 4) in vec4 a_color;
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(CBone),
-                          (void *)offsetof(CBone, color));
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Bone),
+                          (void *)offsetof(Bone, color));
     glVertexAttribDivisor(4, 1);
+
+    // layout(location = 5) in vec4 a_sColor;
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Bone),
+                          (void *)offsetof(Bone, sColor));
+    glVertexAttribDivisor(5, 1);
+
+    // layout(location = 6) in vec4 a_sColor;
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Bone),
+                          (void *)offsetof(Bone, eColor));
+    glVertexAttribDivisor(6, 1);
 
     // Clean up
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
 
-  void Update() override {
-    if (m_Registry->HasChanged<CBone>()) {
+  void Update(void *data) override {
+    if (m_Registry->AnyChanged<CBone>()) {
       auto bones = m_Registry->Get<CBone>();
       m_Buffer.clear();
       for (auto b : bones)
-        m_Buffer.emplace_back(*b);
+        m_Buffer.emplace_back(Bone{
+            .color = b->color,
+            .start = b->joints[CBone::StartJoint].position,
+            .end = b->joints[CBone::EndJoint].position,
+            .sColor = b->joints[CBone::StartJoint].color,
+            .eColor = b->joints[CBone::EndJoint].color,
+            .thickness = b->thickness,
+        });
 
       glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
       glBufferData(GL_ARRAY_BUFFER, m_Buffer.size() * sizeof(CBone),

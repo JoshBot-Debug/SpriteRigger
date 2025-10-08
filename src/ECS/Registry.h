@@ -213,13 +213,14 @@ public:
   template <typename T> void MarkChanged() { m_Dirty[typeid(T)] = true; }
 
   /**
-   * @brief Check whether a specific component type has been marked as changed.
+   * @brief Check whether any specific component type has been marked as
+   * changed.
    *
    * @tparam T Component type to query.
    * @return true if the component type T is marked as changed, false otherwise.
    */
-  template <typename T> bool HasChanged() {
-    return m_Dirty.contains(typeid(T)) && m_Dirty.at(typeid(T));
+  template <typename... T> bool AnyChanged() {
+    return ((m_Dirty.contains(typeid(T)) && m_Dirty.at(typeid(T))), ...);
   }
 
   /**
@@ -230,10 +231,9 @@ public:
    *
    * @return std::tuple<bool, bool, ...> with one entry per queried type.
    */
-  template <typename T, typename U, typename... Rest>
-  std::tuple<bool> HasChanged() {
-    return std::tuple_cat(std::make_tuple(HasChanged<T>()),
-                          HasChanged<U, Rest...>());
+  template <typename... T> auto HasChanged() {
+    return std::make_tuple(
+        (m_Dirty.contains(typeid(T)) && m_Dirty.at(typeid(T)))...);
   }
 
   /**

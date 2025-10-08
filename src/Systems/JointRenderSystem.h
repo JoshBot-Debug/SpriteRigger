@@ -21,9 +21,9 @@
 class JointRenderSystem : public ECS::System {
 private:
   struct Joint {
+    glm::vec4 color = glm::vec4(0.0f);
     glm::vec2 position = glm::vec2(0.0f);
     float boneThickness = 0.0f;
-    glm::vec4 color = glm::vec4(0.0f);
   };
 
 private:
@@ -107,24 +107,21 @@ public:
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
 
-  void Update() override {
-    if (m_Registry->HasChanged<CBone>()) {
+  void Update(void *data) override {
+    auto [cBoneC, cHoveredC] = m_Registry->HasChanged<CBone, CHovered>();
+
+    if (cBoneC) {
       auto bones = m_Registry->Get<CBone>();
 
       m_Buffer.clear();
 
-      for (auto b : bones) {
-        m_Buffer.emplace_back(Joint{
-            .position = b->start,
-            .boneThickness = b->thickness,
-            .color = b->sColor,
-        });
-        m_Buffer.emplace_back(Joint{
-            .position = b->end,
-            .boneThickness = b->thickness,
-            .color = b->eColor,
-        });
-      }
+      for (auto b : bones)
+        for (auto j : b->joints)
+          m_Buffer.emplace_back(Joint{
+              .color = j.color,
+              .position = j.position,
+              .boneThickness = b->thickness,
+          });
 
       glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
       glBufferData(GL_ARRAY_BUFFER, m_Buffer.size() * sizeof(Joint),

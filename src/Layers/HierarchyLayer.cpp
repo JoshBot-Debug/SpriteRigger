@@ -93,7 +93,7 @@ void HierarchyLayer::OnAttach() {
 void HierarchyLayer::OnUpdate(float deltaTime) {
   auto registry = ServiceLocator::Get<ECS::Registry>();
 
-  if (registry->HasChanged<CHierarchy>()) {
+  if (registry->AnyChanged<CHierarchy>()) {
     registry->ClearChanged<CHierarchy>();
 
     const auto &[components] = registry->Collect<CHierarchy>();

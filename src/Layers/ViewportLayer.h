@@ -17,10 +17,10 @@
 #include "Camera/Components/Grid.h"
 #include "Camera/OrthographicCamera.h"
 
-#include "Systems/BoneInteractionSystem.h"
 #include "Systems/BoneRenderSystem.h"
+#include "Systems/HoverSystem.h"
 #include "Systems/JointRenderSystem.h"
-#include "Systems/JointInteractionSystem.h"
+#include "Systems/Common.h"
 
 #include "SerializableLayer.h"
 #include "State.h"
@@ -32,10 +32,12 @@ private:
   std::shared_ptr<ECS::Registry> m_Registry = nullptr;
   std::shared_ptr<ECS::SystemManager> m_System = nullptr;
 
-  std::shared_ptr<BoneInteractionSystem> m_BoneInteractionSystem = nullptr;
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
   std::shared_ptr<JointRenderSystem> m_JointRenderSystem = nullptr;
-  std::shared_ptr<JointInteractionSystem> m_JointInteractionSystem = nullptr;
+
+  std::shared_ptr<HoverSystem> m_HoverSystem = nullptr;
+
+  SystemData m_SystemData;
 
   GLuint m_FrameBuffer = 0;
   GLuint m_ColorAttachment = 0;
@@ -44,6 +46,7 @@ private:
   Grid m_Grid;
   Shader m_Shader;
   OrthographicCamera m_Camera;
+
 
   struct Viewport {
     ImVec2 size{0, 0};

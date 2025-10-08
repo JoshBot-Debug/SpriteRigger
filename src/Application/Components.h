@@ -4,37 +4,20 @@
 #include <stdint.h>
 
 struct CBone {
-  glm::vec2 start = glm::vec2(0.0f);
-  glm::vec2 end = glm::vec2(0.0f);
-  glm::vec4 color = glm::vec4(1.0f);
-  glm::vec4 sColor = glm::vec4(1.0f);
-  glm::vec4 eColor = glm::vec4(1.0f);
+  enum Part : uint8_t { StartJoint = 0, EndJoint, Shaft, None };
+
+  struct Joint {
+    glm::vec2 position = glm::vec2(0.0f);
+    glm::vec4 color = glm::vec4(1.0f);
+  };
+
   float thickness = 0.0f;
+  glm::vec4 color = glm::vec4(1.0f);
+  Joint joints[2] = {};
+};
 
-  bool Intersects(float x, float y) {
-    if (IntersectsJoint(start, x, y) || IntersectsJoint(end, x, y))
-      return false;
-
-    glm::vec2 point(x, y);
-    glm::vec2 dir = end - start;
-    float lenSquared = glm::dot(dir, dir);
-
-    if (lenSquared == 0.0f)
-      return glm::distance(point, start) <= thickness / 2.0f;
-
-    float t = glm::dot(point - start, dir) / lenSquared;
-    t = glm::clamp(t, 0.0f, 1.0f);
-
-    glm::vec2 closest = start + t * dir;
-
-    return glm::distance(point, closest) <= thickness / 2.0f;
-  }
-
-  bool IntersectsJoint(glm::vec2 point, float x, float y) {
-    float dx = point.x - x;
-    float dy = point.y - y;
-    return (dx * dx + dy * dy) <= (thickness * thickness);
-  }
+struct CHovered {
+  CBone::Part target = CBone::Part::None;
 };
 
 struct CHierarchy {

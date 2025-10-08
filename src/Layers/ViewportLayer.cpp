@@ -17,15 +17,13 @@ void ViewportLayer::OnAttach() {
   m_Registry = ServiceLocator::Get<ECS::Registry>();
   m_System = ServiceLocator::Get<ECS::SystemManager>();
 
-  m_BoneInteractionSystem = m_System->Register<BoneInteractionSystem>();
+  m_HoverSystem = m_System->Register<HoverSystem>();
   m_BoneRenderSystem = m_System->Register<BoneRenderSystem>();
   m_JointRenderSystem = m_System->Register<JointRenderSystem>();
-  m_JointInteractionSystem = m_System->Register<JointInteractionSystem>();
 
-  m_BoneInteractionSystem->Initialize(m_Registry.get(), &m_Grid);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
   m_JointRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
-  m_JointInteractionSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
+  m_HoverSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
 }
 
 void ViewportLayer::OnRender() {
@@ -33,6 +31,7 @@ void ViewportLayer::OnRender() {
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_None);
   ImGui::PopStyleVar();
 
+  ImGuiIO &io = ImGui::GetIO();
   ImVec2 viewport = ImGui::GetContentRegionAvail();
   ImVec2 windowPosition = ImGui::GetWindowPos();
 
@@ -42,9 +41,15 @@ void ViewportLayer::OnRender() {
   {
     m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
     m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
-    m_System->Update<BoneInteractionSystem>();
-    m_JointInteractionSystem->viewportSize = m_Viewport.size;
-    m_System->Update<JointInteractionSystem>();
+
+    m_SystemData.deltaTime = static_cast<float>(Window::GetDeltaTime());
+    m_SystemData.mouse = m_Grid.GetMouseCoords();
+    m_SystemData.isDragging = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
+    m_SystemData.isMouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+    m_SystemData.isCtrlDown = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
+    m_SystemData.deltaMouse = GetDeltaMouse(&m_Camera, io, viewport);
+
+    m_System->Update<HoverSystem>(&m_SystemData);
   }
 
   ResizeFramebuffer(viewport);
@@ -54,7 +59,7 @@ void ViewportLayer::OnRender() {
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_System->Update<BoneRenderSystem>();
-    m_System->Update<JointRenderSystem>();
+    // m_System->Update<JointRenderSystem>();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
 

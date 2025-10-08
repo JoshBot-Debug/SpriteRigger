@@ -21,9 +21,9 @@ public:
     CHierarchy *hierarchy = entity->Add<CHierarchy>();
     CFlags *flags = entity->Add<CFlags>();
 
-    bone->start = glm::vec2(1.0f, 1.0f);
-    bone->end = glm::vec2(-2.0f, -2.0f);
     bone->thickness = 0.2f;
+    bone->joints[CBone::StartJoint] = {.position = glm::vec2(1.0f, 1.0f)};
+    bone->joints[CBone::EndJoint] = {.position = glm::vec2(-2.0f, -2.0f)};
 
     hierarchy->id = entity->GetId();
     hierarchy->parent = parent;
@@ -31,5 +31,7 @@ public:
                   entity->GetId());
   }
 
-  void RemoveBone(ECS::EntityId id) { ServiceLocator::Get<ECS::Registry>()->Free(id); }
+  void RemoveBone(ECS::EntityId id) {
+    ServiceLocator::Get<ECS::Registry>()->Free(id);
+  }
 };
