@@ -12,16 +12,7 @@ void main() {
   float ax = v_Position.x; // along the bone (0 → len)
   float ay = abs(v_Position.y); // across (thickness)
 
-  // float dist = (ax < v_Radius)
-  //     ? length(vec2(ax - v_Radius, ay)) - v_Radius
-  //     : (ax > v_Length - v_Radius)
-  //         ? length(vec2(ax - (v_Length - v_Radius), ay)) - v_Radius
-  //         : ay - v_Radius;
-
-  float dist = (ax < v_Radius)
-      ? length(vec2(ax - v_Radius, ay - v_Radius)) - v_Radius
-      : 1.;
-
+  float dist = length(vec2(ax, ay)) - v_Radius;
   if (dist > 0.0)
       discard;
 

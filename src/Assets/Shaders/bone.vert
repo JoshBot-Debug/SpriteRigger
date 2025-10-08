@@ -37,7 +37,8 @@ void main() {
   gl_Position = u_ViewProjection * vec4(pos, 0.0, 1.0);
 
   // Pass local coordinates (in units of half thickness)
-  v_Position = vec2(a_Corner.x * len, a_Corner.y * halfThick); 
+  // v_Position = vec2(a_Corner.x * len, a_Corner.y * halfThick); 
+  v_Position =  vec2((a_Corner.x - 0.5) * a_Thickness * 2.0, a_Corner.y * halfThick);
   v_Length = len;
   v_Radius = a_Thickness;
   v_Color = a_Color;
