@@ -19,7 +19,7 @@ private:
   ECS::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
 
-  CBone::Part HoveredPart(CBone *bone, glm::vec2 mouse) {
+  CBone::Part HoveredOver(CBone *bone, glm::vec2 mouse) {
     auto &start = bone->joints[CBone::StartJoint];
     auto &end = bone->joints[CBone::EndJoint];
 
@@ -31,6 +31,37 @@ private:
       return CBone::Part::Shaft;
 
     return CBone::Part::None;
+  }
+
+  void UpdateColor(ECS::Registry *registry, CBone *bone, CHovered *hovered,
+                   float deltaTime) {
+    auto &c = bone->color;
+    auto &s = bone->joints[CBone::StartJoint].color;
+    auto &e = bone->joints[CBone::EndJoint].color;
+
+    auto ch = Colors::DEFAULT;
+    auto sh = Colors::DEFAULT;
+    auto eh = Colors::DEFAULT;
+
+    if (hovered && hovered->target == CBone::StartJoint)
+      sh = Colors::HIGHLIGHT;
+    else if (hovered && hovered->target == CBone::EndJoint)
+      eh = Colors::HIGHLIGHT;
+    else if (hovered && hovered->target == CBone::Shaft) {
+      ch = Colors::HIGHLIGHT;
+      sh = Colors::HIGHLIGHT;
+      eh = Colors::HIGHLIGHT;
+    }
+
+    if (ECS::Mutate<CBone, glm::vec4>(
+            registry, c, glm::mix(c, ch, ANIMATION_SPEED * deltaTime)) &&
+        ECS::Mutate<CBone, glm::vec4>(
+            registry, s, glm::mix(s, sh, ANIMATION_SPEED * deltaTime)) &&
+        ECS::Mutate<CBone, glm::vec4>(
+            registry, e, glm::mix(e, eh, ANIMATION_SPEED * deltaTime))) {
+      if (!hovered)
+        m_Registry->ClearChanged<CHovered>();
+    }
   }
 
 public:
@@ -52,7 +83,7 @@ public:
     for (auto bone : bones) {
       auto cBone = bone->Get<CBone>();
 
-      CBone::Part part = HoveredPart(cBone, mouse);
+      CBone::Part part = HoveredOver(cBone, mouse);
 
       auto cHovered = bone->Get<CHovered>();
 
@@ -63,6 +94,8 @@ public:
           bone->Add<CHovered>(part);
       } else if (cHovered)
         bone->Free<CHovered>();
+
+      UpdateColor(m_Registry, cBone, cHovered, data->deltaTime);
     }
   }
 };

@@ -37,38 +37,6 @@ private:
   OrthographicCamera *m_Camera = nullptr;
   std::vector<Bone> m_Buffer;
 
-private:
-  void UpdateColor(ECS::Registry *registry, CBone *bone, CHovered *hovered,
-                   float deltaTime) {
-    auto &c = bone->color;
-    auto &s = bone->joints[CBone::StartJoint].color;
-    auto &e = bone->joints[CBone::EndJoint].color;
-
-    auto ch = Colors::DEFAULT;
-    auto sh = Colors::DEFAULT;
-    auto eh = Colors::DEFAULT;
-
-    if (hovered && hovered->target == CBone::StartJoint)
-      sh = Colors::HIGHLIGHT;
-    else if (hovered && hovered->target == CBone::EndJoint)
-      eh = Colors::HIGHLIGHT;
-    else if (hovered && hovered->target == CBone::Shaft) {
-      ch = Colors::HIGHLIGHT;
-      sh = Colors::HIGHLIGHT;
-      eh = Colors::HIGHLIGHT;
-    }
-
-    if (ECS::Mutate<CBone, glm::vec4>(
-            registry, c, glm::mix(c, ch, ANIMATION_SPEED * deltaTime)) &&
-        ECS::Mutate<CBone, glm::vec4>(
-            registry, s, glm::mix(s, sh, ANIMATION_SPEED * deltaTime)) &&
-        ECS::Mutate<CBone, glm::vec4>(
-            registry, e, glm::mix(e, eh, ANIMATION_SPEED * deltaTime))) {
-      if (!hovered)
-        m_Registry->ClearChanged<CHovered>();
-    }
-  }
-
 public:
   ~BoneRenderSystem() {
     m_VAO = 0;
@@ -164,15 +132,10 @@ public:
 
       m_Buffer.clear();
 
-      auto [cBoneC, cHoveredC] = m_Registry->HasChanged<CBone, CHovered>();
-
       for (auto entity : m_Registry->GetEntities("bone")) {
         Bone &buffer = m_Buffer.emplace_back();
 
         auto bone = entity->Get<CBone>();
-        auto hovered = entity->Get<CHovered>();
-
-        UpdateColor(m_Registry, bone, hovered, data->deltaTime);
 
         buffer.color = bone->color;
         buffer.start = bone->joints[CBone::StartJoint].position;
