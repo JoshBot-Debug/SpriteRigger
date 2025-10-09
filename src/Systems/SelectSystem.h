@@ -35,15 +35,20 @@ public:
 
     for (auto [eid, cBone] : m_Registry->Get<CBone>()) {
       if (!m_Registry->Has<CHovered>(eid)) {
-        if (data->isMouseDown && !m_Registry->MarkedForRemoval<CSelected>(eid))
+        if (data->isMouseDown &&
+            !m_Registry->MarkedForRemoval<CSelected>(eid)) {
+          std::cout << "MarkForRemoval CSelected" << std::endl;
           m_Registry->MarkForRemoval<CSelected>(eid);
+        }
 
         continue;
       }
 
       for (auto [id, cHovered] : m_Registry->Get<CHovered>()) {
-        if (data->isMouseDown)
+        if (data->isMouseDown && !m_Registry->Has<CSelected>(id)) {
+          std::cout << "Add CSelected" << std::endl;
           m_Registry->Add<CSelected>(id, cHovered->target);
+        }
       }
     }
 

@@ -118,18 +118,26 @@ public:
         auto &e = cBone->joints[CBone::EndJoint].color;
         auto target = cSelected->target;
 
+        std::cout << "Mutating CSelected " << (int)target << std::endl;
+
         if (target == CBone::StartJoint) {
-          if (Highlight(CBone::StartJoint, s, target, CBone::None, speed))
+          if (Highlight(CBone::StartJoint, s, target, CBone::None, speed)) {
             m_Registry->ClearChanged<CSelected>();
+            std::cout << "ClearChanged CSelected" << std::endl;
+          }
         } else if (target == CBone::EndJoint) {
-          if (Highlight(CBone::EndJoint, e, target, CBone::None, speed))
+          if (Highlight(CBone::EndJoint, e, target, CBone::None, speed)) {
             m_Registry->ClearChanged<CSelected>();
+            std::cout << "ClearChanged CSelected" << std::endl;
+          }
         } else if (target == CBone::Shaft) {
           bool mc = Highlight(CBone::Shaft, c, target, CBone::None, speed);
           bool ms = Highlight(CBone::StartJoint, s, target, CBone::None, speed);
           bool me = Highlight(CBone::EndJoint, e, target, CBone::None, speed);
-          if (mc && ms && me)
+          if (mc && ms && me) {
             m_Registry->ClearChanged<CSelected>();
+            std::cout << "ClearChanged CSelected" << std::endl;
+          }
         }
       }
     }
