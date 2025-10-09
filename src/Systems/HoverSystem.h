@@ -89,21 +89,16 @@ public:
 
     for (auto bone : bones) {
       auto cBone = bone->Get<CBone>();
+      auto cHovered = bone->Get<CHovered>();
 
       CBone::Part part = HoveredOver(cBone, mouse);
 
-      auto cHovered = bone->Get<CHovered>();
-
-      if (part != CBone::Part::None) {
-        if (cHovered)
-          ECS::Mutate<CHovered, CBone::Part>(m_Registry, cHovered->target,
-                                             part);
-        else
-          cHovered = bone->Add<CHovered>(part);
-      } else if (cHovered) {
-        bone->Remove<CHovered>();
-        cHovered = nullptr;
-      }
+      if (!cHovered)
+        cHovered = bone->Add<CHovered>(part);
+      else if (part == CBone::Part::None)
+        cHovered = bone->Remove<CHovered>();
+      else
+        ECS::Mutate<CHovered, CBone::Part>(m_Registry, cHovered->target, part);
 
       UpdateColor(m_Registry, cBone, cHovered, data->deltaTime);
     }

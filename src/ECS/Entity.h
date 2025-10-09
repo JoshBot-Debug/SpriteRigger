@@ -100,8 +100,12 @@ public:
 
   /**
    * Removes components of specified types from this entity.
+   * @return Always returns nullptr, useful for chaining in expression contexts.
    */
-  template <typename... T> void Remove() { (m_Registry->Remove<T>(m_Id), ...); }
+  template <typename... T> std::nullptr_t Remove() {
+    (m_Registry->Remove<T>(m_Id), ...);
+    return nullptr;
+  }
 
   /**
    * Equality operator to compare two entities by their IDs.
