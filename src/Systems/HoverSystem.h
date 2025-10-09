@@ -47,14 +47,16 @@ private:
     auto sh = Colors::DEFAULT;
     auto eh = Colors::DEFAULT;
 
-    if (hovered && hovered->target == CBone::StartJoint)
-      sh = Colors::HIGHLIGHT;
-    else if (hovered && hovered->target == CBone::EndJoint)
-      eh = Colors::HIGHLIGHT;
-    else if (hovered && hovered->target == CBone::Shaft) {
-      ch = Colors::HIGHLIGHT;
-      sh = Colors::HIGHLIGHT;
-      eh = Colors::HIGHLIGHT;
+    if (hovered) {
+      if (hovered->target == CBone::StartJoint)
+        sh = Colors::HIGHLIGHT;
+      else if (hovered->target == CBone::EndJoint)
+        eh = Colors::HIGHLIGHT;
+      else if (hovered->target == CBone::Shaft) {
+        ch = Colors::HIGHLIGHT;
+        sh = Colors::HIGHLIGHT;
+        eh = Colors::HIGHLIGHT;
+      }
     }
 
     float speed = ANIMATION_SPEED * deltaTime;
