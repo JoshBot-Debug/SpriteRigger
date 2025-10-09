@@ -127,7 +127,7 @@ public:
   void Update(void *d) override {
     auto data = reinterpret_cast<SystemData *>(d);
 
-    if (m_Registry->AnyChanged<CBone, CHovered>()) {
+    if (m_Registry->AnyChanged<CBone>()) {
       m_Registry->ClearChanged<CBone>();
 
       m_Buffer.clear();

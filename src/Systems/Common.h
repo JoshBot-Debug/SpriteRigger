@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtx/norm.hpp>
 
 #include "imgui.h"
 
@@ -52,23 +53,17 @@ inline bool Line(glm::vec2 mouse, glm::vec2 start, glm::vec2 end,
 
   return glm::distance(mouse, closest) <= thickness / 2.0f;
 }
-
-inline bool Bone(glm::vec2 mouse, glm::vec2 point, glm::vec2 start,
-                 glm::vec2 end, float thickness) {
-  if (Circle(mouse, start, thickness) || Circle(mouse, end, thickness))
-    return true;
-
-  glm::vec2 dir = end - start;
-  float lenSquared = glm::dot(dir, dir);
-
-  if (lenSquared == 0.0f)
-    return glm::distance(point, start) <= thickness / 2.0f;
-
-  float t = glm::dot(point - start, dir) / lenSquared;
-  t = glm::clamp(t, 0.0f, 1.0f);
-
-  glm::vec2 closest = start + t * dir;
-
-  return glm::distance(point, closest) <= thickness / 2.0f;
-}
 } // namespace Intersect
+
+namespace Animation {
+template <typename T>
+inline T Lerp(const T &current, const T &target, float t, float epsilon = 0.001f) {
+  T next = glm::mix(current, target, t);
+
+  if (glm::length2(target - next) < epsilon * epsilon)
+    return target;
+
+  return next;
+}
+
+} // namespace Animation

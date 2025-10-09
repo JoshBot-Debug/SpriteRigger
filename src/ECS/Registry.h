@@ -32,7 +32,7 @@ private:
 public:
   Registry() = default;
 
-  ~Registry() { Free(); };
+  ~Registry() { Remove(); };
 
   /**
    * Creates a new entity with a given name.
@@ -159,9 +159,9 @@ public:
   }
 
   /**
-   * Frees all components of a specified type across all entities.
+   * Removes all components of a specified type across all entities.
    */
-  template <typename... T> void Free() {
+  template <typename... T> void Remove() {
     for (auto &[eid, components] : m_Components) {
       (components.erase(typeid(T)), ...);
       (m_Dirty.insert_or_assign(typeid(T), true), ...);
@@ -169,17 +169,17 @@ public:
   }
 
   /**
-   * Frees all components of a specified type for the entity specified.
+   * Removes all components of a specified type for the entity specified.
    */
-  template <typename... T> void Free(EntityId entity) {
+  template <typename... T> void Remove(EntityId entity) {
     (m_Components.at(entity).erase(typeid(T)), ...);
     (m_Dirty.insert_or_assign(typeid(T), true), ...);
   }
 
   /**
-   * Frees the entity & all it's components.
+   * Removes the entity & all it's components.
    */
-  void Free(EntityId entity) {
+  void Remove(EntityId entity) {
 
     auto it = std::find_if(m_Entities.begin(), m_Entities.end(),
                            [&](auto e) { return e->Is(entity); });
@@ -195,9 +195,9 @@ public:
   }
 
   /**
-   * Frees all entities & components
+   * Remove all entities & components
    */
-  void Free() {
+  void Remove() {
     m_EID = 0;
     m_Entities.clear();
     m_Components.clear();

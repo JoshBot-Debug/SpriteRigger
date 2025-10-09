@@ -92,7 +92,7 @@ void State::Restore() {
   // Load the ECS state
   const auto &registry = ServiceLocator::Get<ECS::Registry>();
 
-  registry->Free();
+  registry->Remove();
 
   std::vector<std::vector<uint8_t>> entities =
       m_Serializer.GetAll("entity:bone");

@@ -32,6 +32,6 @@ public:
   }
 
   void RemoveBone(ECS::EntityId id) {
-    ServiceLocator::Get<ECS::Registry>()->Free(id);
+    ServiceLocator::Get<ECS::Registry>()->Remove(id);
   }
 };

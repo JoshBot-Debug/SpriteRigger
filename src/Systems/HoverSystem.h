@@ -33,9 +33,12 @@ private:
     return CBone::Part::None;
   }
 
-  // May want to create a ColorInterpolatingSystem to interpolate colors
+  // May want to create a ColorInterpolationSystem to interpolate colors
   void UpdateColor(ECS::Registry *registry, CBone *bone, CHovered *hovered,
                    float deltaTime) {
+    if (!m_Registry->AnyChanged<CHovered>())
+      return;
+
     auto &c = bone->color;
     auto &s = bone->joints[CBone::StartJoint].color;
     auto &e = bone->joints[CBone::EndJoint].color;
@@ -54,12 +57,17 @@ private:
       eh = Colors::HIGHLIGHT;
     }
 
-    if (ECS::Mutate<CBone, glm::vec4>(
-            registry, c, glm::mix(c, ch, ANIMATION_SPEED * deltaTime)) &&
-        ECS::Mutate<CBone, glm::vec4>(
-            registry, s, glm::mix(s, sh, ANIMATION_SPEED * deltaTime)) &&
-        ECS::Mutate<CBone, glm::vec4>(
-            registry, e, glm::mix(e, eh, ANIMATION_SPEED * deltaTime)))
+    float speed = ANIMATION_SPEED * deltaTime;
+
+    bool mc = ECS::Mutate<CBone, glm::vec4>(registry, c,
+                                            Animation::Lerp(c, ch, speed));
+
+    bool ms = ECS::Mutate<CBone, glm::vec4>(registry, s,
+                                            Animation::Lerp(s, sh, speed));
+    bool me = ECS::Mutate<CBone, glm::vec4>(registry, e,
+                                            Animation::Lerp(e, eh, speed));
+
+    if (mc && ms && me)
       m_Registry->ClearChanged<CHovered>();
   }
 
@@ -88,11 +96,14 @@ public:
 
       if (part != CBone::Part::None) {
         if (cHovered)
-          cHovered->target = part;
+          ECS::Mutate<CHovered, CBone::Part>(m_Registry, cHovered->target,
+                                             part);
         else
-          bone->Add<CHovered>(part);
-      } else if (cHovered)
-        bone->Free<CHovered>();
+          cHovered = bone->Add<CHovered>(part);
+      } else if (cHovered) {
+        bone->Remove<CHovered>();
+        cHovered = nullptr;
+      }
 
       UpdateColor(m_Registry, cBone, cHovered, data->deltaTime);
     }

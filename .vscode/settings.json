@@ -103,7 +103,8 @@
     "__tree": "cpp",
     "locale": "cpp",
     "ios": "cpp",
-    "__locale": "cpp"
+    "__locale": "cpp",
+    "queue": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

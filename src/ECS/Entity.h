@@ -99,9 +99,9 @@ public:
   bool Is(EntityId id) { return m_Id == id; }
 
   /**
-   * Frees components of specified types from this entity.
+   * Removes components of specified types from this entity.
    */
-  template <typename... T> void Free() { (m_Registry->Free<T>(m_Id), ...); }
+  template <typename... T> void Remove() { (m_Registry->Remove<T>(m_Id), ...); }
 
   /**
    * Equality operator to compare two entities by their IDs.

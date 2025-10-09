@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
     Window::Options options = {
         .title = "Sprite Rigger",
         .darkMode = IsDarkMode(),
+        .maximized = false,
     };
 
     if (!initialized) {
