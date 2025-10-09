@@ -59,10 +59,8 @@ private:
         ECS::Mutate<CBone, glm::vec4>(
             registry, s, glm::mix(s, sh, ANIMATION_SPEED * deltaTime)) &&
         ECS::Mutate<CBone, glm::vec4>(
-            registry, e, glm::mix(e, eh, ANIMATION_SPEED * deltaTime))) {
-      if (!hovered)
-        m_Registry->ClearChanged<CHovered>();
-    }
+            registry, e, glm::mix(e, eh, ANIMATION_SPEED * deltaTime)))
+      m_Registry->ClearChanged<CHovered>();
   }
 
 public:
