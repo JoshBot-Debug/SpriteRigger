@@ -29,8 +29,8 @@ template <typename C, typename T>
 inline bool Mutate(ECS::Registry *registry, T &current, const T &next) {
   bool mutated = current != next;
   if (mutated) {
-    registry->MarkChanged<C>();
     current = next;
+    registry->MarkChanged<C>();
   }
   return !mutated;
 }
