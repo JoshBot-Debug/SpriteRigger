@@ -23,11 +23,15 @@ private:
     auto &start = bone->joints[CBone::StartJoint];
     auto &end = bone->joints[CBone::EndJoint];
 
-    if (Intersect::Circle(mouse, start.position, bone->thickness))
+    float radius = bone->thickness * 0.5f;
+    glm::vec2 direction = glm::normalize(start.position - end.position);
+    glm::vec2 offset = direction * radius * radius;
+
+    if (Intersect::Circle(mouse, start.position - offset, radius))
       return CBone::Part::StartJoint;
-    if (Intersect::Circle(mouse, end.position, bone->thickness))
+    if (Intersect::Circle(mouse, end.position + offset, radius))
       return CBone::Part::EndJoint;
-    if (Intersect::Line(mouse, start.position, end.position, bone->thickness))
+    if (Intersect::Line(mouse, start.position - offset, end.position + offset, bone->thickness))
       return CBone::Part::Shaft;
 
     return CBone::Part::None;

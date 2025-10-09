@@ -44,14 +44,14 @@ inline bool Line(glm::vec2 mouse, glm::vec2 start, glm::vec2 end,
   float lenSquared = glm::dot(dir, dir);
 
   if (lenSquared == 0.0f)
-    return glm::distance(mouse, start) <= thickness / 2.0f;
+    return glm::distance2(mouse, start) <= (thickness * 0.5f) * (thickness * 0.5f);
 
   float t = glm::dot(mouse - start, dir) / lenSquared;
   t = glm::clamp(t, 0.0f, 1.0f);
 
   glm::vec2 closest = start + t * dir;
 
-  return glm::distance(mouse, closest) <= thickness / 2.0f;
+  return glm::distance2(mouse, closest) <= (thickness * 0.5f) * (thickness * 0.5f);
 }
 } // namespace Intersect
 
