@@ -16,7 +16,8 @@ class Entity {
 private:
   EntityId m_Id = 0;  ///< Unique identifier for the entity.
   std::string m_Name; ///< Name of the entity.
-  Registry *m_Registry = nullptr; ///< Pointer to the Registry managing this entity.
+  Registry *m_Registry =
+      nullptr; ///< Pointer to the Registry managing this entity.
 
 public:
   /**
@@ -104,6 +105,21 @@ public:
   template <typename... T> std::nullptr_t Remove() {
     (m_Registry->Remove<T>(m_Id), ...);
     return nullptr;
+  }
+
+  /**
+   * Marks components of specified types from this entity for removal
+   */
+  template <typename... T> void MarkForRemoval() {
+    (m_Registry->MarkForRemoval<T>(m_Id), ...);
+  }
+
+  /**
+   * Check if a component is marked for removal
+   * @return True if the component is marked for removal
+   */
+  template <typename T> bool MarkedForRemoval() const {
+    return m_Registry->MarkedForRemoval<T>(m_Id);
   }
 
   /**

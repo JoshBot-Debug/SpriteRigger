@@ -33,7 +33,8 @@ private:
   /// Color of origin (x=0, y=0) grid lines.
   ImU32 m_AxisColor = IM_COL32(200, 200, 200, 200);
 
-  ImVec2 m_Mouse = ImVec2(0,0);
+  ImVec2 m_Mouse = ImVec2(0, 0);
+  ImVec2 m_PreviousMouse = ImVec2(0, 0);
 
 public:
   /**
@@ -94,4 +95,8 @@ public:
   };
 
   const ImVec2 &GetMouseCoords() const { return m_Mouse; };
+
+  const ImVec2 GetDeltaMouseCoords() const {
+    return ImVec2(m_Mouse.x - m_PreviousMouse.x, m_Mouse.y - m_PreviousMouse.y);
+  };
 };

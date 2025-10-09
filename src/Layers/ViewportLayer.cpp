@@ -19,11 +19,13 @@ void ViewportLayer::OnAttach() {
 
   m_HoverSystem = m_System->Register<HoverSystem>();
   m_SelectSystem = m_System->Register<SelectSystem>();
+  m_DragSystem = m_System->Register<DragSystem>();
   m_BoneRenderSystem = m_System->Register<BoneRenderSystem>();
   m_ColorInterpolationSystem = m_System->Register<ColorInterpolationSystem>();
 
   m_HoverSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
   m_SelectSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
+  m_DragSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
   m_ColorInterpolationSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
 }
@@ -49,10 +51,11 @@ void ViewportLayer::OnRender() {
     m_SystemData.isDragging = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
     m_SystemData.isMouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
     m_SystemData.isCtrlDown = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
-    m_SystemData.deltaMouse = GetDeltaMouse(&m_Camera, io, viewport);
+    m_SystemData.deltaMouse = m_Grid.GetDeltaMouseCoords();
 
     m_System->Update<HoverSystem>(&m_SystemData);
     m_System->Update<SelectSystem>(&m_SystemData);
+    m_System->Update<DragSystem>(&m_SystemData);
     m_System->Update<ColorInterpolationSystem>(&m_SystemData);
   }
 
@@ -72,7 +75,10 @@ void ViewportLayer::OnRender() {
   ImGui::End();
 }
 
-void ViewportLayer::OnDetach() { m_State = nullptr; }
+void ViewportLayer::OnDetach() {
+  m_State = nullptr;
+  m_System->Free();
+}
 
 void ViewportLayer::Save(Serializer &serializer) {
   std::vector<uint8_t> buffer(sizeof(m_Camera.Position) +

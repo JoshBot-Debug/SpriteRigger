@@ -44,15 +44,16 @@ void Grid::Render(ImVec2 viewportSize, ImVec2 viewportMin) {
 
   // Draw info
   {
-
     ImVec2 mouseScreen = ImGui::GetMousePos();
     ImVec2 mouseInViewport =
         ImVec2(mouseScreen.x - viewportMin.x, mouseScreen.y - viewportMin.y);
 
+    m_PreviousMouse = m_Mouse;
     m_Mouse.x = left + (mouseInViewport.x / viewportSize.x) * (right - left);
     m_Mouse.y =
         bottom + ((viewportSize.y - mouseInViewport.y) / viewportSize.y) *
                      (top - bottom);
+
     ImGui::PushFont(m_Font, m_FontSize);
 
     ImGui::SetCursorScreenPos(

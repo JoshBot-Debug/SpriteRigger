@@ -19,12 +19,6 @@ struct SystemData {
   bool isCtrlDown = false;
 };
 
-inline ImVec2 GetDeltaMouse(OrthographicCamera *camera, ImGuiIO &io,
-                            ImVec2 viewport) {
-  return ImVec2(io.MouseDelta.x * camera->Zoom * 2.0f / viewport.x,
-                -io.MouseDelta.y * camera->Zoom * 2.0f / viewport.y);
-}
-
 namespace Colors {
 inline const glm::vec4 HIGHLIGHT = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 inline const glm::vec4 DEFAULT = glm::vec4(1.0f);

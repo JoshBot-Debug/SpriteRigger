@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstring>
 #include <glm/glm.hpp>
 #include <vector>
 
@@ -31,26 +33,37 @@ private:
   };
 
 private:
-  GLuint m_VAO = 0, m_VBO = 0;
+  GLuint m_VAO = 0, m_VBO = 0, m_QuadVBO = 0;
   Shader *m_Shader = nullptr;
   ECS::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
-  std::vector<Bone> m_Buffer;
+
+  void *m_Buffer = nullptr;
+  GLsizei m_Instances = 0;
 
 public:
-  ~BoneRenderSystem() {
+  void Free() {
+    if (m_VBO)
+      glDeleteBuffers(1, &m_VBO);
+    if (m_QuadVBO)
+      glDeleteBuffers(1, &m_QuadVBO);
+    if (m_VAO)
+      glDeleteVertexArrays(1, &m_VAO);
+
     m_VAO = 0;
     m_VBO = 0;
+    m_Buffer = nullptr;
     m_Shader = nullptr;
     m_Registry = nullptr;
     m_Camera = nullptr;
+    m_Instances = 0;
   }
 
   void Initialize(ECS::Registry *registry, Shader *shader,
                   OrthographicCamera *camera) {
-    m_Registry = registry;
-    m_Shader = shader;
     m_Camera = camera;
+    m_Shader = shader;
+    m_Registry = registry;
 
     const std::string EXE_DIRECTORY = GetExecutableDirectory();
 
@@ -67,9 +80,8 @@ public:
 
     float quadVerts[8] = {0.0f, -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f};
 
-    GLuint quadVBO;
-    glGenBuffers(1, &quadVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glGenBuffers(1, &m_QuadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), quadVerts, GL_STATIC_DRAW);
 
     // layout(location = 0) in vec2 a_corner;
@@ -78,10 +90,21 @@ public:
                           (void *)0);
     glVertexAttribDivisor(0, 0);
 
-    // Now create the per-instance buffer (CBone instances)
-    glGenBuffers(1, &m_VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
+    // Now create the mapped buffer
+    {
+      glGenBuffers(1, &m_VBO);
+      glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+
+      GLsizeiptr bufferSize = 1024 * sizeof(Bone);
+
+      glBufferStorage(GL_ARRAY_BUFFER, bufferSize, nullptr,
+                      GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
+                          GL_MAP_COHERENT_BIT);
+
+      m_Buffer = glMapBufferRange(GL_ARRAY_BUFFER, 0, bufferSize,
+                                  GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
+                                      GL_MAP_COHERENT_BIT);
+    }
 
     // layout(location = 1) in vec2 a_start;
     glEnableVertexAttribArray(1);
@@ -124,29 +147,31 @@ public:
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
 
-  void Update(void *d) override {   
+  void Update(void *d) override {
     auto data = reinterpret_cast<SystemData *>(d);
 
     if (m_Registry->AnyChanged<CBone>()) {
       m_Registry->ClearChanged<CBone>();
 
-      m_Buffer.clear();
+      std::vector<Bone> buffer;
 
       for (auto [_, cBone] : m_Registry->Get<CBone>()) {
-        Bone &buffer = m_Buffer.emplace_back();
+        Bone &bone = buffer.emplace_back();
 
-        buffer.color = cBone->color;
-        buffer.start = cBone->joints[CBone::StartJoint].position;
-        buffer.end = cBone->joints[CBone::EndJoint].position;
-        buffer.sColor = cBone->joints[CBone::StartJoint].color;
-        buffer.eColor = cBone->joints[CBone::EndJoint].color;
-        buffer.thickness = cBone->thickness;
+        bone.color = cBone->color;
+        bone.start = cBone->joints[CBone::StartJoint].position;
+        bone.end = cBone->joints[CBone::EndJoint].position;
+        bone.sColor = cBone->joints[CBone::StartJoint].color;
+        bone.eColor = cBone->joints[CBone::EndJoint].color;
+        bone.thickness = cBone->thickness;
       }
 
-      glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-      glBufferData(GL_ARRAY_BUFFER, m_Buffer.size() * sizeof(CBone),
-                   m_Buffer.data(), GL_DYNAMIC_DRAW);
+      m_Instances = static_cast<GLsizei>(buffer.size());
+      std::memcpy(m_Buffer, buffer.data(), buffer.size() * sizeof(Bone));
     }
+
+    if (!m_Instances)
+      return;
 
     glBindVertexArray(m_VAO);
     m_Shader->bind("bone");
@@ -154,7 +179,7 @@ public:
     m_Shader->setUniformMatrix4fv("u_ViewProjection",
                                   m_Camera->GetViewProjectionMatrix());
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, (GLsizei)m_Buffer.size());
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, m_Instances);
 
     m_Shader->unbind();
     glBindVertexArray(0);

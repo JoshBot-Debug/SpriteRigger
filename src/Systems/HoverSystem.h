@@ -19,36 +19,8 @@ private:
   ECS::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
 
-public:
-  ~HoverSystem() { m_Registry = nullptr; }
-
-  void Initialize(ECS::Registry *registry, Grid *grid,
-                  OrthographicCamera *camera) {
-    m_Registry = registry;
-    m_Grid = grid;
-    m_Camera = camera;
-  };
-
-  void Update(void *d) override {
-    auto data = reinterpret_cast<SystemData *>(d);
-    glm::vec2 mouse = glm::vec2(data->mouse.x, data->mouse.y);
-
-    for (auto [eid, cBone] : m_Registry->Get<CBone>()) {
-      auto entity = m_Registry->GetEntity(eid);
-      auto cHovered = m_Registry->Get<CHovered>(eid);
-
-      CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
-
-      if (!cHovered)
-        cHovered = entity->Add<CHovered>(part);
-      else if (part == CBone::Part::None)
-        cHovered = entity->Remove<CHovered>();
-      else
-        ECS::Mutate<CHovered, CBone::Part>(m_Registry, cHovered->target, part);
-    }
-  }
-
-  static CBone::Part HoveredOver(CBone *bone, glm::vec2 mouse) {
+private:
+  CBone::Part HoveredOver(CBone *bone, glm::vec2 mouse) {
     auto &start = bone->joints[CBone::StartJoint];
     auto &end = bone->joints[CBone::EndJoint];
 
@@ -65,5 +37,45 @@ public:
       return CBone::Part::Shaft;
 
     return CBone::Part::None;
+  }
+
+public:
+  void Free() {
+    m_Grid = nullptr;
+    m_Camera = nullptr;
+    m_Registry = nullptr;
+  }
+
+  void Initialize(ECS::Registry *registry, Grid *grid,
+                  OrthographicCamera *camera) {
+    m_Grid = grid;
+    m_Camera = camera;
+    m_Registry = registry;
+  };
+
+  void Update(void *d) override {
+    auto data = reinterpret_cast<SystemData *>(d);
+    glm::vec2 mouse = glm::vec2(data->mouse.x, data->mouse.y);
+
+    for (auto [eid, cBone] : m_Registry->Get<CBone>()) {
+      auto entity = m_Registry->GetEntity(eid);
+      auto cHovered = m_Registry->Get<CHovered>(eid);
+
+      CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
+
+      if (cHovered && part == CBone::Part::None && !entity->MarkedForRemoval<CHovered>()) {
+        entity->MarkForRemoval<CHovered>();
+        cHovered->target = CBone::Part::None;
+        std::cout << "MarkForRemoval CHovered" << std::endl;
+      }
+
+      if (part != CBone::Part::None) {
+        if (!cHovered) {
+          cHovered = entity->Add<CHovered>(part);
+          std::cout << "Add CHovered " << (int)part << std::endl;
+        } else
+          ECS::Mutate<CHovered, CBone::Part>(m_Registry, cHovered->target, part);
+      }
+    }
   }
 };

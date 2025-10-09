@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <any>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <stdint.h>
@@ -28,6 +29,9 @@ private:
       m_Components; ///< Components indexed by entity ID.
 
   std::unordered_map<std::type_index, bool> m_Dirty;
+
+  std::unordered_map<EntityId, std::unordered_map<std::type_index, bool>>
+      m_MarkForRemoval;
 
 public:
   Registry() = default;
@@ -185,10 +189,8 @@ public:
    * Removes all components of a specified type across all entities.
    */
   template <typename... T> void Remove() {
-    for (auto &[eid, components] : m_Components) {
+    for (auto &[eid, components] : m_Components)
       (components.erase(typeid(T)), ...);
-      (m_Dirty.insert_or_assign(typeid(T), true), ...);
-    }
   }
 
   /**
@@ -196,16 +198,12 @@ public:
    */
   template <typename... T> void Remove(EntityId entity) {
     (m_Components.at(entity).erase(typeid(T)), ...);
-    (m_Dirty.insert_or_assign(typeid(T), true), ...);
   }
 
   /**
    * Removes the entity & all it's components.
    */
   void Remove(EntityId entity) {
-    for (auto &[typeId, component] : m_Components.at(entity))
-      m_Dirty[typeId] = true;
-
     m_Entities.erase(entity);
     m_Components.erase(entity);
   }
@@ -217,6 +215,42 @@ public:
     m_EID = 0;
     m_Entities.clear();
     m_Components.clear();
+  }
+
+  /**
+   * Marks a component for removal, for all entities.
+   * The component will be removed once ClearChanged() is called.
+   */
+  template <typename... T> void MarkForRemoval() {
+    for (auto &[eid, components] : m_Components) {
+      (m_Dirty.insert_or_assign(typeid(T), true), ...);
+      (m_MarkForRemoval[eid].insert_or_assign(typeid(T), true), ...);
+    }
+  }
+
+  /**
+   * Marks a component for removal, for the specified entity.
+   * The component will be removed once ClearChanged() is called.
+   */
+  template <typename... T> void MarkForRemoval(EntityId entity) {
+    (m_Dirty.insert_or_assign(typeid(T), true), ...);
+    (m_MarkForRemoval[entity].insert_or_assign(typeid(T), true), ...);
+  }
+
+  /**
+   * Check if a component is marked for removal for the specified entity
+   * @return True if the component is marked for removal
+   */
+  template <typename T> bool MarkedForRemoval(EntityId entity) const {
+    auto it = m_MarkForRemoval.find(entity);
+    if (it == m_MarkForRemoval.end())
+      return false;
+
+    auto jt = it->second.find(typeid(T));
+    if (jt == it->second.end())
+      return false;
+
+    return jt->second;
   }
 
   /**
@@ -256,10 +290,23 @@ public:
   /**
    * @brief Clear the "changed" flag for a given component type.
    *
+   * @note This method also removes any entities & components staged for removal
    * @tparam T Component type to reset.
    */
   template <typename... T> void ClearChanged() {
     ((m_Dirty[typeid(T)] = false), ...);
+
+    auto flush = [&](std::type_index t) {
+      for (auto &[eid, typeMap] : m_MarkForRemoval) {
+        auto it = typeMap.find(t);
+        if (it != typeMap.end() && it->second) {
+          it->second = false;
+          m_Components.at(eid).erase(t);
+        }
+      }
+    };
+
+    (flush(typeid(T)), ...);
   }
 
   /**

@@ -22,6 +22,7 @@
 #include "Systems/Common.h"
 #include "Systems/HoverSystem.h"
 #include "Systems/SelectSystem.h"
+#include "Systems/DragSystem.h"
 
 #include "SerializableLayer.h"
 #include "State.h"
@@ -37,6 +38,7 @@ private:
   std::shared_ptr<ColorInterpolationSystem> m_ColorInterpolationSystem = nullptr;
   std::shared_ptr<HoverSystem> m_HoverSystem = nullptr;
   std::shared_ptr<SelectSystem> m_SelectSystem = nullptr;
+  std::shared_ptr<DragSystem> m_DragSystem = nullptr;
 
   SystemData m_SystemData;
 

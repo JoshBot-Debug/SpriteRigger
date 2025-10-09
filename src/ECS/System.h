@@ -9,6 +9,7 @@ class System {
 public:
   virtual ~System() = default;
   virtual void Update(void *data) = 0;
+  virtual void Free(){};
 };
 
 class SystemManager {
@@ -24,6 +25,11 @@ public:
 
   template <typename T> void Update(void *data = nullptr) {
     m_Systems.at(typeid(T))->Update(data);
+  }
+
+  void Free(void *data = nullptr) {
+    for (auto [_, system] : m_Systems)
+      system->Free();
   }
 };
 } // namespace ECS

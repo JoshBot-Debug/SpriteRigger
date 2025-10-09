@@ -21,7 +21,6 @@ private:
   OrthographicCamera *m_Camera = nullptr;
 
 private:
-
   /**
    * @brief Determines the highlight color for a specific bone part.
    *
@@ -30,7 +29,8 @@ private:
    * target is the entire shaft, the highlight color is returned. Otherwise,
    * the base color is preserved.
    *
-   * @param part   The specific bone part to evaluate (StartJoint, Shaft, or EndJoint).
+   * @param part   The specific bone part to evaluate (StartJoint, Shaft, or
+   * EndJoint).
    * @param target The bone part currently being targeted for highlighting.
    * @param base   The base color to return when no highlight applies.
    * @return The resulting color for this bone part.
@@ -66,13 +66,17 @@ private:
   };
 
 public:
-  ~ColorInterpolationSystem() { m_Registry = nullptr; }
+  void Free() {
+    m_Grid = nullptr;
+    m_Camera = nullptr;
+    m_Registry = nullptr;
+  }
 
   void Initialize(ECS::Registry *registry, Grid *grid,
                   OrthographicCamera *camera) {
-    m_Registry = registry;
     m_Grid = grid;
     m_Camera = camera;
+    m_Registry = registry;
   };
 
   void Update(void *d) override {
@@ -97,8 +101,13 @@ public:
         bool ms = Highlight(CBone::StartJoint, s, target, skip, speed);
         bool me = Highlight(CBone::EndJoint, e, target, skip, speed);
 
-        if (mc && ms && me)
+        std::cout << "Mutating CHovered " << (int)target << " " << (int)skip
+                  << std::endl;
+
+        if (mc && ms && me) {
           m_Registry->ClearChanged<CHovered>();
+          std::cout << "ClearChanged CHovered" << std::endl;
+        }
       }
     }
 
@@ -109,14 +118,18 @@ public:
         auto &e = cBone->joints[CBone::EndJoint].color;
         auto target = cSelected->target;
 
-        if (target == CBone::StartJoint)
-          Highlight(CBone::StartJoint, s, target, CBone::None, speed);
-        else if (target == CBone::EndJoint)
-          Highlight(CBone::EndJoint, e, target, CBone::None, speed);
-        else if (target == CBone::Shaft) {
-          Highlight(CBone::Shaft, c, target, CBone::None, speed);
-          Highlight(CBone::StartJoint, s, target, CBone::None, speed);
-          Highlight(CBone::EndJoint, e, target, CBone::None, speed);
+        if (target == CBone::StartJoint) {
+          if (Highlight(CBone::StartJoint, s, target, CBone::None, speed))
+            m_Registry->ClearChanged<CSelected>();
+        } else if (target == CBone::EndJoint) {
+          if (Highlight(CBone::EndJoint, e, target, CBone::None, speed))
+            m_Registry->ClearChanged<CSelected>();
+        } else if (target == CBone::Shaft) {
+          bool mc = Highlight(CBone::Shaft, c, target, CBone::None, speed);
+          bool ms = Highlight(CBone::StartJoint, s, target, CBone::None, speed);
+          bool me = Highlight(CBone::EndJoint, e, target, CBone::None, speed);
+          if (mc && ms && me)
+            m_Registry->ClearChanged<CSelected>();
         }
       }
     }
