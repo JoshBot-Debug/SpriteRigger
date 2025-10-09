@@ -21,10 +21,19 @@ private:
   OrthographicCamera *m_Camera = nullptr;
 
 private:
+
   /**
-   * @param part What part of the bone is this, StartJoint, Shaft or EndJoint
-   * @param target The part of the bone we want get the color for
-   * @param base The base color if nothing matches
+   * @brief Determines the highlight color for a specific bone part.
+   *
+   * Returns the appropriate highlight color for a given bone part based on the
+   * currently targeted part. If the target matches the current part or the
+   * target is the entire shaft, the highlight color is returned. Otherwise,
+   * the base color is preserved.
+   *
+   * @param part   The specific bone part to evaluate (StartJoint, Shaft, or EndJoint).
+   * @param target The bone part currently being targeted for highlighting.
+   * @param base   The base color to return when no highlight applies.
+   * @return The resulting color for this bone part.
    */
   glm::vec4 GetHighlightColor(CBone::Part part, CBone::Part target,
                               const glm::vec4 &base) {
@@ -36,11 +45,16 @@ private:
   };
 
   /**
-   * @param part What part of the bone is this, StartJoint, Shaft or EndJoint
-   * @param color A reference to the color variable for this joint
-   * @param target The part of the bone we want to color
-   * @param skip The part of the bone we want to skip, regardless of the target
-   * @param lerp The animation time
+   * @brief Updates the color of a specific bone part based on highlight state.
+   *
+   * Smoothly transitions the given color toward the appropriate highlight.
+   *
+   * @param part   The bone part to modify (StartJoint, Shaft, or EndJoint).
+   * @param color  Reference to the current color of this bone part.
+   * @param target The bone part being highlighted.
+   * @param skip   The bone part to exclude from modification.
+   * @param lerp   The interpolation factor controlling animation speed.
+   * @return True if the color was successfully updated; otherwise false.
    */
   bool Highlight(CBone::Part part, glm::vec4 &color, CBone::Part target,
                  CBone::Part skip, float lerp) {
