@@ -28,9 +28,10 @@ namespace ECS {
 template <typename C, typename T>
 inline bool Mutate(ECS::Registry *registry, T &current, const T &next) {
   bool mutated = current != next;
-  if (mutated)
+  if (mutated) {
     registry->MarkChanged<C>();
-  current = next;
+    current = next;
+  }
   return !mutated;
 }
 } // namespace ECS
