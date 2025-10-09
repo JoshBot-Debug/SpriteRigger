@@ -67,8 +67,6 @@ void ViewportLayer::OnRender() {
   ImGui::SetCursorScreenPos(m_Viewport.min);
   ImGui::Image((void *)(intptr_t)m_ColorAttachment, m_Viewport.size);
   ImGui::End();
-
-  m_Registry->ClearChanged<CBone>();
 }
 
 void ViewportLayer::OnDetach() { m_State = nullptr; }
