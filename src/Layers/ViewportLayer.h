@@ -18,8 +18,9 @@
 #include "Camera/OrthographicCamera.h"
 
 #include "Systems/BoneRenderSystem.h"
-#include "Systems/HoverSystem.h"
+#include "Systems/ColorInterpolationSystem.h"
 #include "Systems/Common.h"
+#include "Systems/HoverSystem.h"
 
 #include "SerializableLayer.h"
 #include "State.h"
@@ -32,6 +33,7 @@ private:
   std::shared_ptr<ECS::SystemManager> m_System = nullptr;
 
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
+  std::shared_ptr<ColorInterpolationSystem> m_ColorInterpolationSystem = nullptr;
   std::shared_ptr<HoverSystem> m_HoverSystem = nullptr;
 
   SystemData m_SystemData;
@@ -43,7 +45,6 @@ private:
   Grid m_Grid;
   Shader m_Shader;
   OrthographicCamera m_Camera;
-
 
   struct Viewport {
     ImVec2 size{0, 0};
