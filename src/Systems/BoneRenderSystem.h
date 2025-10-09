@@ -124,7 +124,7 @@ public:
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
 
-  void Update(void *d) override {
+  void Update(void *d) override {   
     auto data = reinterpret_cast<SystemData *>(d);
 
     if (m_Registry->AnyChanged<CBone>()) {
@@ -132,17 +132,15 @@ public:
 
       m_Buffer.clear();
 
-      for (auto entity : m_Registry->GetEntities("bone")) {
+      for (auto [_, cBone] : m_Registry->Get<CBone>()) {
         Bone &buffer = m_Buffer.emplace_back();
 
-        auto bone = entity->Get<CBone>();
-
-        buffer.color = bone->color;
-        buffer.start = bone->joints[CBone::StartJoint].position;
-        buffer.end = bone->joints[CBone::EndJoint].position;
-        buffer.sColor = bone->joints[CBone::StartJoint].color;
-        buffer.eColor = bone->joints[CBone::EndJoint].color;
-        buffer.thickness = bone->thickness;
+        buffer.color = cBone->color;
+        buffer.start = cBone->joints[CBone::StartJoint].position;
+        buffer.end = cBone->joints[CBone::EndJoint].position;
+        buffer.sColor = cBone->joints[CBone::StartJoint].color;
+        buffer.eColor = cBone->joints[CBone::EndJoint].color;
+        buffer.thickness = cBone->thickness;
       }
 
       glBindBuffer(GL_ARRAY_BUFFER, m_VBO);

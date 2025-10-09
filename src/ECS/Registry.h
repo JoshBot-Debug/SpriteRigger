@@ -22,7 +22,7 @@ using EntityId = uint32_t;
 class Registry {
 private:
   EntityId m_EID = 0; ///< The next available entity ID.
-  std::vector<std::shared_ptr<Entity>>
+  std::unordered_map<EntityId, std::shared_ptr<Entity>>
       m_Entities; ///< List of all entities in the registry.
   std::map<EntityId, std::unordered_map<std::type_index, std::shared_ptr<void>>>
       m_Components; ///< Components indexed by entity ID.
@@ -46,7 +46,7 @@ public:
       m_EID = id;
     uint32_t eid = id ? id : ++m_EID;
     auto entity = std::make_shared<Entity>(eid, name, this);
-    m_Entities.push_back(entity);
+    m_Entities.emplace(eid, entity);
     return entity.get();
   };
 
@@ -72,7 +72,22 @@ public:
    * @return True if the entity has the component, false otherwise.
    */
   template <typename T> bool Has(EntityId entity) {
-    return (m_Components.find(entity) != m_Components.end());
+    auto it = m_Components.find(entity);
+    if (it == m_Components.end())
+      return false;
+    return (m_Components[entity].find(typeid(T)) != m_Components[entity].end());
+  }
+
+  /**
+   * Checks if any entity has a specific component type.
+   *
+   * @return True if the entity has the component, false otherwise.
+   */
+  template <typename T> bool Has() {
+    for (auto [eid, components] : m_Components)
+      if (components.find(typeid(T)) != components.end())
+        return true;
+    return false;
   }
 
   /**
@@ -101,13 +116,20 @@ public:
   }
 
   /**
+   * Retrieves an entity
+   *
+   * @return A pointer to the entity.
+   */
+  Entity *GetEntity(EntityId entity) { return m_Entities.at(entity).get(); }
+
+  /**
    * Retrieves all entities
    *
    * @return A vector of pointers to the entity.
    */
   const std::vector<Entity *> GetEntities() {
     std::vector<Entity *> results;
-    for (auto &entity : m_Entities)
+    for (auto &[_, entity] : m_Entities)
       results.push_back(entity.get());
     return results;
   }
@@ -124,7 +146,8 @@ public:
    *
    * @return A tuple containing vectors of pointers to the components.
    */
-  template <typename... T> std::tuple<std::vector<T *>...> Collect() {
+  template <typename... T>
+  std::tuple<std::vector<std::pair<EntityId, T *>>...> Collect() {
     return std::make_tuple(Get<T>()...);
   }
 
@@ -133,13 +156,13 @@ public:
    *
    * @return A vector of pointers to the components.
    */
-  template <typename T> std::vector<T *> Get() {
-    std::vector<T *> result;
+  template <typename T> std::vector<std::pair<EntityId, T *>> Get() {
+    std::vector<std::pair<EntityId, T *>> result;
 
     for (const auto &[eid, components] : m_Components)
       try {
         result.push_back(
-            std::static_pointer_cast<T>(components.at(typeid(T))).get());
+            {eid, std::static_pointer_cast<T>(components.at(typeid(T))).get()});
       } catch (const std::exception &e) {
       }
 
@@ -153,7 +176,7 @@ public:
    */
   std::vector<Entity *> Entities() {
     std::vector<Entity *> entities(m_Entities.size());
-    for (auto &entity : m_Entities)
+    for (auto &[_, entity] : m_Entities)
       entities.push_back(entity.get());
     return entities;
   }
@@ -180,17 +203,10 @@ public:
    * Removes the entity & all it's components.
    */
   void Remove(EntityId entity) {
-
-    auto it = std::find_if(m_Entities.begin(), m_Entities.end(),
-                           [&](auto e) { return e->Is(entity); });
-
-    if (it == m_Entities.end())
-      return;
-
     for (auto &[typeId, component] : m_Components.at(entity))
       m_Dirty[typeId] = true;
 
-    m_Entities.erase(it);
+    m_Entities.erase(entity);
     m_Components.erase(entity);
   }
 
@@ -220,7 +236,8 @@ public:
    * @return true if the component type T is marked as changed, false otherwise.
    */
   template <typename... T> bool AnyChanged() {
-    return ((m_Dirty.find(typeid(T)) != m_Dirty.end() && m_Dirty[typeid(T)]) || ...);
+    return ((m_Dirty.find(typeid(T)) != m_Dirty.end() && m_Dirty[typeid(T)]) ||
+            ...);
   }
 
   /**

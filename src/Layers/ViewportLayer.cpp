@@ -18,10 +18,12 @@ void ViewportLayer::OnAttach() {
   m_System = ServiceLocator::Get<ECS::SystemManager>();
 
   m_HoverSystem = m_System->Register<HoverSystem>();
+  m_SelectSystem = m_System->Register<SelectSystem>();
   m_BoneRenderSystem = m_System->Register<BoneRenderSystem>();
   m_ColorInterpolationSystem = m_System->Register<ColorInterpolationSystem>();
 
   m_HoverSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
+  m_SelectSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
   m_ColorInterpolationSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
 }
@@ -50,6 +52,7 @@ void ViewportLayer::OnRender() {
     m_SystemData.deltaMouse = GetDeltaMouse(&m_Camera, io, viewport);
 
     m_System->Update<HoverSystem>(&m_SystemData);
+    m_System->Update<SelectSystem>(&m_SystemData);
     m_System->Update<ColorInterpolationSystem>(&m_SystemData);
   }
 

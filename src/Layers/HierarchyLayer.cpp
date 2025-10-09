@@ -55,7 +55,7 @@ void HierarchyLayer::OnAttach() {
       return;
 
     if (ImGui::IsItemClicked()) {
-      for (auto &flag : registry->Get<CFlags>())
+      for (auto &[_, flag] : registry->Get<CFlags>())
         flag->selected = false;
       cFlags->selected = true;
     }
@@ -101,8 +101,8 @@ void HierarchyLayer::OnUpdate(float deltaTime) {
     m_Hierarchy.Clear();
 
     for (size_t i = 0; i < components.size(); i++) {
-      uint32_t id = components[i]->id;
-      uint32_t parent = components[i]->parent;
+      uint32_t id = components[i].second->id;
+      uint32_t parent = components[i].second->parent;
       m_Hierarchy.Add({
           .id = id,
           .parent = parent,

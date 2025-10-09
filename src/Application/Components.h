@@ -20,6 +20,10 @@ struct CHovered {
   CBone::Part target = CBone::Part::None;
 };
 
+struct CSelected {
+  CBone::Part target = CBone::Part::None;
+};
+
 struct CHierarchy {
   uint32_t id = 0;
   uint32_t parent = 0;

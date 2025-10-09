@@ -16,8 +16,7 @@ class Entity {
 private:
   EntityId m_Id = 0;  ///< Unique identifier for the entity.
   std::string m_Name; ///< Name of the entity.
-  Registry *m_Registry =
-      nullptr; ///< Pointer to the Registry managing this entity.
+  Registry *m_Registry = nullptr; ///< Pointer to the Registry managing this entity.
 
 public:
   /**

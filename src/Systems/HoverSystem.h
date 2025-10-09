@@ -19,24 +19,6 @@ private:
   ECS::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
 
-  CBone::Part HoveredOver(CBone *bone, glm::vec2 mouse) {
-    auto &start = bone->joints[CBone::StartJoint];
-    auto &end = bone->joints[CBone::EndJoint];
-
-    float radius = bone->thickness * 0.5f;
-    glm::vec2 direction = glm::normalize(start.position - end.position);
-    glm::vec2 offset = direction * radius * radius;
-
-    if (Intersect::Circle(mouse, start.position - offset, radius))
-      return CBone::Part::StartJoint;
-    if (Intersect::Circle(mouse, end.position + offset, radius))
-      return CBone::Part::EndJoint;
-    if (Intersect::Line(mouse, start.position - offset, end.position + offset, bone->thickness))
-      return CBone::Part::Shaft;
-
-    return CBone::Part::None;
-  }
-
 public:
   ~HoverSystem() { m_Registry = nullptr; }
 
@@ -51,20 +33,37 @@ public:
     auto data = reinterpret_cast<SystemData *>(d);
     glm::vec2 mouse = glm::vec2(data->mouse.x, data->mouse.y);
 
-    auto bones = m_Registry->GetEntities("bone");
+    for (auto [eid, cBone] : m_Registry->Get<CBone>()) {
+      auto entity = m_Registry->GetEntity(eid);
+      auto cHovered = m_Registry->Get<CHovered>(eid);
 
-    for (auto bone : bones) {
-      auto cBone = bone->Get<CBone>();
-      auto cHovered = bone->Get<CHovered>();
-
-      CBone::Part part = HoveredOver(cBone, mouse);
+      CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
 
       if (!cHovered)
-        cHovered = bone->Add<CHovered>(part);
+        cHovered = entity->Add<CHovered>(part);
       else if (part == CBone::Part::None)
-        cHovered = bone->Remove<CHovered>();
+        cHovered = entity->Remove<CHovered>();
       else
         ECS::Mutate<CHovered, CBone::Part>(m_Registry, cHovered->target, part);
     }
+  }
+
+  static CBone::Part HoveredOver(CBone *bone, glm::vec2 mouse) {
+    auto &start = bone->joints[CBone::StartJoint];
+    auto &end = bone->joints[CBone::EndJoint];
+
+    float radius = bone->thickness * 0.5f;
+    glm::vec2 direction = glm::normalize(start.position - end.position);
+    glm::vec2 offset = direction * radius * radius;
+
+    if (Intersect::Circle(mouse, start.position - offset, radius))
+      return CBone::Part::StartJoint;
+    if (Intersect::Circle(mouse, end.position + offset, radius))
+      return CBone::Part::EndJoint;
+    if (Intersect::Line(mouse, start.position - offset, end.position + offset,
+                        bone->thickness))
+      return CBone::Part::Shaft;
+
+    return CBone::Part::None;
   }
 };
