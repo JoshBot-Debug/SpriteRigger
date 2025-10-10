@@ -16,6 +16,7 @@ struct SystemData {
   ImVec2 viewport = ImVec2(0.0f, 0.0f);
   bool isDragging = false;
   bool isMouseDown = false;
+  bool isMouseClicked = false;
   bool isCtrlDown = false;
 };
 

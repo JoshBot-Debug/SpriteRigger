@@ -33,22 +33,23 @@ public:
   void Update(void *d) override {
     auto data = reinterpret_cast<SystemData *>(d);
 
-    for (auto [eid, cBone] : m_Registry->Get<CBone>()) {
-      if (!m_Registry->Has<CHovered>(eid)) {
-        if (data->isMouseDown &&
-            !m_Registry->MarkedForRemoval<CSelected>(eid)) {
-          std::cout << "MarkForRemoval CSelected" << std::endl;
-          m_Registry->MarkForRemoval<CSelected>(eid);
-        }
+    if (!data->isMouseClicked)
+      return;
 
-        continue;
+    for (auto [eid, cSelected] : m_Registry->Get<CSelected>()) {
+      if (!m_Registry->MarkedForRemoval<CSelected>(eid)) {
+        std::cout << "MarkForRemoval CSelected " << (int)cSelected->target
+                  << std::endl;
+        cSelected->target = CBone::None;
+        m_Registry->MarkForRemoval<CSelected>(eid);
+        // m_Registry->ClearChanged<CSelected>(eid);
       }
+    }
 
-      for (auto [id, cHovered] : m_Registry->Get<CHovered>()) {
-        if (data->isMouseDown && !m_Registry->Has<CSelected>(id)) {
-          std::cout << "Add CSelected" << std::endl;
-          m_Registry->Add<CSelected>(id, cHovered->target);
-        }
+    for (auto [eid, cHovered] : m_Registry->Get<CHovered>()) {
+      if (!m_Registry->Has<CSelected>(eid)) {
+        std::cout << "Add CSelected " << (int)cHovered->target << std::endl;
+        m_Registry->Add<CSelected>(eid, cHovered->target);
       }
     }
 

@@ -74,7 +74,7 @@ public:
           cHovered = entity->Add<CHovered>(part);
           std::cout << "Add CHovered " << (int)part << std::endl;
         } else
-          ECS::Mutate<CHovered, CBone::Part>(m_Registry, cHovered->target, part);
+          ECS::Mutate<CHovered, CBone::Part>(m_Registry, eid, cHovered->target, part);
       }
     }
   }

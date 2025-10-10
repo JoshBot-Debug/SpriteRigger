@@ -52,10 +52,11 @@ void ViewportLayer::OnRender() {
     m_SystemData.isMouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
     m_SystemData.isCtrlDown = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
     m_SystemData.deltaMouse = m_Grid.GetDeltaMouseCoords();
+    m_SystemData.isMouseClicked = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
 
     m_System->Update<HoverSystem>(&m_SystemData);
     m_System->Update<SelectSystem>(&m_SystemData);
-    m_System->Update<DragSystem>(&m_SystemData);
+    // m_System->Update<DragSystem>(&m_SystemData);
     m_System->Update<ColorInterpolationSystem>(&m_SystemData);
   }
 

@@ -31,6 +31,8 @@ private:
   std::unordered_map<std::type_index, bool> m_Dirty;
 
   std::unordered_map<EntityId, std::unordered_map<std::type_index, bool>>
+      m_DirtyTwo;
+  std::unordered_map<EntityId, std::unordered_map<std::type_index, bool>>
       m_MarkForRemoval;
 
 public:
@@ -64,8 +66,8 @@ public:
   template <typename T, typename... Args>
   T *Add(EntityId entity, Args &&...args) {
     auto component = std::make_shared<T>(std::forward<Args>(args)...);
-    m_Components[entity][typeid(T)] = component;
-    MarkChanged<T>();
+    m_Components[entity][std::type_index(typeid(T))] = component;
+    MarkChanged<T>(entity);
     return component.get();
   }
 
@@ -79,7 +81,8 @@ public:
     auto it = m_Components.find(entity);
     if (it == m_Components.end())
       return false;
-    return (m_Components[entity].find(typeid(T)) != m_Components[entity].end());
+    return (m_Components[entity].find(std::type_index(typeid(T))) !=
+            m_Components[entity].end());
   }
 
   /**
@@ -89,19 +92,28 @@ public:
    */
   template <typename T> bool Has() {
     for (auto [eid, components] : m_Components)
-      if (components.find(typeid(T)) != components.end())
+      if (components.find(std::type_index(typeid(T))) != components.end())
         return true;
     return false;
   }
 
   /**
-   * Collects components of specified types from a single entity.
+   * Retrieves all components of a specified type across all entities.
    *
-   * @param entity The entity ID from which to collect components.
-   * @return A tuple containing pointers to the components.
+   * @return A vector of pointers to the components.
    */
-  template <typename... T> std::tuple<T *...> Collect(EntityId entity) {
-    return std::make_tuple(Get<T>(entity)...);
+  template <typename T> std::vector<std::pair<EntityId, T *>> Get() {
+    std::vector<std::pair<EntityId, T *>> result;
+
+    for (const auto &[eid, components] : m_Components)
+      try {
+        result.push_back({eid, std::static_pointer_cast<T>(
+                                   components.at(std::type_index(typeid(T))))
+                                   .get()});
+      } catch (const std::exception &e) {
+      }
+
+    return result;
   }
 
   /**
@@ -112,11 +124,33 @@ public:
    */
   template <typename T> T *Get(EntityId entity) {
     try {
-      return std::static_pointer_cast<T>(m_Components.at(entity).at(typeid(T)))
+      return std::static_pointer_cast<T>(
+                 m_Components.at(entity).at(std::type_index(typeid(T))))
           .get();
     } catch (const std::exception &e) {
     }
     return nullptr;
+  }
+
+  /**
+   * Collects all components of specified types across all entities.
+   *
+   * @return A vector containing a pair of entity id & vectors of pointers to
+   * the components.
+   */
+  template <typename... T>
+  std::tuple<std::vector<std::pair<EntityId, T *>>...> Collect() {
+    return std::make_tuple(Get<T>()...);
+  }
+
+  /**
+   * Collects components of specified types from a single entity.
+   *
+   * @param entity The entity ID from which to collect components.
+   * @return A tuple containing pointers to the components.
+   */
+  template <typename... T> std::tuple<T *...> Collect(EntityId entity) {
+    return std::make_tuple(Get<T>(entity)...);
   }
 
   /**
@@ -146,58 +180,18 @@ public:
   const std::vector<Entity *> GetEntities(const std::string &name);
 
   /**
-   * Collects all components of specified types across all entities.
-   *
-   * @return A tuple containing vectors of pointers to the components.
-   */
-  template <typename... T>
-  std::tuple<std::vector<std::pair<EntityId, T *>>...> Collect() {
-    return std::make_tuple(Get<T>()...);
-  }
-
-  /**
-   * Retrieves all components of a specified type across all entities.
-   *
-   * @return A vector of pointers to the components.
-   */
-  template <typename T> std::vector<std::pair<EntityId, T *>> Get() {
-    std::vector<std::pair<EntityId, T *>> result;
-
-    for (const auto &[eid, components] : m_Components)
-      try {
-        result.push_back(
-            {eid, std::static_pointer_cast<T>(components.at(typeid(T))).get()});
-      } catch (const std::exception &e) {
-      }
-
-    return result;
-  }
-
-  /**
-   * Retrieves all entities in the registry.
-   *
-   * @return A vector of pointers to all entities.
-   */
-  std::vector<Entity *> Entities() {
-    std::vector<Entity *> entities(m_Entities.size());
-    for (auto &[_, entity] : m_Entities)
-      entities.push_back(entity.get());
-    return entities;
-  }
-
-  /**
    * Removes all components of a specified type across all entities.
    */
   template <typename... T> void Remove() {
     for (auto &[eid, components] : m_Components)
-      (components.erase(typeid(T)), ...);
+      (components.erase(std::type_index(typeid(T))), ...);
   }
 
   /**
    * Removes all components of a specified type for the entity specified.
    */
   template <typename... T> void Remove(EntityId entity) {
-    (m_Components.at(entity).erase(typeid(T)), ...);
+    (m_Components.at(entity).erase(std::type_index(typeid(T))), ...);
   }
 
   /**
@@ -218,23 +212,15 @@ public:
   }
 
   /**
-   * Marks a component for removal, for all entities.
-   * The component will be removed once ClearChanged() is called.
-   */
-  template <typename... T> void MarkForRemoval() {
-    for (auto &[eid, components] : m_Components) {
-      (m_Dirty.insert_or_assign(typeid(T), true), ...);
-      (m_MarkForRemoval[eid].insert_or_assign(typeid(T), true), ...);
-    }
-  }
-
-  /**
    * Marks a component for removal, for the specified entity.
    * The component will be removed once ClearChanged() is called.
    */
   template <typename... T> void MarkForRemoval(EntityId entity) {
-    (m_Dirty.insert_or_assign(typeid(T), true), ...);
-    (m_MarkForRemoval[entity].insert_or_assign(typeid(T), true), ...);
+    (m_DirtyTwo[entity].insert_or_assign(std::type_index(typeid(T)), true),
+     ...);
+    (m_MarkForRemoval[entity].insert_or_assign(std::type_index(typeid(T)),
+                                               true),
+     ...);
   }
 
   /**
@@ -246,7 +232,7 @@ public:
     if (it == m_MarkForRemoval.end())
       return false;
 
-    auto jt = it->second.find(typeid(T));
+    auto jt = it->second.find(std::type_index(typeid(T)));
     if (jt == it->second.end())
       return false;
 
@@ -260,7 +246,9 @@ public:
    *
    * @tparam T Component type to mark.
    */
-  template <typename T> void MarkChanged() { m_Dirty[typeid(T)] = true; }
+  template <typename T> void MarkChanged(EntityId entity) {
+    m_DirtyTwo[entity][std::type_index(typeid(T))] = true;
+  }
 
   /**
    * @brief Check whether any specific component type has been marked as
@@ -270,21 +258,91 @@ public:
    * @return true if the component type T is marked as changed, false otherwise.
    */
   template <typename... T> bool AnyChanged() {
-    return ((m_Dirty.find(typeid(T)) != m_Dirty.end() && m_Dirty[typeid(T)]) ||
-            ...);
+    for (auto &[eid, components] : m_DirtyTwo)
+      if (((components.find(std::type_index(typeid(T))) != components.end() &&
+            components[std::type_index(typeid(T))] == true) ||
+           ...))
+        return true;
+
+    return false;
   }
 
   /**
-   * @brief Check whether multiple component types have been marked as changed.
+   * Retrieves a component of type T from a specified entity if it was changed.
+   *
+   * @param entity The entity ID from which to retrieve the component.
+   * @return A pointer to the component, or nullptr if nothing changed.
+   */
+  template <typename T> T *GetChanged(EntityId entity) {
+    auto it = m_DirtyTwo.find(entity);
+
+    if (it == m_DirtyTwo.end())
+      return nullptr;
+
+    auto cit = it->second.find(std::type_index(typeid(T)));
+
+    if (cit == it->second.end())
+      return nullptr;
+
+    return std::static_pointer_cast<T>(
+        m_Components.at(entity).at(cit->first).get());
+  }
+
+  /**
+   * Retrieves a vecotr components of type T from all entities if it was
+   * changed.
+   *
+   * @return A vector of pairs with the entity id & component
+   */
+  template <typename T> std::vector<std::pair<EntityId, T *>> GetChanged() {
+    std::vector<std::pair<EntityId, T *>> result;
+
+    for (const auto &[eid, components] : m_DirtyTwo)
+      for (const auto &[cid, changed] : components) {
+        if (!changed || cid != std::type_index(typeid(T)))
+          continue;
+        try {
+          result.push_back(
+              {eid, std::static_pointer_cast<T>(m_Components.at(eid).at(cid))
+                        .get()});
+        } catch (const std::exception &e) {
+        }
+      }
+
+    return result;
+  }
+
+  /**
+   * Collects components of specified types from a single entity if there are
+   * changes, nullptr otherwise.
+   *
+   * @param entity The entity ID from which to collect components.
+   * @return A tuple containing pointers to the components or nullptr if nothing
+   * changed.
+   */
+  template <typename... T> std::tuple<T *...> CollectChanged(EntityId entity) {
+    return std::make_tuple(GetChanged<T>(entity)...);
+  }
+
+  /**
+   * @brief Check whether multiple component types have been marked as changed
+   * for the specified entity.
    *
    * Expands to a tuple of booleans, where each element corresponds to the
    * result of HasChanged for the given component type.
    *
+   * @param entity The entity id
    * @return std::tuple<bool, bool, ...> with one entry per queried type.
    */
-  template <typename... T> auto HasChanged() {
+  template <typename... T> auto HasChanged(EntityId entity) {
+    auto it = m_DirtyTwo.find(entity);
+
+    if (it == m_DirtyTwo.end())
+      return {};
+
     return std::make_tuple(
-        (m_Dirty.find(typeid(T)) != m_Dirty.end() && m_Dirty[typeid(T)])...);
+        (it->second.find(std::type_index(typeid(T))) != it->second.end() &&
+         it->second[std::type_index(typeid(T))])...);
   }
 
   /**
@@ -294,27 +352,49 @@ public:
    * @tparam T Component type to reset.
    */
   template <typename... T> void ClearChanged() {
-    ((m_Dirty[typeid(T)] = false), ...);
+    for (auto &[eid, components] : m_DirtyTwo)
+      for (auto &[cid, value] : components)
+        if (((cid == std::type_index(typeid(T))) || ...))
+          value = false;
 
-    auto flush = [&](std::type_index t) {
-      for (auto &[eid, typeMap] : m_MarkForRemoval) {
-        auto it = typeMap.find(t);
-        if (it != typeMap.end() && it->second) {
-          it->second = false;
-          m_Components.at(eid).erase(t);
-        }
-      }
-    };
+    for (auto &[eid, components] : m_MarkForRemoval)
+      ((ClearChanged<T>(eid)), ...);
+  }
 
-    (flush(typeid(T)), ...);
+  /**
+   * @brief Clear the "changed" flag for a given component type for the
+   * specified entity.
+   *
+   * @note This method also removes any entities & components staged for
+   * removal
+   * @tparam T Component type to reset.
+   */
+  template <typename... T> void ClearChanged(EntityId entity) {
+    for (auto &[cid, value] : m_DirtyTwo.at(entity))
+      if (((cid == std::type_index(typeid(T))) || ...))
+        value = false;
+
+    auto it = m_MarkForRemoval.find(entity);
+    if (it == m_MarkForRemoval.end())
+      return;
+
+    ((it->second.erase(std::type_index(typeid(T))) &&
+      m_Components[it->first].erase(std::type_index(typeid(T)))),
+     ...);
   }
 
   /**
    * @brief Clear the "changed" flag for a all component types.
    */
   void ClearChanged() {
-    for (auto &[i, dirty] : m_Dirty)
-      dirty = false;
+    m_DirtyTwo.clear();
+
+    for (auto &[eid, components] : m_MarkForRemoval)
+      for (auto &[cid, value] : components)
+        if (value)
+          m_Components[eid].erase(cid);
+
+    m_MarkForRemoval.clear();
   }
 };
 } // namespace ECS

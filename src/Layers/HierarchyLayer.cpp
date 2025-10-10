@@ -93,21 +93,17 @@ void HierarchyLayer::OnAttach() {
 void HierarchyLayer::OnUpdate(float deltaTime) {
   auto registry = ServiceLocator::Get<ECS::Registry>();
 
-  if (registry->AnyChanged<CHierarchy>()) {
-    registry->ClearChanged<CHierarchy>();
+  const auto components = registry->GetChanged<CHierarchy>();
 
-    const auto &[components] = registry->Collect<CHierarchy>();
-
+  if (components.size())
     m_Hierarchy.Clear();
 
-    for (size_t i = 0; i < components.size(); i++) {
-      uint32_t id = components[i].second->id;
-      uint32_t parent = components[i].second->parent;
-      m_Hierarchy.Add({
-          .id = id,
-          .parent = parent,
-      });
-    }
+  for (auto &[eid, cHierarchy] : components) {
+    registry->ClearChanged<CHierarchy>(eid);
+    m_Hierarchy.Add({
+        .id = cHierarchy->id,
+        .parent = cHierarchy->parent,
+    });
   }
 }
 
