@@ -284,8 +284,8 @@ public:
     if (cit == it->second.end())
       return nullptr;
 
-    return std::static_pointer_cast<T>(
-        m_Components.at(entity).at(cit->first).get());
+    return std::static_pointer_cast<T>(m_Components.at(entity).at(cit->first))
+        .get();
   }
 
   /**
@@ -370,7 +370,7 @@ public:
    * @tparam T Component type to reset.
    */
   template <typename... T> void ClearChanged(EntityId entity) {
-    for (auto &[cid, value] : m_DirtyTwo.at(entity))
+    for (auto &[cid, value] : m_DirtyTwo[entity])
       if (((cid == std::type_index(typeid(T))) || ...))
         value = false;
 

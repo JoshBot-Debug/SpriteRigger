@@ -57,8 +57,8 @@ private:
    * @return True if the color was successfully updated; otherwise false.
    */
   bool Highlight(ECS::EntityId eid, CBone::Part part, glm::vec4 &color,
-                 CBone::Part target, CBone::Part skip, float lerp) {
-    if (part == skip)
+                 CBone::Part target, bool skip, float lerp) {
+    if (skip)
       return true;
     glm::vec4 next = GetHighlightColor(part, target, Colors::DEFAULT);
     return ECS::Mutate<CBone, glm::vec4>(m_Registry, eid, color,
@@ -94,12 +94,14 @@ public:
         auto target = cHovered->target;
         auto skip = cSelected ? cSelected->target : CBone::None;
 
-        bool mc = Highlight(eid, CBone::Shaft, c, target, skip, speed);
-        bool ms = Highlight(eid, CBone::StartJoint, s, target, skip, speed);
-        bool me = Highlight(eid, CBone::EndJoint, e, target, skip, speed);
+        bool mc = Highlight(eid, CBone::Shaft, c, target, skip == CBone::Shaft,
+                            speed);
+        bool ms = Highlight(eid, CBone::StartJoint, s, target,
+                            skip == CBone::StartJoint, speed);
+        bool me = Highlight(eid, CBone::EndJoint, e, target,
+                            skip == CBone::EndJoint, speed);
 
-        std::cout << "Mutating CHovered " << (int)target << " " << (int)skip
-                  << std::endl;
+        std::cout << "Mutating CHovered " << (int)target << " " << std::endl;
 
         if (mc && ms && me) {
           m_Registry->ClearChanged<CHovered>(eid);
@@ -110,34 +112,27 @@ public:
 
     for (auto [eid, cSelected] : m_Registry->GetChanged<CSelected>()) {
       if (auto cBone = m_Registry->Get<CBone>(eid)) {
+
         auto &c = cBone->color;
         auto &s = cBone->joints[CBone::StartJoint].color;
         auto &e = cBone->joints[CBone::EndJoint].color;
         auto target = cSelected->target;
 
-        std::cout << "Mutating CSelected " << (int)target << std::endl;
+        std::cout << "Mutating CSelected " << (int)target << " " << std::endl;
 
-        if (target == CBone::StartJoint) {
-          if (Highlight(eid, CBone::StartJoint, s, target, CBone::None,
-                        speed)) {
-            m_Registry->ClearChanged<CSelected>(eid);
-            std::cout << "ClearChanged CSelected " << (int)target << std::endl;
-          }
-        } else if (target == CBone::EndJoint) {
-          if (Highlight(eid, CBone::EndJoint, e, target, CBone::None, speed)) {
-            m_Registry->ClearChanged<CSelected>(eid);
-            std::cout << "ClearChanged CSelected " << (int)target << std::endl;
-          }
-        } else if (target == CBone::Shaft) {
-          bool mc = Highlight(eid, CBone::Shaft, c, target, CBone::None, speed);
-          bool ms =
-              Highlight(eid, CBone::StartJoint, s, target, CBone::None, speed);
-          bool me =
-              Highlight(eid, CBone::EndJoint, e, target, CBone::None, speed);
-          if (mc && ms && me) {
-            m_Registry->ClearChanged<CSelected>(eid);
-            std::cout << "ClearChanged CSelected " << (int)target << std::endl;
-          }
+        bool mc =
+            Highlight(eid, CBone::Shaft, c, target,
+                      target != CBone::Shaft && target != CBone::None, speed);
+        bool ms = Highlight(
+            eid, CBone::StartJoint, s, target,
+            target != CBone::StartJoint && target != CBone::None, speed);
+        bool me = Highlight(eid, CBone::EndJoint, e, target,
+                            target != CBone::EndJoint && target != CBone::None,
+                            speed);
+
+        if (mc && ms && me) {
+          m_Registry->ClearChanged<CSelected>(eid);
+          std::cout << "ClearChanged CSelected " << (int)target << std::endl;
         }
       }
     }
