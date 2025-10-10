@@ -35,6 +35,14 @@ private:
     return counter;
   }
 
+  /**
+   * A global counter for unique entity ids.
+   */
+  static EntityId &GetEntityCounter() {
+    static EntityId counter = 0;
+    return counter;
+  }
+
 public:
   Registry() { m_Entities.reserve(100); };
 
@@ -49,12 +57,33 @@ public:
   }
 
   /**
+   * Retrieve a unique, stable ID for a entity type.
+   */
+  template <typename T> static size_t GetEntityTypeID() {
+    static const size_t id = ++GetEntityCounter();
+    return id;
+  }
+
+  /**
    * Creates a new entity with a given name.
    *
    * @param id The id the entity (optional).
    * @return A pointer to the newly created entity.
    */
   template <typename T> Entity *CreateEntity(EntityId id = 0) {
+    EntityId &eid = GetEntityCounter();
+    eid = id > eid ? id : eid + 1;
+    auto entity = std::make_shared<Entity>(eid, this);
+    return entity.get();
+  };
+
+  /**
+   * Creates a new entity with a given name.
+   *
+   * @param id The id the entity (optional).
+   * @return A pointer to the newly created entity.
+   */
+  template <typename T> Entity *CreateEntity() {
     EntityId eid = static_cast<EntityId>(m_Entities.size() + 1);
     eid = id > eid ? id : eid;
     auto entity = std::make_shared<Entity>(eid, this);
