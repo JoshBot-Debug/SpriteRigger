@@ -48,8 +48,8 @@ void HierarchyLayer::OnAttach() {
 
     auto registry = ServiceLocator::Get<ECS::Registry>();
 
-    CHierarchy *cHierarchy = registry->Get<CHierarchy>(item->id);
-    CFlags *cFlags = registry->Get<CFlags>(item->id);
+    auto *cHierarchy = registry->Get<CHierarchy>(item->id);
+    auto *cFlags = registry->Get<CFlags>(item->id);
 
     if (!cHierarchy)
       return;
@@ -72,6 +72,14 @@ void HierarchyLayer::OnAttach() {
       if (ImGui::IsItemDeactivated())
         cFlags->rename = false;
     }
+
+    ImGui::BeginChild("Debug");
+    auto *cHovered = registry->Get<CHovered>(item->id);
+    auto *cSelected = registry->Get<CSelected>(item->id);
+    
+    ImGui::Text("cHovered %i %s %s", !cHovered ? -1 : (int)cHovered->target, registry->MarkedForRemoval<CHovered>(item->id) ? "Marked for removal" : "", registry->GetChanged<CHovered>(item->id) ? "Dirty" : "Clean");
+    ImGui::Text("cSelected %i %s %s", !cSelected ? -1 : (int)cSelected->target, registry->MarkedForRemoval<CSelected>(item->id) ? "Marked for removal" : "", registry->GetChanged<CSelected>(item->id) ? "Dirty" : "Clean");
+    ImGui::EndChild();
 
     if (cFlags->selected)
       item->flags = ImGuiTreeNodeFlags_Selected;

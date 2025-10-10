@@ -274,18 +274,28 @@ public:
    * @return A pointer to the component, or nullptr if nothing changed.
    */
   template <typename T> T *GetChanged(EntityId entity) {
-    auto it = m_DirtyTwo.find(entity);
-
-    if (it == m_DirtyTwo.end())
+    // Check if entity has any changed components
+    auto dirtyIt = m_DirtyTwo.find(entity);
+    if (dirtyIt == m_DirtyTwo.end())
       return nullptr;
 
-    auto cit = it->second.find(std::type_index(typeid(T)));
-
-    if (cit == it->second.end())
+    // Check if this component type is marked as changed
+    const auto type = std::type_index(typeid(T));
+    auto dirtyEntryIt = dirtyIt->second.find(type);
+    if (dirtyEntryIt == dirtyIt->second.end() || !dirtyEntryIt->second)
       return nullptr;
 
-    return std::static_pointer_cast<T>(m_Components.at(entity).at(cit->first))
-        .get();
+    // Retrieve the component from the entity's component map
+    auto compIt = m_Components.find(entity);
+    if (compIt == m_Components.end())
+      return nullptr;
+
+    auto compEntryIt = compIt->second.find(type);
+    if (compEntryIt == compIt->second.end())
+      return nullptr;
+
+    // Return the underlying pointer
+    return std::static_pointer_cast<T>(compEntryIt->second).get();
   }
 
   /**
@@ -299,7 +309,7 @@ public:
 
     for (const auto &[eid, components] : m_DirtyTwo)
       for (const auto &[cid, changed] : components) {
-        if (!changed || cid != std::type_index(typeid(T)))
+        if (cid != std::type_index(typeid(T)) || !changed)
           continue;
         try {
           result.push_back(

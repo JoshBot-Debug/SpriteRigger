@@ -40,9 +40,13 @@ public:
       if (!m_Registry->MarkedForRemoval<CSelected>(eid)) {
         std::cout << "MarkForRemoval CSelected " << (int)cSelected->target
                   << std::endl;
+        auto cHovered = m_Registry->Get<CHovered>(eid);
+        if (cHovered && cHovered->target != cSelected->target) {
+          ECS::Mutate<CSelected, CBone::Part>(m_Registry, eid, cSelected->target, cHovered->target);
+          continue;
+        }
         cSelected->target = CBone::None;
         m_Registry->MarkForRemoval<CSelected>(eid);
-        // m_Registry->ClearChanged<CSelected>(eid);
       }
     }
 
@@ -52,16 +56,5 @@ public:
         m_Registry->Add<CSelected>(eid, cHovered->target);
       }
     }
-
-    // if (!m_Registry->Has<CHovered>()) {
-    //   if (data->isMouseDown)
-    //     m_Registry->Remove<CSelected>();
-    //   return;
-    // }
-
-    // for (auto [id, cHovered] : m_Registry->Get<CHovered>()) {
-    //   if (data->isMouseDown)
-    //     m_Registry->Add<CSelected>(id, cHovered->target);
-    // }
   }
 };
