@@ -28,10 +28,8 @@ private:
   std::map<EntityId, std::unordered_map<std::type_index, std::shared_ptr<void>>>
       m_Components; ///< Components indexed by entity ID.
 
-  std::unordered_map<std::type_index, bool> m_Dirty;
-
   std::unordered_map<EntityId, std::unordered_map<std::type_index, bool>>
-      m_DirtyTwo;
+      m_Dirty;
   std::unordered_map<EntityId, std::unordered_map<std::type_index, bool>>
       m_MarkForRemoval;
 
@@ -216,7 +214,7 @@ public:
    * The component will be removed once ClearChanged() is called.
    */
   template <typename... T> void MarkForRemoval(EntityId entity) {
-    (m_DirtyTwo[entity].insert_or_assign(std::type_index(typeid(T)), true),
+    (m_Dirty[entity].insert_or_assign(std::type_index(typeid(T)), true),
      ...);
     (m_MarkForRemoval[entity].insert_or_assign(std::type_index(typeid(T)),
                                                true),
@@ -247,7 +245,7 @@ public:
    * @tparam T Component type to mark.
    */
   template <typename T> void MarkChanged(EntityId entity) {
-    m_DirtyTwo[entity][std::type_index(typeid(T))] = true;
+    m_Dirty[entity][std::type_index(typeid(T))] = true;
   }
 
   /**
@@ -258,7 +256,7 @@ public:
    * @return true if the component type T is marked as changed, false otherwise.
    */
   template <typename... T> bool AnyChanged() {
-    for (auto &[eid, components] : m_DirtyTwo)
+    for (auto &[eid, components] : m_Dirty)
       if (((components.find(std::type_index(typeid(T))) != components.end() &&
             components[std::type_index(typeid(T))] == true) ||
            ...))
@@ -275,8 +273,8 @@ public:
    */
   template <typename T> T *GetChanged(EntityId entity) {
     // Check if entity has any changed components
-    auto dirtyIt = m_DirtyTwo.find(entity);
-    if (dirtyIt == m_DirtyTwo.end())
+    auto dirtyIt = m_Dirty.find(entity);
+    if (dirtyIt == m_Dirty.end())
       return nullptr;
 
     // Check if this component type is marked as changed
@@ -307,7 +305,7 @@ public:
   template <typename T> std::vector<std::pair<EntityId, T *>> GetChanged() {
     std::vector<std::pair<EntityId, T *>> result;
 
-    for (const auto &[eid, components] : m_DirtyTwo)
+    for (const auto &[eid, components] : m_Dirty)
       for (const auto &[cid, changed] : components) {
         if (cid != std::type_index(typeid(T)) || !changed)
           continue;
@@ -345,9 +343,9 @@ public:
    * @return std::tuple<bool, bool, ...> with one entry per queried type.
    */
   template <typename... T> auto HasChanged(EntityId entity) {
-    auto it = m_DirtyTwo.find(entity);
+    auto it = m_Dirty.find(entity);
 
-    if (it == m_DirtyTwo.end())
+    if (it == m_Dirty.end())
       return {};
 
     return std::make_tuple(
@@ -362,7 +360,7 @@ public:
    * @tparam T Component type to reset.
    */
   template <typename... T> void ClearChanged() {
-    for (auto &[eid, components] : m_DirtyTwo)
+    for (auto &[eid, components] : m_Dirty)
       for (auto &[cid, value] : components)
         if (((cid == std::type_index(typeid(T))) || ...))
           value = false;
@@ -380,7 +378,7 @@ public:
    * @tparam T Component type to reset.
    */
   template <typename... T> void ClearChanged(EntityId entity) {
-    for (auto &[cid, value] : m_DirtyTwo[entity])
+    for (auto &[cid, value] : m_Dirty[entity])
       if (((cid == std::type_index(typeid(T))) || ...))
         value = false;
 
@@ -397,7 +395,7 @@ public:
    * @brief Clear the "changed" flag for a all component types.
    */
   void ClearChanged() {
-    m_DirtyTwo.clear();
+    m_Dirty.clear();
 
     for (auto &[eid, components] : m_MarkForRemoval)
       for (auto &[cid, value] : components)
