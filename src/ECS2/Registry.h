@@ -72,11 +72,12 @@ public:
   /**
    * Creates a new entity with a given name.
    *
+   * @tparam E Entity
    * @return A pointer to the newly created entity.
    */
-  template <typename T> Entity *CreateEntity() {
-    EntityTypeId tid = GetEntityTypeId<T>();
-    auto [id, reused] = GetEntityId<T>();
+  template <typename E> Entity *CreateEntity() {
+    EntityTypeId tid = GetEntityTypeId<E>();
+    auto [id, reused] = GetEntityId<E>();
 
     if (reused)
       m_EntitiesByETID[tid][id] = new Entity{tid, id + 1, this};
@@ -89,26 +90,30 @@ public:
   /**
    * Get an entity by id
    *
+   * @tparam E Entity
    * @return A point to the entity or nullptr if it was destroyed
    */
-  template <typename T> Entity *GetEntity(EntityId id) {
-    return m_EntitiesByETID[GetEntityTypeId<T>()][id - 1];
+  template <typename E> Entity *GetEntity(EntityId id) {
+    return m_EntitiesByETID[GetEntityTypeId<E>()][id - 1];
   }
 
   /**
    * Get all entities by type
    *
+   * @tparam E Entity
    * @return A vector of entity pointers, may contain nullptrs
    */
-  template <typename T> std::vector<Entity *> GetEntities() {
-    return m_EntitiesByETID[GetEntityTypeId<T>()];
+  template <typename E> std::vector<Entity *> GetEntities() {
+    return m_EntitiesByETID[GetEntityTypeId<E>()];
   }
 
   /**
    * Destroys an entity
+   * 
+   * @tparam E Entity
    */
-  template <typename T> void DestroyEntity(EntityId id) {
-    EntityTypeId tid = GetEntityTypeId<T>();
+  template <typename E> void DestroyEntity(EntityId id) {
+    EntityTypeId tid = GetEntityTypeId<E>();
     delete m_EntitiesByETID[tid][id - 1];
     m_EntitiesByETID[tid][id - 1] = nullptr;
     m_FreeEntitySlotsByETID[tid].push_back(id - 1);
@@ -117,6 +122,8 @@ public:
   /**
    * Adds a component typename C to the specified entity.
    *
+   * @tparam E Entity
+   * @tparam C Component
    * @param id The entity ID to which the component will be added.
    * @param args Constructor arguments for the component.
    * @return A pointer to the newly created component.
@@ -131,6 +138,7 @@ public:
   /**
    * Checks if any entity has a component C.
    *
+   * @tparam C Component
    * @return True if the entity has the component, false otherwise.
    */
   template <typename C> bool Has() {
@@ -145,6 +153,8 @@ public:
   /**
    * Checks if an entity E has a component C.
    *
+   * @tparam E Entity
+   * @tparam C Component
    * @param id The entity id.
    * @return True if the entity has the component, false otherwise.
    */
@@ -157,6 +167,7 @@ public:
   /**
    * Retrieves components C from all entities.
    *
+   * @tparam C Component
    * @return A vector of pointers to the component.
    */
   template <typename C> std::vector<C *> Get() {
@@ -172,6 +183,7 @@ public:
   /**
    * Retrieves a component C from entity E.
    *
+   * @tparam C Component
    * @param id The entity id
    * @return A pointer to the component, or nullptr if not found.
    */
@@ -180,6 +192,19 @@ public:
     Entity *entity = GetEntity<E>(id);
     return entity->Get<C>();
   }
+
+  // /**
+  //  * Retrieves component C from entity E.
+  //  * 
+  //  * @tparam C Component
+  //  * @param id The entity id
+  //  * @return A pointer to the component, or nullptr if not found.
+  //  */
+  // template <typename E, typename C> C *Get(EntityId id) {
+  //   EntityTypeId tid = GetEntityTypeId<E>();
+  //   Entity *entity = GetEntity<E>(id);
+  //   return entity->Get<C>();
+  // }
 
   /**
    * Removes all components of a specified type for the entity specified.

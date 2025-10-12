@@ -32,6 +32,7 @@ private:
 
   std::bitset<MAX_COMPONENTS> m_Has;
   std::bitset<MAX_COMPONENTS> m_Dirty;
+  std::bitset<MAX_COMPONENTS> m_Removal;
 
 private:
   /**
@@ -136,6 +137,24 @@ public:
   }
 
   /**
+   * Mark all components for removal
+   *
+   * @note The component will be removed once ClearChanges() is called
+   *
+   * @tparam C Component
+   * @tparam Rest Components
+   */
+  template <typename C, typename... Rest> void MarkForRemove() {
+    size_t id = GetComponentTypeId<C>();
+    if (m_Has.test(id)) {
+      m_Removal.set(id, true);
+      m_Dirty.set(id, true);
+    }
+    if constexpr (sizeof...(Rest) > 0)
+      MarkForRemove<Rest...>();
+  }
+
+  /**
    * Mark the given components as changed
    *
    * @tparam C Component
@@ -196,9 +215,20 @@ public:
    * Clear changes for components
    *
    * @tparam C Component
+   * @tparam Rest Components
    */
-  template <typename... C> void ClearChanged() {
-    (m_Dirty.set(GetComponentTypeId<C>(), false), ...);
+  template <typename C, typename... Rest> void ClearChanged() {
+    size_t id = GetComponentTypeId<C>();
+    m_Dirty.set(id, false);
+
+    if (m_Removal.test(id) && m_Has.test(id)) {
+      m_Components[id].reset();
+      m_Has.set(id, false);
+      m_Removal.set(id, false);
+    }
+
+    if constexpr (sizeof...(Rest) > 0)
+      ClearChanged<Rest...>();
   }
 
   /**
