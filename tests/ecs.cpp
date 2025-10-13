@@ -102,8 +102,8 @@ TEST(Registry, AddComponents) {
   EXPECT_TRUE(cHovered != nullptr);
   EXPECT_TRUE(cSelected != nullptr);
 
-  auto hovered = registry.Get<CHovered>();
-  auto selected = registry.Get<CSelected>();
+  auto hovered = registry.Get<EBone, CHovered>();
+  auto selected = registry.Get<EBone, CSelected>();
 
   EXPECT_EQ(hovered.size(), 1);
   EXPECT_EQ(selected.size(), 1);
@@ -138,18 +138,6 @@ TEST(Registry, GetComponents) {
   EXPECT_EQ(g2, 2);
   EXPECT_EQ(g3, 3);
   EXPECT_EQ(g4, 4);
-
-  auto many = registry.Get<CHovered, CSelected>();
-
-  EXPECT_EQ(many.size(), 2);
-
-  EXPECT_EQ(many[0].first->GetId(), bone_1->GetId());
-  EXPECT_EQ(many[1].first->GetId(), bone_2->GetId());
-
-  EXPECT_EQ(std::get<0>(many[0].second)->id, 1);
-  EXPECT_EQ(std::get<1>(many[0].second)->id, 2);
-  EXPECT_EQ(std::get<0>(many[1].second)->id, 3);
-  EXPECT_EQ(std::get<1>(many[1].second)->id, 4);
 }
 
 TEST(Entity, Changes) {
@@ -190,8 +178,8 @@ TEST(Entity, Changes) {
   EXPECT_EQ(anyChanged, true);
   EXPECT_EQ(hasChanged, true);
   EXPECT_EQ(getChanged->id, 1);
-  EXPECT_EQ(std::get<0>(collectChanged.second)->id, 1);
-  EXPECT_EQ(std::get<1>(collectChanged.second)->id, 2);
+  EXPECT_EQ(std::get<0>(collectChanged)->id, 1);
+  EXPECT_EQ(std::get<1>(collectChanged)->id, 2);
 
   bone_1->ClearChanged<CHovered>();
   hasChanged = bone_1->HasChanged<CHovered>();

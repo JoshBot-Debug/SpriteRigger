@@ -26,11 +26,11 @@ namespace ECS2 {
  * from next).
  */
 template <typename C, typename T>
-inline bool Mutate(ECS::Registry *registry, ECS::EntityId eid, T &current, const T &next) {
+inline bool Mutate(ECS2::Entity *entity, T &current, const T &next) {
   bool mutated = current != next;
   if (mutated) {
     current = next;
-    registry->MarkChanged<C>(eid);
+    entity->MarkChanged<C>();
   }
   return !mutated;
 }

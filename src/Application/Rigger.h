@@ -2,7 +2,7 @@
 
 #include "Utility.h"
 
-#include "ECS/Entity.h"
+#include "ECS2/Registry.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 #include "Application/Components.h"
@@ -12,10 +12,10 @@ private:
 public:
   Rigger() = default;
 
-  void NewBone(ECS::EntityId parent) {
-    auto registry = ServiceLocator::Get<ECS::Registry>();
+  void NewBone(ECS2::EntityId parent) {
+    auto registry = ServiceLocator::Get<ECS2::Registry>();
 
-    ECS::Entity *entity = registry->CreateEntity("bone");
+    ECS2::Entity *entity = registry->CreateEntity<EBone>();
 
     CBone *bone = entity->Add<CBone>();
     CHierarchy *hierarchy = entity->Add<CHierarchy>();
@@ -27,11 +27,11 @@ public:
 
     hierarchy->id = entity->GetId();
     hierarchy->parent = parent;
-    std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %u",
+    std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %lu",
                   entity->GetId());
   }
 
-  void RemoveBone(ECS::EntityId id) {
-    ServiceLocator::Get<ECS::Registry>()->Remove(id);
+  void RemoveBone(ECS2::EntityId id) {
+    ServiceLocator::Get<ECS2::Registry>()->DestroyEntity<EBone>(id);
   }
 };

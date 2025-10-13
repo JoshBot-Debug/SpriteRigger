@@ -4,19 +4,19 @@
 
 #include "imgui.h"
 
-#include "ECS/Entity.h"
-#include "ECS/System.h"
-#include "ECS/Utility.h"
+#include "ECS2/Registry.h"
+#include "ECS2/System.h"
+#include "ECS2/Utility.h"
 
 #include "Camera/Components/Grid.h"
 #include "Camera/OrthographicCamera.h"
 
 #include "Common.h"
 
-class HoverSystem : public ECS::System {
+class HoverSystem : public ECS2::System {
 private:
   Grid *m_Grid = nullptr;
-  ECS::Registry *m_Registry = nullptr;
+  ECS2::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
 
 private:
@@ -46,7 +46,7 @@ public:
     m_Registry = nullptr;
   }
 
-  void Initialize(ECS::Registry *registry, Grid *grid,
+  void Initialize(ECS2::Registry *registry, Grid *grid,
                   OrthographicCamera *camera) {
     m_Grid = grid;
     m_Camera = camera;
@@ -57,9 +57,8 @@ public:
     auto data = reinterpret_cast<SystemData *>(d);
     glm::vec2 mouse = glm::vec2(data->mouse.x, data->mouse.y);
 
-    for (auto [eid, cBone] : m_Registry->Get<CBone>()) {
-      auto entity = m_Registry->GetEntity(eid);
-      auto cHovered = m_Registry->Get<CHovered>(eid);
+    for (auto [entity, cBone] : m_Registry->Get<EBone, CBone>()) {
+      auto cHovered = entity->Get<CHovered>();
 
       CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
 
@@ -74,7 +73,7 @@ public:
           cHovered = entity->Add<CHovered>(part);
           std::cout << "Add CHovered " << (int)part << std::endl;
         } else
-          ECS::Mutate<CHovered, CBone::Part>(m_Registry, eid, cHovered->target, part);
+          ECS2::Mutate<CHovered, CBone::Part>(entity, cHovered->target, part);
       }
     }
   }

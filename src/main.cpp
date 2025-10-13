@@ -8,8 +8,8 @@
 
 #include "Application/Rigger.h"
 #include "Components/Hierarchy.h"
-#include "ECS/Entity.h"
-#include "ECS/System.h"
+#include "ECS2/Entity.h"
+#include "ECS2/System.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 #include "Utility.h"
@@ -21,10 +21,10 @@ int main(int argc, char **argv) {
   State state;
 
   ServiceLocator::Register<Rigger>();
-  ServiceLocator::Register<ECS::Registry>();
+  ServiceLocator::Register<ECS2::Registry>();
 
   while (state.IsApplicationRunning()) {
-    ServiceLocator::Register<ECS::SystemManager>();
+    ServiceLocator::Register<ECS2::SystemManager>();
 
     bool initialized = state.IsInitialized();
 
@@ -169,10 +169,10 @@ int main(int argc, char **argv) {
     style.WindowMenuButtonPosition = ImGuiDir_None;
 
     window.Run();
-    ServiceLocator::Unregister<ECS::SystemManager>();
+    ServiceLocator::Unregister<ECS2::SystemManager>();
   }
 
-  ServiceLocator::Unregister<ECS::Registry>();
+  ServiceLocator::Unregister<ECS2::Registry>();
   ServiceLocator::Unregister<Rigger>();
 
   Window::Shutdown();

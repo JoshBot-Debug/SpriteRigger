@@ -26,7 +26,7 @@ namespace ECS {
  * from next).
  */
 template <typename C, typename T>
-inline bool Mutate(ECS::Registry *registry, ECS::EntityId eid, T &current, const T &next) {
+inline bool Mutate(ECS2::Registry *registry, ECS2::EntityId eid, T &current, const T &next) {
   bool mutated = current != next;
   if (mutated) {
     current = next;

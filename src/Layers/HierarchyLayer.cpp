@@ -2,7 +2,7 @@
 
 #include "Application/Components.h"
 #include "Application/Rigger.h"
-#include "ECS/Entity.h"
+#include "ECS2/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
@@ -33,8 +33,8 @@ void HierarchyLayer::OnAttach() {
                      ImGui::Separator();
                      if (ImGui::MenuItem(item->name, item->shortcut,
                                          item->selected, item->enabled))
-                       ServiceLocator::Get<ECS::Registry>()
-                           ->Get<CFlags>(ToInt32(data))
+                       ServiceLocator::Get<ECS2::Registry>()
+                           ->Get<EBone, CFlags>(ToInt32(data))
                            ->rename = true;
                    },
            },
@@ -46,17 +46,17 @@ void HierarchyLayer::OnAttach() {
 
     m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
 
-    auto registry = ServiceLocator::Get<ECS::Registry>();
+    auto registry = ServiceLocator::Get<ECS2::Registry>();
 
-    auto *cHierarchy = registry->Get<CHierarchy>(item->id);
-    auto *cFlags = registry->Get<CFlags>(item->id);
+    auto *cHierarchy = registry->Get<EBone, CHierarchy>(item->id);
+    auto *cFlags = registry->Get<EBone, CFlags>(item->id);
 
     if (!cHierarchy)
       return;
 
     if (ImGui::IsItemClicked()) {
-      for (auto &[_, flag] : registry->Get<CFlags>())
-        flag->selected = false;
+      for (auto [_, cFlag] : registry->Get<EBone, CFlags>())
+        cFlag->selected = false;
       cFlags->selected = true;
     }
 
@@ -74,11 +74,21 @@ void HierarchyLayer::OnAttach() {
     }
 
     ImGui::BeginChild("Debug");
-    auto *cHovered = registry->Get<CHovered>(item->id);
-    auto *cSelected = registry->Get<CSelected>(item->id);
-    
-    ImGui::Text("cHovered %i %s %s", !cHovered ? -1 : (int)cHovered->target, registry->MarkedForRemoval<CHovered>(item->id) ? "Marked for removal" : "", registry->GetChanged<CHovered>(item->id) ? "Dirty" : "Clean");
-    ImGui::Text("cSelected %i %s %s", !cSelected ? -1 : (int)cSelected->target, registry->MarkedForRemoval<CSelected>(item->id) ? "Marked for removal" : "", registry->GetChanged<CSelected>(item->id) ? "Dirty" : "Clean");
+    auto *cHovered = registry->Get<EBone, CHovered>(item->id);
+    auto *cSelected = registry->Get<EBone, CSelected>(item->id);
+
+    ImGui::Text("cHovered %i %s %s", !cHovered ? -1 : (int)cHovered->target,
+                registry->MarkedForRemoval<EBone, CHovered>(item->id)
+                    ? "Marked for removal"
+                    : "",
+                registry->GetChanged<EBone, CHovered>(item->id) ? "Dirty"
+                                                                : "Clean");
+    ImGui::Text("cSelected %i %s %s", !cSelected ? -1 : (int)cSelected->target,
+                registry->MarkedForRemoval<EBone, CSelected>(item->id)
+                    ? "Marked for removal"
+                    : "",
+                registry->GetChanged<EBone, CSelected>(item->id) ? "Dirty"
+                                                                 : "Clean");
     ImGui::EndChild();
 
     if (cFlags->selected)
@@ -99,15 +109,15 @@ void HierarchyLayer::OnAttach() {
 }
 
 void HierarchyLayer::OnUpdate(float deltaTime) {
-  auto registry = ServiceLocator::Get<ECS::Registry>();
+  auto registry = ServiceLocator::Get<ECS2::Registry>();
 
-  const auto components = registry->GetChanged<CHierarchy>();
+  const auto components = registry->GetChanged<EBone, CHierarchy>();
 
   if (components.size())
     m_Hierarchy.Clear();
 
   for (auto &[eid, cHierarchy] : components) {
-    registry->ClearChanged<CHierarchy>(eid);
+    eid->ClearChanged<CHierarchy>();
     m_Hierarchy.Add({
         .id = cHierarchy->id,
         .parent = cHierarchy->parent,

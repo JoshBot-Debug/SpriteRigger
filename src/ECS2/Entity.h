@@ -86,11 +86,12 @@ public:
    * @param args Constructor arguments for the component.
    * @return A pointer to the newly created component.
    */
-  template <typename C, typename... CArgs> void Add(CArgs &&...args) {
+  template <typename C, typename... CArgs> C *Add(CArgs &&...args) {
     size_t id = GetComponentTypeId<C>();
     m_Components[id] = std::make_shared<C>(std::forward<CArgs>(args)...);
     m_Has.set(id, true);
     m_Dirty.set(id, true);
+    return static_cast<C *>(m_Components[id].get());
   }
 
   /**
@@ -121,6 +122,16 @@ public:
   }
 
   /**
+   * Retrieves a components.
+   *
+   * @tparam C Component
+   * @return A pointer to the component, or nullptr if not found.
+   */
+  template <typename... C> std::tuple<C *...> Collect() {
+    return std::make_tuple(Get<C>()...);
+  }
+
+  /**
    * Remove components from the entity
    *
    * @tparam C Component
@@ -137,6 +148,15 @@ public:
   }
 
   /**
+   * Remove all components from the entity
+   */
+  void Remove() {
+    m_Has.reset();
+    for (auto component : m_Components)
+      component.reset();
+  }
+
+  /**
    * Mark components for removal
    *
    * @note The component will be removed once ClearChanges() is called
@@ -144,14 +164,24 @@ public:
    * @tparam C Component
    * @tparam Rest Components
    */
-  template <typename C, typename... Rest> void MarkForRemove() {
+  template <typename C, typename... Rest> void MarkForRemoval() {
     size_t id = GetComponentTypeId<C>();
     if (m_Has.test(id)) {
       m_Removal.set(id, true);
       m_Dirty.set(id, true);
     }
     if constexpr (sizeof...(Rest) > 0)
-      MarkForRemove<Rest...>();
+      MarkForRemoval<Rest...>();
+  }
+
+  /**
+   * Check if a component was marked for removal
+   *
+   * @tparam C Component
+   * @return A bool, true for marked, false otherwise
+   */
+  template <typename C> bool MarkedForRemoval() {
+    return m_Removal.test(GetComponentTypeId<C>());
   }
 
   /**
@@ -202,9 +232,8 @@ public:
    * @tparam C Component
    * @return A pointer to the component
    */
-  template <typename... C>
-  std::pair<Entity *, std::tuple<C *...>> CollectChanged() {
-    return {this, std::make_tuple(GetChanged<C>()...)};
+  template <typename... C> std::tuple<C *...> CollectChanged() {
+    return std::make_tuple(GetChanged<C>()...);
   }
 
   /**

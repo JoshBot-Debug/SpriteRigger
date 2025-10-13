@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <stdint.h>
 
+struct EBone {};
+
 struct CBone {
   enum Part : uint8_t { StartJoint = 0, EndJoint, Shaft, None };
 

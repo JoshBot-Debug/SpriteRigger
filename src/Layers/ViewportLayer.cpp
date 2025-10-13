@@ -8,14 +8,14 @@
 #include <cstring>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "ECS/Utility.h"
+#include "ECS2/Utility.h"
 
 ViewportLayer::ViewportLayer(State *state)
     : m_State(state), m_Grid(&m_Camera) {}
 
 void ViewportLayer::OnAttach() {
-  m_Registry = ServiceLocator::Get<ECS::Registry>();
-  m_System = ServiceLocator::Get<ECS::SystemManager>();
+  m_Registry = ServiceLocator::Get<ECS2::Registry>();
+  m_System = ServiceLocator::Get<ECS2::SystemManager>();
 
   m_HoverSystem = m_System->Register<HoverSystem>();
   m_SelectSystem = m_System->Register<SelectSystem>();
@@ -56,7 +56,7 @@ void ViewportLayer::OnRender() {
 
     m_System->Update<HoverSystem>(&m_SystemData);
     m_System->Update<SelectSystem>(&m_SystemData);
-    // m_System->Update<DragSystem>(&m_SystemData);
+    m_System->Update<DragSystem>(&m_SystemData);
     m_System->Update<ColorInterpolationSystem>(&m_SystemData);
   }
 

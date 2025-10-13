@@ -7,8 +7,8 @@
 
 #include "Window/Window.h"
 
-#include "ECS/Entity.h"
-#include "ECS/System.h"
+#include "ECS2/Entity.h"
+#include "ECS2/System.h"
 
 #include "Shader/Shader.h"
 
@@ -31,8 +31,8 @@ class ViewportLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
 
-  std::shared_ptr<ECS::Registry> m_Registry = nullptr;
-  std::shared_ptr<ECS::SystemManager> m_System = nullptr;
+  std::shared_ptr<ECS2::Registry> m_Registry = nullptr;
+  std::shared_ptr<ECS2::SystemManager> m_System = nullptr;
 
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
   std::shared_ptr<ColorInterpolationSystem> m_ColorInterpolationSystem = nullptr;

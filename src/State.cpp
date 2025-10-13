@@ -6,7 +6,7 @@
 #include "Utility.h"
 
 #include "Application/Components.h"
-#include "ECS/Entity.h"
+#include "ECS2/Registry.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 #include <cstring>
@@ -90,13 +90,14 @@ void State::Restore() {
     layer->Restore(m_Serializer);
 
   // Load the ECS state
-  const auto &registry = ServiceLocator::Get<ECS::Registry>();
+  const auto &registry = ServiceLocator::Get<ECS2::Registry>();
 
   registry->Remove();
 
   std::vector<std::vector<uint8_t>> entities =
       m_Serializer.GetAll("entity:bone");
 
+  // TODO, do not use entity id as the id for hierarchy.
   for (auto &buffer : entities) {
     size_t offset = 0;
 
@@ -106,7 +107,7 @@ void State::Restore() {
     std::memcpy(&id, ptr, sizeof(id));
     ptr += sizeof(id);
 
-    ECS::Entity *entity = registry->CreateEntity("bone", id);
+    ECS2::Entity *entity = registry->CreateEntity<EBone>();
 
     CBone *bone = entity->Add<CBone>();
     CHierarchy *hierarchy = entity->Add<CHierarchy>();
@@ -131,7 +132,7 @@ void State::Save() {
     layer->Save(m_Serializer);
 
   // Save the ECS state
-  const auto &registry = ServiceLocator::Get<ECS::Registry>();
+  const auto &registry = ServiceLocator::Get<ECS2::Registry>();
 
   auto serialize = [](std::vector<uint8_t> &buffer, const void *data,
                       uint32_t size) {
@@ -140,9 +141,7 @@ void State::Save() {
   };
 
   // Serialize bone entity
-  for (auto &entity : registry->GetEntities()) {
-    if (!entity->Is("bone"))
-      continue;
+  for (auto &entity : registry->GetEntities<EBone>()) {
 
     const auto &[bone, hierarchy, flags] =
         entity->Collect<CBone, CHierarchy, CFlags>();

@@ -7,9 +7,9 @@
 
 #include "imgui.h"
 
-#include "ECS/Entity.h"
-#include "ECS/System.h"
-#include "ECS/Utility.h"
+#include "ECS2/Registry.h"
+#include "ECS2/System.h"
+#include "ECS2/Utility.h"
 
 #include "Application/Components.h"
 #include "Shader/Shader.h"
@@ -21,7 +21,7 @@
 #include "Camera/OrthographicCamera.h"
 #include "Common.h"
 
-class BoneRenderSystem : public ECS::System {
+class BoneRenderSystem : public ECS2::System {
 private:
   struct Bone {
     glm::vec4 color = glm::vec4(0.0f);
@@ -35,7 +35,7 @@ private:
 private:
   GLuint m_VAO = 0, m_VBO = 0, m_QuadVBO = 0;
   Shader *m_Shader = nullptr;
-  ECS::Registry *m_Registry = nullptr;
+  ECS2::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
 
   void *m_Buffer = nullptr;
@@ -59,7 +59,7 @@ public:
     m_Instances = 0;
   }
 
-  void Initialize(ECS::Registry *registry, Shader *shader,
+  void Initialize(ECS2::Registry *registry, Shader *shader,
                   OrthographicCamera *camera) {
     m_Camera = camera;
     m_Shader = shader;
@@ -150,12 +150,13 @@ public:
   void Update(void *d) override {
     auto data = reinterpret_cast<SystemData *>(d);
 
-    if (m_Registry->AnyChanged<CBone>()) {
-      m_Registry->ClearChanged<CBone>();
-
+    auto changes = m_Registry->GetChanged<EBone, CBone>();
+    
+    if (changes.size()) {
       std::vector<Bone> buffer;
 
-      for (auto [_, cBone] : m_Registry->Get<CBone>()) {
+      for (auto [entity, cBone] : changes) {
+        entity->ClearChanged<CBone>();
         Bone &bone = buffer.emplace_back();
 
         bone.color = cBone->color;

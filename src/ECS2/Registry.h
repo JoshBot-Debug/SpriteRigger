@@ -165,6 +165,7 @@ public:
   /**
    * Retrieves a component C from entity E.
    *
+   * @tparam E Entity
    * @tparam C Component
    * @param id The entity id
    * @return A pointer to the component, or nullptr if not found.
@@ -177,38 +178,53 @@ public:
   /**
    * Retrieves components C from all entities.
    *
+   * @tparam E Entity
    * @tparam C Component
    * @return A vector of pointers to the component & entity.
    */
-  template <typename... C>
-  std::vector<std::pair<Entity *, std::tuple<C *...>>> Get() {
-    std::vector<std::pair<Entity *, std::tuple<C *...>>> components;
+  template <typename E, typename C> std::vector<std::pair<Entity *, C *>> Get() {
+    std::vector<std::pair<Entity *, C *>> components;
     for (auto &entities : m_EntitiesByETID)
       for (Entity *entity : entities)
-        components.emplace_back(entity, std::make_tuple(entity->Get<C>()...));
+        if (entity->Has<C>())
+          components.emplace_back(entity, entity->Get<C>());
     return components;
   }
 
   /**
    * Removes all components of a specified type for the entity specified.
    *
-   * @param id The entity id
    * @tparam C Component
+   * @tparam Rest Components
+   * @param id The entity id
    */
-  template <typename E, typename... C> void Remove(EntityId id) {
+  template <typename E, typename C, typename... Rest> void Remove(EntityId id) {
     Entity *entity = GetEntity<E>(id);
-    entity->Remove<C...>();
+    entity->Remove<C, Rest...>();
   }
 
   /**
-   * Removes all components from all entities
+   * Removes all components from an entity type E
    *
+   * @tparam E Entity
+   * @tparam Rest Components
    * @tparam C Component
    */
-  template <typename E, typename... C> void Remove() {
+  template <typename E, typename C, typename... Rest> void Remove() {
     for (Entity *entity : GetEntities<E>())
-      entity->Remove<C...>();
+      entity->Remove<C, Rest...>();
   }
+
+
+  /**
+   * Removes all components from all entites
+   */
+  void Remove() {
+    for (auto &entities : m_EntitiesByETID)
+      for (Entity *entity : entities)
+        entity->Remove();
+  }
+
 
   /**
    * Mark components for removal for an entity
@@ -221,9 +237,9 @@ public:
    *
    * @param id The entity id
    */
-  template <typename E, typename... C> void MarkForRemove(EntityId id) {
+  template <typename E, typename... C> void MarkForRemoval(EntityId id) {
     Entity *entity = GetEntity<E>(id);
-    entity->MarkForRemove<C...>();
+    entity->MarkForRemoval<C...>();
   }
 
   /**
@@ -235,24 +251,22 @@ public:
    * @tparam C Component
    * @tparam Rest Components
    */
-  template <typename E, typename... C> void MarkForRemove() {
+  template <typename E, typename... C> void MarkForRemoval() {
     for (Entity *entity : GetEntities<E>())
-      entity->MarkForRemove<C...>();
+      entity->MarkForRemoval<C...>();
   }
 
   /**
-   * Mark components for removal for all entities
-   *
-   * @note The component will be removed once ClearChanges() is called
-   *
+   * Mark components for removal for an entity type
+   * 
    * @tparam E Entity
    * @tparam C Component
+   * @param id Then entity id
    * @tparam Rest Components
    */
-  template <typename... C> void MarkForRemove() {
-    for (auto &entities : m_EntitiesByETID)
-      for (Entity *entity : entities)
-        entity->MarkForRemove<C...>();
+  template <typename E, typename C> bool MarkedForRemoval(EntityId id) {
+    Entity *entity = GetEntity<E>(id);
+    return entity->MarkedForRemoval<C>();
   }
 
   /**
@@ -260,6 +274,7 @@ public:
    *
    * @tparam E Entity
    * @tparam C Component
+   * @param id The entity id
    */
   template <typename E, typename... C> void MarkChanged(EntityId id) {
     Entity *entity = GetEntity<E>(id);
@@ -281,14 +296,14 @@ public:
    * Get a component if it changed for all entities
    *
    * @tparam C Component
-   * @return bool True if changed, false otherwise
+   * @return A vector of pointers to the component & entity
    */
   template <typename C> std::vector<std::pair<Entity *, C *>> GetChanged() {
     std::vector<std::pair<Entity *, C *>> components;
     for (auto &entities : m_EntitiesByETID)
       for (Entity *entity : entities)
-        if (entity->HasChanged<C>())
-          components.emplace_back(entity, entity->Get<C>());
+        if (C *changed = entity->GetChanged<C>())
+          components.emplace_back(entity, changed);
     return components;
   }
 
@@ -297,15 +312,75 @@ public:
    *
    * @tparam E Entity
    * @tparam C Component
-   * @return bool True if changed, false otherwise
+   * @return A vector of pointers to the component & entity
    */
   template <typename E, typename C>
   std::vector<std::pair<Entity *, C *>> GetChanged() {
     std::vector<std::pair<Entity *, C *>> components;
     for (Entity *entity : GetEntities<E>())
-      if (entity->HasChanged<C>())
-        components.emplace_back(entity, entity->Get<C>());
+      if (C *changed = entity->GetChanged<C>())
+        components.emplace_back(entity, changed);
     return components;
+  }
+
+  /**
+   * Get the component if it changed, nullptr if not
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   *
+   * @param id The entity id
+   * @return A pointer to the component or nullptr if nothing changed
+   */
+  template <typename E, typename C> C *GetChanged(EntityId id) {
+    Entity *entity = GetEntity<E>(id);
+    return entity->GetChanged<C>();
+  }
+
+  /**
+   * Get the component if it changed, nullptr if not
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   *
+   * @param id The entity id
+   * @return A pointer to the component or nullptr if nothing changed
+   */
+  template <typename E, typename... C>
+  std::tuple<C *...> CollectChanged(EntityId id) {
+    Entity *entity = GetEntity<E>(id);
+    return entity->CollectChanged<C...>();
+  }
+
+  /**
+   * Get the component if it changed, nullptr if not for all entities of type E
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   * @return A vector of pairs with pointers to the component or nullptr if
+   * nothing changed & entity
+   */
+  template <typename E, typename... C> std::tuple<C *...> CollectChanged() {
+    std::vector<std::pair<Entity *, std::tuple<C *...>>> components;
+    for (Entity *entity : GetEntities<E>())
+      components.emplace_back(entity, entity->GetChanged<C...>());
+    return components;
+  }
+
+  /**
+   * Check if a component has changed for an entity
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   *
+   * @param id The entity id
+   * @return bool True if changed, false otherwise
+   */
+  template <typename E, typename C> bool HasChanged() {
+    for (Entity *entity : GetEntities<E>())
+      if (entity->HasChanged<C>())
+        return true;
+    return false;
   }
 
   /**
@@ -320,6 +395,62 @@ public:
   template <typename E, typename C> bool HasChanged(EntityId id) {
     Entity *entity = GetEntity<E>(id);
     return entity->HasChanged<C>();
+  }
+
+  /**
+   * Check if any component has changed for an entity
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   *
+   * @return bool True if changed, false otherwise
+   */
+  template <typename E, typename... C> bool AnyChanged() {
+    for (Entity *entity : GetEntities<E>())
+      if (entity->AnyChanged<C...>())
+        return true;
+    return false;
+  }
+
+  /**
+   * Check if any component has changed for an entity
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   *
+   * @param id The entity id
+   * @return bool True if changed, false otherwise
+   */
+  template <typename E, typename... C> bool AnyChanged(EntityId id) {
+    Entity *entity = GetEntity<E>(id);
+    return entity->AnyChanged<C...>();
+  }
+
+  /**
+   * Clear changes in an entity
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   *
+   * @return bool True if changed, false otherwise
+   */
+  template <typename E, typename... C> void ClearChanged() {
+    for (Entity *entity : GetEntities<E>())
+      entity->ClearChanged<C...>();
+  }
+
+  /**
+   * Clear changes in an entity
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   *
+   * @param id The entity id
+   * @return bool True if changed, false otherwise
+   */
+  template <typename E, typename... C> void ClearChanged(EntityId id) {
+    Entity *entity = GetEntity<E>(id);
+    entity->ClearChanged<C...>();
   }
 };
 } // namespace ECS2

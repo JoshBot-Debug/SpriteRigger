@@ -5,19 +5,19 @@
 
 #include "imgui.h"
 
-#include "ECS/Entity.h"
-#include "ECS/System.h"
-#include "ECS/Utility.h"
+#include "ECS2/Registry.h"
+#include "ECS2/System.h"
+#include "ECS2/Utility.h"
 
 #include "Camera/Components/Grid.h"
 #include "Camera/OrthographicCamera.h"
 
 #include "Common.h"
 
-class ColorInterpolationSystem : public ECS::System {
+class ColorInterpolationSystem : public ECS2::System {
 private:
   Grid *m_Grid = nullptr;
-  ECS::Registry *m_Registry = nullptr;
+  ECS2::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
 
 private:
@@ -56,13 +56,13 @@ private:
    * @param lerp   The interpolation factor controlling animation speed.
    * @return True if the color was successfully updated; otherwise false.
    */
-  bool Highlight(ECS::EntityId eid, CBone::Part part, glm::vec4 &color,
+  bool Highlight(ECS2::Entity *entity, CBone::Part part, glm::vec4 &color,
                  CBone::Part target, bool skip, float lerp) {
     if (skip)
       return true;
     glm::vec4 next = GetHighlightColor(part, target, Colors::DEFAULT);
-    return ECS::Mutate<CBone, glm::vec4>(m_Registry, eid, color,
-                                         Animation::Lerp(color, next, lerp));
+    return ECS2::Mutate<CBone, glm::vec4>(entity, color,
+                                          Animation::Lerp(color, next, lerp));
   };
 
 public:
@@ -72,7 +72,7 @@ public:
     m_Registry = nullptr;
   }
 
-  void Initialize(ECS::Registry *registry, Grid *grid,
+  void Initialize(ECS2::Registry *registry, Grid *grid,
                   OrthographicCamera *camera) {
     m_Grid = grid;
     m_Camera = camera;
@@ -84,9 +84,9 @@ public:
 
     float speed = ANIMATION_SPEED * data->deltaTime;
 
-    for (auto [eid, cHovered] : m_Registry->GetChanged<CHovered>()) {
-      if (auto cBone = m_Registry->Get<CBone>(eid)) {
-        auto cSelected = m_Registry->Get<CSelected>(eid);
+    for (auto [entity, cHovered] : m_Registry->GetChanged<EBone, CHovered>()) {
+      if (auto cBone = entity->Get<CBone>()) {
+        auto cSelected = entity->Get<CSelected>();
 
         auto &c = cBone->color;
         auto &s = cBone->joints[CBone::StartJoint].color;
@@ -94,24 +94,25 @@ public:
         auto target = cHovered->target;
         auto skip = cSelected ? cSelected->target : CBone::None;
 
-        bool mc = Highlight(eid, CBone::Shaft, c, target, skip == CBone::Shaft,
-                            speed);
-        bool ms = Highlight(eid, CBone::StartJoint, s, target,
+        bool mc = Highlight(entity, CBone::Shaft, c, target,
+                            skip == CBone::Shaft, speed);
+        bool ms = Highlight(entity, CBone::StartJoint, s, target,
                             skip == CBone::StartJoint, speed);
-        bool me = Highlight(eid, CBone::EndJoint, e, target,
+        bool me = Highlight(entity, CBone::EndJoint, e, target,
                             skip == CBone::EndJoint, speed);
 
         std::cout << "Mutating CHovered " << (int)target << " " << std::endl;
 
         if (mc && ms && me) {
-          m_Registry->ClearChanged<CHovered>(eid);
+          entity->ClearChanged<CHovered>();
           std::cout << "ClearChanged CHovered" << std::endl;
         }
       }
     }
 
-    for (auto [eid, cSelected] : m_Registry->GetChanged<CSelected>()) {
-      if (auto cBone = m_Registry->Get<CBone>(eid)) {
+    for (auto [entity, cSelected] :
+         m_Registry->GetChanged<EBone, CSelected>()) {
+      if (auto cBone = entity->Get<CBone>()) {
 
         auto &c = cBone->color;
         auto &s = cBone->joints[CBone::StartJoint].color;
@@ -121,17 +122,17 @@ public:
         std::cout << "Mutating CSelected " << (int)target << " " << std::endl;
 
         bool mc =
-            Highlight(eid, CBone::Shaft, c, target,
+            Highlight(entity, CBone::Shaft, c, target,
                       target != CBone::Shaft && target != CBone::None, speed);
         bool ms = Highlight(
-            eid, CBone::StartJoint, s, target,
+            entity, CBone::StartJoint, s, target,
             target != CBone::StartJoint && target != CBone::None, speed);
-        bool me = Highlight(eid, CBone::EndJoint, e, target,
+        bool me = Highlight(entity, CBone::EndJoint, e, target,
                             target != CBone::EndJoint && target != CBone::None,
                             speed);
 
         if (mc && ms && me) {
-          m_Registry->ClearChanged<CSelected>(eid);
+          entity->ClearChanged<CSelected>();
           std::cout << "ClearChanged CSelected " << (int)target << std::endl;
         }
       }

@@ -4,16 +4,16 @@
 
 #include "imgui.h"
 
-#include "ECS/Entity.h"
-#include "ECS/System.h"
+#include "ECS2/Registry.h"
+#include "ECS2/System.h"
 
 #include "Camera/OrthographicCamera.h"
 #include "Common.h"
 
-class SelectSystem : public ECS::System {
+class SelectSystem : public ECS2::System {
 private:
   Grid *m_Grid = nullptr;
-  ECS::Registry *m_Registry = nullptr;
+  ECS2::Registry *m_Registry = nullptr;
   OrthographicCamera *m_Camera = nullptr;
 
 public:
@@ -23,7 +23,7 @@ public:
     m_Registry = nullptr;
   }
 
-  void Initialize(ECS::Registry *registry, Grid *grid,
+  void Initialize(ECS2::Registry *registry, Grid *grid,
                   OrthographicCamera *camera) {
     m_Grid = grid;
     m_Camera = camera;
@@ -36,24 +36,25 @@ public:
     if (!data->isMouseClicked)
       return;
 
-    for (auto [eid, cSelected] : m_Registry->Get<CSelected>()) {
-      if (!m_Registry->MarkedForRemoval<CSelected>(eid)) {
+    for (auto [entity, cSelected] : m_Registry->Get<EBone, CSelected>()) {
+      if (!entity->MarkedForRemoval<CSelected>()) {
         std::cout << "MarkForRemoval CSelected " << (int)cSelected->target
                   << std::endl;
-        auto cHovered = m_Registry->Get<CHovered>(eid);
+        auto cHovered = entity->Get<CHovered>();
         if (cHovered && cHovered->target != cSelected->target) {
-          ECS::Mutate<CSelected, CBone::Part>(m_Registry, eid, cSelected->target, cHovered->target);
+          ECS2::Mutate<CSelected, CBone::Part>(entity, cSelected->target,
+                                               cHovered->target);
           continue;
         }
         cSelected->target = CBone::None;
-        m_Registry->MarkForRemoval<CSelected>(eid);
+        entity->MarkForRemoval<CSelected>();
       }
     }
 
-    for (auto [eid, cHovered] : m_Registry->Get<CHovered>()) {
-      if (!m_Registry->Has<CSelected>(eid)) {
+    for (auto [entity, cHovered] : m_Registry->Get<EBone, CHovered>()) {
+      if (!entity->Has<CSelected>()) {
         std::cout << "Add CSelected " << (int)cHovered->target << std::endl;
-        m_Registry->Add<CSelected>(eid, cHovered->target);
+        entity->Add<CSelected>(cHovered->target);
       }
     }
   }
