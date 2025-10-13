@@ -137,7 +137,7 @@ public:
   }
 
   /**
-   * Mark all components for removal
+   * Mark components for removal
    *
    * @note The component will be removed once ClearChanges() is called
    *
@@ -198,17 +198,13 @@ public:
 
   /**
    * Get the component if it changed, nullptr if not
-   * and clear the changed flag
    *
    * @tparam C Component
    * @return A pointer to the component
    */
-  template <typename C> C *ConsumeChanged() {
-    size_t id = GetComponentTypeId<C>();
-    if (!m_Has.test(id) || !m_Dirty.test(id))
-      return nullptr;
-    m_Dirty.set(id, false);
-    return static_cast<C *>(m_Components[id].get());
+  template <typename... C>
+  std::pair<Entity *, std::tuple<C *...>> CollectChanged() {
+    return {this, std::make_tuple(GetChanged<C>()...)};
   }
 
   /**
@@ -219,16 +215,37 @@ public:
    */
   template <typename C, typename... Rest> void ClearChanged() {
     size_t id = GetComponentTypeId<C>();
-    m_Dirty.set(id, false);
 
-    if (m_Removal.test(id) && m_Has.test(id)) {
-      m_Components[id].reset();
+    if (m_Removal.test(id)) {
+      if (m_Has.test(id))
+        m_Components[id].reset();
       m_Has.set(id, false);
       m_Removal.set(id, false);
     }
 
+    m_Dirty.set(id, false);
+
     if constexpr (sizeof...(Rest) > 0)
       ClearChanged<Rest...>();
+  }
+
+  /**
+   * Clear changes for all components
+   *
+   * @tparam C Component
+   * @tparam Rest Components
+   */
+  void ClearChanged() {
+    for (size_t id = 0; id < MAX_COMPONENTS; id++) {
+      if (m_Removal.test(id)) {
+        if (m_Has.test(id))
+          m_Components[id].reset();
+        m_Has.set(id, false);
+        m_Removal.set(id, false);
+      }
+
+      m_Dirty.set(id, false);
+    }
   }
 
   /**
