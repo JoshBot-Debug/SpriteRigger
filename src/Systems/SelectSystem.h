@@ -33,29 +33,40 @@ public:
   void Update(void *d) override {
     auto data = reinterpret_cast<SystemData *>(d);
 
-    if (!data->isMouseClicked)
-      return;
+    if (data->isMouseClicked) {
+      for (auto [entity, cSelected] : m_Registry->Get<EBone, CSelected>()) {
 
-    for (auto [entity, cSelected] : m_Registry->Get<EBone, CSelected>()) {
-      if (!entity->MarkedForRemoval<CSelected>()) {
-        std::cout << "MarkForRemoval CSelected " << (int)cSelected->target
-                  << std::endl;
+        bool unselecting = entity->MarkedForRemoval<CSelected>();
         auto cHovered = entity->Get<CHovered>();
+
         if (cHovered && cHovered->target != cSelected->target) {
+          if (unselecting)
+            entity->Remove<CSelected>();
+
           ECS2::Mutate<CSelected, CBone::Part>(entity, cSelected->target,
                                                cHovered->target);
           continue;
         }
+
+        if (unselecting)
+          continue;
+
         cSelected->target = CBone::None;
         entity->MarkForRemoval<CSelected>();
       }
-    }
 
-    for (auto [entity, cHovered] : m_Registry->Get<EBone, CHovered>()) {
-      if (!entity->Has<CSelected>()) {
-        std::cout << "Add CSelected " << (int)cHovered->target << std::endl;
+      /// TODO: Z-indexing needs to be taken care of here
+      for (auto [entity, cHovered] : m_Registry->Get<EBone, CHovered>()) {
+        if (entity->Has<CSelected>())
+          continue;
+
         entity->Add<CSelected>(cHovered->target);
       }
+    }
+
+    if (!data->isMouseDown) {
+      for (auto [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
+        entity->MarkForRemoval<CSelected>();
     }
   }
 };

@@ -60,21 +60,22 @@ public:
     for (auto [entity, cBone] : m_Registry->Get<EBone, CBone>()) {
       auto cHovered = entity->Get<CHovered>();
 
+      if (entity->MarkedForRemoval<CHovered>())
+        continue;
+
       CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
 
-      if (cHovered && part == CBone::Part::None && !entity->MarkedForRemoval<CHovered>()) {
+      if (cHovered && part == CBone::Part::None) {
         entity->MarkForRemoval<CHovered>();
         cHovered->target = CBone::Part::None;
-        std::cout << "MarkForRemoval CHovered" << std::endl;
+        continue;
       }
 
-      if (part != CBone::Part::None) {
-        if (!cHovered) {
+      if (part != CBone::Part::None)
+        if (!cHovered)
           cHovered = entity->Add<CHovered>(part);
-          std::cout << "Add CHovered " << (int)part << std::endl;
-        } else
+        else
           ECS2::Mutate<CHovered, CBone::Part>(entity, cHovered->target, part);
-      }
     }
   }
 };

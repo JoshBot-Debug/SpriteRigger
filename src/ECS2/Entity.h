@@ -142,6 +142,7 @@ public:
     if (m_Has.test(id)) {
       m_Components[id].reset();
       m_Has.set(id, false);
+      m_Removal.set(id, false);
     }
     if constexpr (sizeof...(Rest) > 0)
       Remove<Rest...>();

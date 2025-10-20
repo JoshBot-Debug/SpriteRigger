@@ -88,6 +88,11 @@ public:
       if (auto cBone = entity->Get<CBone>()) {
         auto cSelected = entity->Get<CSelected>();
 
+        if (cSelected && entity->MarkedForRemoval<CSelected>()) {
+          entity->Remove<CSelected>();
+          cSelected = nullptr;
+        }
+
         auto &c = cBone->color;
         auto &s = cBone->joints[CBone::StartJoint].color;
         auto &e = cBone->joints[CBone::EndJoint].color;
@@ -96,17 +101,15 @@ public:
 
         bool mc = Highlight(entity, CBone::Shaft, c, target,
                             skip == CBone::Shaft, speed);
-        bool ms = Highlight(entity, CBone::StartJoint, s, target,
-                            skip == CBone::StartJoint, speed);
-        bool me = Highlight(entity, CBone::EndJoint, e, target,
-                            skip == CBone::EndJoint, speed);
+        bool ms =
+            Highlight(entity, CBone::StartJoint, s, target,
+                      skip == CBone::StartJoint || skip == CBone::Shaft, speed);
+        bool me =
+            Highlight(entity, CBone::EndJoint, e, target,
+                      skip == CBone::EndJoint || skip == CBone::Shaft, speed);
 
-        std::cout << "Mutating CHovered " << (int)target << " " << std::endl;
-
-        if (mc && ms && me) {
+        if (mc && ms && me)
           entity->ClearChanged<CHovered>();
-          std::cout << "ClearChanged CHovered" << std::endl;
-        }
       }
     }
 
@@ -119,22 +122,18 @@ public:
         auto &e = cBone->joints[CBone::EndJoint].color;
         auto target = cSelected->target;
 
-        std::cout << "Mutating CSelected " << (int)target << " " << std::endl;
+        bool mc = Highlight(
+            entity, CBone::Shaft, c, target,
+            target == CBone::StartJoint || target == CBone::EndJoint, speed);
 
-        bool mc =
-            Highlight(entity, CBone::Shaft, c, target,
-                      target != CBone::Shaft && target != CBone::None, speed);
-        bool ms = Highlight(
-            entity, CBone::StartJoint, s, target,
-            target != CBone::StartJoint && target != CBone::None, speed);
+        bool ms = Highlight(entity, CBone::StartJoint, s, target,
+                            target == CBone::EndJoint, speed);
+
         bool me = Highlight(entity, CBone::EndJoint, e, target,
-                            target != CBone::EndJoint && target != CBone::None,
-                            speed);
+                            target == CBone::StartJoint, speed);
 
-        if (mc && ms && me) {
+        if (mc && ms && me)
           entity->ClearChanged<CSelected>();
-          std::cout << "ClearChanged CSelected " << (int)target << std::endl;
-        }
       }
     }
   }
