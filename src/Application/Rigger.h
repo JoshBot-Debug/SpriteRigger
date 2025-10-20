@@ -6,9 +6,9 @@
 #include "ServiceLocator/ServiceLocator.h"
 
 #include "Application/Components.h"
+#include "Components/Hierarchy.h"
 
 class Rigger {
-private:
 public:
   Rigger() = default;
 

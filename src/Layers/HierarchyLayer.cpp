@@ -8,7 +8,7 @@
 HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 
 void HierarchyLayer::OnAttach() {
-
+  
   m_BoneContextMenu.Register(
       {.renderOn = ContextMenu::PopupContext::ITEM,
        .items = {
@@ -111,13 +111,11 @@ void HierarchyLayer::OnAttach() {
 void HierarchyLayer::OnUpdate(float deltaTime) {
   auto registry = ServiceLocator::Get<ECS2::Registry>();
 
-  const auto components = registry->GetChanged<EBone, CHierarchy>();
-
-  if (components.size())
+  if (registry->HasChanged<EBone, CHierarchy>())
     m_Hierarchy.Clear();
 
-  for (auto &[eid, cHierarchy] : components) {
-    eid->ClearChanged<CHierarchy>();
+  for (auto &[entity, cHierarchy] : registry->Get<EBone, CHierarchy>()) {
+    entity->ClearChanged<CHierarchy>();
     m_Hierarchy.Add({
         .id = cHierarchy->id,
         .parent = cHierarchy->parent,
