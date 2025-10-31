@@ -2,7 +2,7 @@
 
 #include "Application/Components.h"
 #include "Application/Rigger.h"
-#include "ECS2/Entity.h"
+#include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
@@ -33,7 +33,7 @@ void HierarchyLayer::OnAttach() {
                      ImGui::Separator();
                      if (ImGui::MenuItem(item->name, item->shortcut,
                                          item->selected, item->enabled))
-                       ServiceLocator::Get<ECS2::Registry>()
+                       ServiceLocator::Get<ECS::Registry>()
                            ->Get<EBone, CFlags>(ToInt32(data))
                            ->rename = true;
                    },
@@ -46,7 +46,7 @@ void HierarchyLayer::OnAttach() {
 
     m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
 
-    auto registry = ServiceLocator::Get<ECS2::Registry>();
+    auto registry = ServiceLocator::Get<ECS::Registry>();
 
     auto *cHierarchy = registry->Get<EBone, CHierarchy>(item->id);
     auto *cFlags = registry->Get<EBone, CFlags>(item->id);
@@ -72,25 +72,7 @@ void HierarchyLayer::OnAttach() {
       if (ImGui::IsItemDeactivated())
         cFlags->rename = false;
     }
-
-    ImGui::BeginChild("Debug");
-    auto *cHovered = registry->Get<EBone, CHovered>(item->id);
-    auto *cSelected = registry->Get<EBone, CSelected>(item->id);
-
-    ImGui::Text("cHovered %i %s %s", !cHovered ? -1 : (int)cHovered->target,
-                registry->MarkedForRemoval<EBone, CHovered>(item->id)
-                    ? "Marked for removal"
-                    : "",
-                registry->GetChanged<EBone, CHovered>(item->id) ? "Dirty"
-                                                                : "Clean");
-    ImGui::Text("cSelected %i %s %s", !cSelected ? -1 : (int)cSelected->target,
-                registry->MarkedForRemoval<EBone, CSelected>(item->id)
-                    ? "Marked for removal"
-                    : "",
-                registry->GetChanged<EBone, CSelected>(item->id) ? "Dirty"
-                                                                 : "Clean");
-    ImGui::EndChild();
-
+    
     if (cFlags->selected)
       item->flags = ImGuiTreeNodeFlags_Selected;
     else
@@ -109,7 +91,7 @@ void HierarchyLayer::OnAttach() {
 }
 
 void HierarchyLayer::OnUpdate(float deltaTime) {
-  auto registry = ServiceLocator::Get<ECS2::Registry>();
+  auto registry = ServiceLocator::Get<ECS::Registry>();
 
   if (registry->HasChanged<EBone, CHierarchy>())
     m_Hierarchy.Clear();

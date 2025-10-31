@@ -3228,7 +3228,7 @@ Other changes:
   It will only works with SDL 2.0.18+ if your code calls 'SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1")'
   prior to calling SDL_CreateWindow(). Updated all examples accordingly. (#6071, #1953)
 - Backends: SDL3: Added experimental imgui_impl_sdl3.cpp backend. (#6146) [@dovker, @ocornut]
-  SDL 3.0.0 has not yet been released, so it is possible that its spECS2/api will change before
+  SDL 3.0.0 has not yet been released, so it is possible that its spECS/api will change before
   release. This backend is provided as a convenience for early adopters etc. We don't recommend
   switching to SDL3 before it is released.
 - Backends: GLFW: Registering custom low-level mouse wheel handler to get more accurate

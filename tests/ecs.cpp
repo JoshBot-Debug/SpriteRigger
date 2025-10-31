@@ -1,9 +1,9 @@
-#include "ECS2/Registry.h"
+#include "ECS/Registry.h"
 #include <gtest/gtest.h>
 
 TEST(Registry, CreateEntity) {
 
-  ECS2::Registry registry;
+  ECS::Registry registry;
 
   struct EBone {};
   struct EHierarchy {};
@@ -27,7 +27,7 @@ TEST(Registry, CreateEntity) {
 
 TEST(Registry, GetEntity) {
 
-  ECS2::Registry registry;
+  ECS::Registry registry;
 
   struct EBone {};
 
@@ -46,7 +46,7 @@ TEST(Registry, GetEntity) {
 
 TEST(Registry, DeleteEntity) {
 
-  ECS2::Registry registry;
+  ECS::Registry registry;
 
   struct EBone {};
   struct EHierarchy {};
@@ -79,7 +79,7 @@ TEST(Registry, DeleteEntity) {
 
 TEST(Registry, AddComponents) {
 
-  ECS2::Registry registry;
+  ECS::Registry registry;
 
   struct EBone {};
   struct CHovered {};
@@ -111,7 +111,7 @@ TEST(Registry, AddComponents) {
 
 TEST(Registry, GetComponents) {
 
-  ECS2::Registry registry;
+  ECS::Registry registry;
 
   struct EBone {};
   struct CHovered {
@@ -142,7 +142,7 @@ TEST(Registry, GetComponents) {
 
 TEST(Entity, Changes) {
 
-  ECS2::Registry registry;
+  ECS::Registry registry;
 
   struct EBone {};
 

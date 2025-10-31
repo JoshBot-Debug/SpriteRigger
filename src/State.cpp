@@ -6,7 +6,7 @@
 #include "Utility.h"
 
 #include "Application/Components.h"
-#include "ECS2/Registry.h"
+#include "ECS/Registry.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 #include <cstring>
@@ -90,7 +90,7 @@ void State::Restore() {
     layer->Restore(m_Serializer);
 
   // Load the ECS state
-  const auto &registry = ServiceLocator::Get<ECS2::Registry>();
+  const auto &registry = ServiceLocator::Get<ECS::Registry>();
 
   registry->Remove();
 
@@ -107,7 +107,7 @@ void State::Restore() {
     std::memcpy(&id, ptr, sizeof(id));
     ptr += sizeof(id);
 
-    ECS2::Entity *entity = registry->CreateEntity<EBone>();
+    ECS::Entity *entity = registry->CreateEntity<EBone>();
 
     CBone *bone = entity->Add<CBone>();
     CHierarchy *hierarchy = entity->Add<CHierarchy>();
@@ -132,7 +132,7 @@ void State::Save() {
     layer->Save(m_Serializer);
 
   // Save the ECS state
-  const auto &registry = ServiceLocator::Get<ECS2::Registry>();
+  const auto &registry = ServiceLocator::Get<ECS::Registry>();
 
   auto serialize = [](std::vector<uint8_t> &buffer, const void *data,
                       uint32_t size) {

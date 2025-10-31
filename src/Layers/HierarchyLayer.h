@@ -9,7 +9,7 @@
 #include "SerializableLayer.h"
 #include "State.h"
 
-#include "ECS2/Registry.h"
+#include "ECS/Registry.h"
 
 class HierarchyLayer : public SerializableLayer {
 private:

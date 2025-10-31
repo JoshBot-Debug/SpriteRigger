@@ -7,8 +7,8 @@
 
 #include "Window/Window.h"
 
-#include "ECS2/Entity.h"
-#include "ECS2/System.h"
+#include "ECS/Entity.h"
+#include "ECS/System.h"
 
 #include "Shader/Shader.h"
 
@@ -18,11 +18,8 @@
 #include "Camera/OrthographicCamera.h"
 
 #include "Systems/BoneRenderSystem.h"
-#include "Systems/ColorInterpolationSystem.h"
 #include "Systems/Common.h"
 #include "Systems/HoverSystem.h"
-#include "Systems/SelectSystem.h"
-#include "Systems/DragSystem.h"
 
 #include "SerializableLayer.h"
 #include "State.h"
@@ -31,14 +28,11 @@ class ViewportLayer : public SerializableLayer {
 private:
   State *m_State = nullptr;
 
-  std::shared_ptr<ECS2::Registry> m_Registry = nullptr;
-  std::shared_ptr<ECS2::SystemManager> m_System = nullptr;
+  std::shared_ptr<ECS::Registry> m_Registry = nullptr;
+  std::shared_ptr<ECS::SystemManager> m_System = nullptr;
 
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
-  std::shared_ptr<ColorInterpolationSystem> m_ColorInterpolationSystem = nullptr;
   std::shared_ptr<HoverSystem> m_HoverSystem = nullptr;
-  std::shared_ptr<SelectSystem> m_SelectSystem = nullptr;
-  std::shared_ptr<DragSystem> m_DragSystem = nullptr;
 
   SystemData m_SystemData;
 
