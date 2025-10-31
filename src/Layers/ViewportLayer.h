@@ -20,6 +20,8 @@
 #include "Systems/BoneRenderSystem.h"
 #include "Systems/Common.h"
 #include "Systems/HoverSystem.h"
+#include "Systems/Animation/AnimationTimelineSystem.h"
+#include "Systems/Animation/ValueAnimationSystem.h"
 
 #include "SerializableLayer.h"
 #include "State.h"
@@ -33,6 +35,9 @@ private:
 
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
   std::shared_ptr<HoverSystem> m_HoverSystem = nullptr;
+
+  std::shared_ptr<AnimationTimelineSystem> m_AnimationTimelineSystem = nullptr;
+  std::shared_ptr<ValueAnimationSystem> m_ValueAnimationSystem = nullptr;
 
   SystemData m_SystemData;
 

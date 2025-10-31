@@ -126,7 +126,7 @@ public:
    *
    * @tparam C Component
    * @tparam CArgs Component args
-   * @return A pointer to the component, or nullptr if not found.
+   * @return A pointer to the component.
    */
   template <typename C, typename... CArgs> C *Ensure(CArgs &&...args) {
     size_t id = GetComponentTypeId<C>();

@@ -2,8 +2,6 @@
 
 #include <glm/glm.hpp>
 
-#include "imgui.h"
-
 #include "ECS/Registry.h"
 #include "ECS/System.h"
 #include "ECS/Utility.h"
@@ -61,12 +59,45 @@ public:
       CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
 
       if (part == CBone::Part::None) {
-        entity->Remove<CHovered>();
+        if (entity->Has<CHovered>()) {
+          entity->Remove<CHovered>();
+
+          auto *timeline = entity->Ensure<CAnimationTimeline>();
+          timeline->t = 0.0f;
+          timeline->duration = 0.5f;
+          timeline->elapsed = 0.0f;
+          timeline->active = true;
+
+          auto *animation = entity->Ensure<CValueAnimation<glm::vec4>>();
+          animation->target = &cBone->color;
+          animation->start = cBone->color;
+          animation->end = Colors::DEFAULT;
+          animation->timeline = timeline;
+        }
         continue;
       }
 
-      entity->Ensure<CHovered>()->target = part;
-      entity->MarkChanged<CHovered>();
+      CHovered *component = entity->Ensure<CHovered>();
+
+      bool mutated = component->target != part;
+
+      component->target = part;
+
+      if (mutated) {
+        auto *timeline = entity->Ensure<CAnimationTimeline>();
+        timeline->t = 0.0f;
+        timeline->duration = 0.5f;
+        timeline->elapsed = 0.0f;
+        timeline->active = true;
+
+        auto *animation = entity->Ensure<CValueAnimation<glm::vec4>>();
+        animation->target = &cBone->color;
+        animation->start = cBone->color;
+        animation->end = glm::vec4(1, 0, 0, 1);
+        animation->timeline = timeline;
+      }
+
+      entity->ClearChanged<CHovered>();
     }
   }
 };

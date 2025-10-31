@@ -20,8 +20,13 @@ void ViewportLayer::OnAttach() {
   m_HoverSystem = m_System->Register<HoverSystem>();
   m_BoneRenderSystem = m_System->Register<BoneRenderSystem>();
 
+  m_ValueAnimationSystem = m_System->Register<ValueAnimationSystem>();
+  m_AnimationTimelineSystem = m_System->Register<AnimationTimelineSystem>();
+
   m_HoverSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
+  m_ValueAnimationSystem->Initialize(m_Registry.get());
+  m_AnimationTimelineSystem->Initialize(m_Registry.get());
 }
 
 void ViewportLayer::OnRender() {
@@ -49,6 +54,8 @@ void ViewportLayer::OnRender() {
     m_SystemData.isMouseClicked = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
 
     m_System->Update<HoverSystem>(&m_SystemData);
+    m_ValueAnimationSystem->Update(&m_SystemData);
+    m_AnimationTimelineSystem->Update(&m_SystemData);
   }
 
   ResizeFramebuffer(viewport);

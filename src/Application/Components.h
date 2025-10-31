@@ -32,3 +32,17 @@ struct CFlags {
   bool rename = false;
   bool selected = false;
 };
+
+struct CAnimationTimeline {
+  float t = 0.0f;
+  float duration = 0.0f;
+  float elapsed = 0.0f;
+  bool active = true;
+};
+
+template <typename T> struct CValueAnimation {
+  T *target = nullptr;
+  T start;
+  T end;
+  CAnimationTimeline *timeline = nullptr;
+};
