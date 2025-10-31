@@ -58,9 +58,35 @@ public:
     for (auto [entity, cBone] : m_Registry->Get<EBone, CBone>()) {
       CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
 
+      if (entity->Has<CSelected>() && entity->Get<CSelected>()->target == part)
+        continue;
+
       if (part == CBone::Part::None) {
         if (entity->Has<CHovered>()) {
           entity->Remove<CHovered>();
+          
+          // TODO
+          // Create the animation subsystem
+          // Remove animation from the ECS, handle them in a seperate subsystem
+          // Keep ECS only for state management
+          //
+          // auto timeline = Animate::Timeline("hover");
+
+          // auto oneTime = Animate::Once("hover")
+          //   .Timeline(timeline)
+          //   .Duration(0.5f)
+          //   .Value(&cBone->color, Colors::DEFAULT)
+          //   .Value(&cBone->joints[0].color, Colors::DEFAULT)
+          //   .Value(&cBone->joints[1].color, Colors::DEFAULT)
+          //   .Play();
+
+          // auto keyframes = Animate::Keyframe("hover")
+          //   .Timeline(timeline)
+          //   .Value(cBone->color)
+          //   .At(0.0f, Colors::DEFAULT)
+          //   .At(1.0f, Colors::HIGHLIGHT)
+          //   .At(2.0f, Colors::DEFAULT)
+          //   .Loop();
 
           auto *timeline = entity->Ensure<CAnimationTimeline>();
           timeline->t = 0.0f;

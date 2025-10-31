@@ -2,7 +2,6 @@
 
 #include "imgui.h"
 #include <exception>
-#include <functional>
 #include <vector>
 
 class ContextMenu {
@@ -12,8 +11,8 @@ public:
     const char *shortcut = nullptr;
     bool *selected = nullptr;
     bool enabled = true;
-    std::function<void(Item *item, void *)> onRenderItem = nullptr;
-    std::function<void(void *)> onClick = nullptr;
+    void (*onRenderItem)(Item *item, void *) = nullptr;
+    void (*onClick)(void *) = nullptr;
   };
 
   enum class PopupContext {

@@ -208,7 +208,8 @@ public:
   }
 
   /**
-   * Removes all components of a specified type for the entity specified if they exist for that entity.
+   * Removes all components of a specified type for the entity specified if they
+   * exist for that entity.
    *
    * @tparam C Component
    * @tparam Rest Components

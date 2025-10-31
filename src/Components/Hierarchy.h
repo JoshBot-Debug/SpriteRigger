@@ -2,7 +2,6 @@
 
 #include <imgui.h>
 
-#include <functional>
 #include <stdint.h>
 #include <unordered_map>
 #include <vector>
@@ -16,7 +15,7 @@ public:
     NodeId parent = 0;
     std::string label;
     ImGuiTreeNodeFlags flags;
-    std::function<void(Item *item)> onRenderItem = nullptr;
+    void (*onRenderItem)(Item *item) = nullptr;
   };
 
 private:
@@ -62,7 +61,7 @@ private:
       return nullptr;
     };
 
-    void Render(const std::function<void(Item *item)> &renderItem) {
+    void Render(void (*renderItem)(Item *, void *), void *data) {
       ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
@@ -83,11 +82,11 @@ private:
       if (item.onRenderItem)
         item.onRenderItem(&item);
       else
-        renderItem(&item);
+        renderItem(&item, data);
 
       if (hasChildren && opened) {
         for (auto *child : children)
-          child->Render(renderItem);
+          child->Render(renderItem, data);
 
         ImGui::TreePop();
       }
@@ -98,7 +97,8 @@ private:
 
 private:
   Node *m_Root = new Node();
-  std::function<void(Item *item)> m_RenderItem = nullptr;
+  void *m_RenderItemData = nullptr;
+  void (*m_RenderItem)(Item *, void *) = nullptr;
 
 public:
   Hierarchy() = default;
@@ -114,18 +114,25 @@ public:
     m_Root->children.clear();
   };
 
-  void OnRenderItem(const std::function<void(Item *item)> &callback) {
+  void OnRenderItem(void (*callback)(Item *, void *)) {
     m_RenderItem = callback;
   }
 
-  void Render(const std::string &id) {
+  void SetRenderItemData(void *renderItemData) {
+    m_RenderItemData = renderItemData;
+  }
+
+  void Render(const std::string &id, void *renderItemData = nullptr) {
+    if (renderItemData)
+      m_RenderItemData = renderItemData;
+
     if (m_Root->children.size() == 0)
       return;
 
     if (ImGui::BeginTable(id.c_str(), 1, s_TableFlags)) {
 
       for (auto *child : m_Root->children)
-        child->Render(m_RenderItem);
+        child->Render(m_RenderItem, m_RenderItemData);
 
       ImGui::EndTable();
     }

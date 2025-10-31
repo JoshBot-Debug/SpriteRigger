@@ -8,7 +8,7 @@
 HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
 
 void HierarchyLayer::OnAttach() {
-  
+
   m_BoneContextMenu.Register(
       {.renderOn = ContextMenu::PopupContext::ITEM,
        .items = {
@@ -40,11 +40,15 @@ void HierarchyLayer::OnAttach() {
            },
        }});
 
-  m_Hierarchy.OnRenderItem([&](Hierarchy::Item *item) {
+  m_Hierarchy.SetRenderItemData(&m_BoneContextMenu);
+
+  m_Hierarchy.OnRenderItem([](Hierarchy::Item *item, void *data) {
+    auto boneContextMenu = static_cast<ContextMenu *>(data);
+    
     std::string inputId = ("##ID:" + std::to_string(item->id)).c_str();
     std::string ctxId = ("bcm:" + std::to_string(item->id)).c_str();
 
-    m_BoneContextMenu.Render(ctxId.c_str(), ToVoidPtr(item->id));
+    boneContextMenu->Render(ctxId.c_str(), ToVoidPtr(item->id));
 
     auto registry = ServiceLocator::Get<ECS::Registry>();
 
@@ -72,7 +76,7 @@ void HierarchyLayer::OnAttach() {
       if (ImGui::IsItemDeactivated())
         cFlags->rename = false;
     }
-    
+
     if (cFlags->selected)
       item->flags = ImGuiTreeNodeFlags_Selected;
     else
