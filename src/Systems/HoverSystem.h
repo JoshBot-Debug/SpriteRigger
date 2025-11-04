@@ -11,6 +11,9 @@
 
 #include "Common.h"
 
+#include "Animate/Once.h"
+#include "Animate/Timeline.h"
+
 class HoverSystem : public ECS::System {
 private:
   Grid *m_Grid = nullptr;
@@ -55,7 +58,7 @@ public:
     auto data = reinterpret_cast<SystemData *>(d);
     glm::vec2 mouse = glm::vec2(data->mouse.x, data->mouse.y);
 
-    for (auto [entity, cBone] : m_Registry->Get<EBone, CBone>()) {
+    for (auto &[entity, cBone] : m_Registry->Get<EBone, CBone>()) {
       CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
 
       if (entity->Has<CSelected>() && entity->Get<CSelected>()->target == part)
@@ -64,7 +67,15 @@ public:
       if (part == CBone::Part::None) {
         if (entity->Has<CHovered>()) {
           entity->Remove<CHovered>();
-          
+          entity->MarkChanged<CBone>();
+
+          Animate::Once<glm::vec4>::Create()
+              ->Duration(2.0f)
+              ->Value(&cBone->color, Colors::DEFAULT)
+              ->Value(&cBone->joints[0].color, Colors::DEFAULT)
+              ->Value(&cBone->joints[1].color, Colors::DEFAULT)
+              ->Play();
+
           // TODO
           // Create the animation subsystem
           // Remove animation from the ECS, handle them in a seperate subsystem
@@ -87,18 +98,6 @@ public:
           //   .At(1.0f, Colors::HIGHLIGHT)
           //   .At(2.0f, Colors::DEFAULT)
           //   .Loop();
-
-          auto *timeline = entity->Ensure<CAnimationTimeline>();
-          timeline->t = 0.0f;
-          timeline->duration = 0.5f;
-          timeline->elapsed = 0.0f;
-          timeline->active = true;
-
-          auto *animation = entity->Ensure<CValueAnimation<glm::vec4>>();
-          animation->target = &cBone->color;
-          animation->start = cBone->color;
-          animation->end = Colors::DEFAULT;
-          animation->timeline = timeline;
         }
         continue;
       }
@@ -110,17 +109,13 @@ public:
       component->target = part;
 
       if (mutated) {
-        auto *timeline = entity->Ensure<CAnimationTimeline>();
-        timeline->t = 0.0f;
-        timeline->duration = 0.5f;
-        timeline->elapsed = 0.0f;
-        timeline->active = true;
-
-        auto *animation = entity->Ensure<CValueAnimation<glm::vec4>>();
-        animation->target = &cBone->color;
-        animation->start = cBone->color;
-        animation->end = glm::vec4(1, 0, 0, 1);
-        animation->timeline = timeline;
+        entity->MarkChanged<CBone>();
+        Animate::Once<glm::vec4>::Create()
+            ->Duration(2.0f)
+            ->Value(&cBone->color, Colors::HIGHLIGHT)
+            ->Value(&cBone->joints[0].color, Colors::HIGHLIGHT)
+            ->Value(&cBone->joints[1].color, Colors::HIGHLIGHT)
+            ->Play();
       }
 
       entity->ClearChanged<CHovered>();
