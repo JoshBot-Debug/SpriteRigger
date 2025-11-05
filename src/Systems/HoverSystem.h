@@ -67,37 +67,16 @@ public:
       if (part == CBone::Part::None) {
         if (entity->Has<CHovered>()) {
           entity->Remove<CHovered>();
-          entity->MarkChanged<CBone>();
 
-          Animate::Once<glm::vec4>::Create()
-              ->Duration(2.0f)
+          Animate::Once<glm::vec4, ECS::Entity>::Create()
+              ->Duration(0.25f)
               ->Value(&cBone->color, Colors::DEFAULT)
               ->Value(&cBone->joints[0].color, Colors::DEFAULT)
               ->Value(&cBone->joints[1].color, Colors::DEFAULT)
+              ->OnUpdate(
+                  entity,
+                  [](ECS::Entity *entity) { entity->MarkChanged<CBone>(); })
               ->Play();
-
-          // TODO
-          // Create the animation subsystem
-          // Remove animation from the ECS, handle them in a seperate subsystem
-          // Keep ECS only for state management
-          //
-          // auto timeline = Animate::Timeline("hover");
-
-          // auto oneTime = Animate::Once("hover")
-          //   .Timeline(timeline)
-          //   .Duration(0.5f)
-          //   .Value(&cBone->color, Colors::DEFAULT)
-          //   .Value(&cBone->joints[0].color, Colors::DEFAULT)
-          //   .Value(&cBone->joints[1].color, Colors::DEFAULT)
-          //   .Play();
-
-          // auto keyframes = Animate::Keyframe("hover")
-          //   .Timeline(timeline)
-          //   .Value(cBone->color)
-          //   .At(0.0f, Colors::DEFAULT)
-          //   .At(1.0f, Colors::HIGHLIGHT)
-          //   .At(2.0f, Colors::DEFAULT)
-          //   .Loop();
         }
         continue;
       }
@@ -110,12 +89,35 @@ public:
 
       if (mutated) {
         entity->MarkChanged<CBone>();
-        Animate::Once<glm::vec4>::Create()
-            ->Duration(2.0f)
-            ->Value(&cBone->color, Colors::HIGHLIGHT)
-            ->Value(&cBone->joints[0].color, Colors::HIGHLIGHT)
-            ->Value(&cBone->joints[1].color, Colors::HIGHLIGHT)
-            ->Play();
+
+        auto animation = Animate::Once<glm::vec4, ECS::Entity>::Create()
+                             ->Duration(0.25f)
+                             ->OnUpdate(entity, [](ECS::Entity *entity) {
+                               entity->MarkChanged<CBone>();
+                             });
+
+        if (part == CBone::StartJoint) {
+          animation->Value(&cBone->joints[CBone::StartJoint].color,
+                           Colors::HIGHLIGHT);
+          animation->Value(&cBone->joints[CBone::EndJoint].color,
+                           Colors::DEFAULT);
+          animation->Value(&cBone->color, Colors::DEFAULT);
+        }
+
+        if (part == CBone::EndJoint) {
+          animation->Value(&cBone->joints[CBone::EndJoint].color,
+                           Colors::HIGHLIGHT);
+          animation->Value(&cBone->joints[CBone::StartJoint].color,
+                           Colors::DEFAULT);
+          animation->Value(&cBone->color, Colors::DEFAULT);
+        }
+
+        if (part == CBone::Shaft)
+          animation->Value(&cBone->color, Colors::HIGHLIGHT)
+              ->Value(&cBone->joints[0].color, Colors::HIGHLIGHT)
+              ->Value(&cBone->joints[1].color, Colors::HIGHLIGHT);
+
+        animation->Play();
       }
 
       entity->ClearChanged<CHovered>();
