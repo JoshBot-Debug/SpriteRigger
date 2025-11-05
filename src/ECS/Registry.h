@@ -150,6 +150,20 @@ public:
   }
 
   /**
+   * Checks if any entity E has a component C.
+   *
+   * @tparam E Entity
+   * @tparam C Component
+   * @return True if the entity has the component, false otherwise.
+   */
+  template <typename E, typename C> bool Has() {
+    for (Entity *entity : GetEntities<E>())
+      if (entity && entity->Has<C>())
+        return true;
+    return false;
+  }
+
+  /**
    * Checks if an entity E has a component C.
    *
    * @tparam E Entity

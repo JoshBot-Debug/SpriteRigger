@@ -58,25 +58,49 @@ public:
     auto data = reinterpret_cast<SystemData *>(d);
     glm::vec2 mouse = glm::vec2(data->mouse.x, data->mouse.y);
 
+    static int i = 0;
+
     for (auto &[entity, cBone] : m_Registry->Get<EBone, CBone>()) {
       CBone::Part part = HoverSystem::HoveredOver(cBone, mouse);
 
-      if (entity->Has<CSelected>() && entity->Get<CSelected>()->target == part)
+      if (entity->Has<CSelected>() &&
+          (entity->Get<CSelected>()->target == part ||
+           entity->Get<CSelected>()->target == CBone::None))
         continue;
+
+      std::cout << i++ << " " << entity->Has<CSelected>() << std::endl;
 
       if (part == CBone::Part::None) {
         if (entity->Has<CHovered>()) {
           entity->Remove<CHovered>();
 
-          Animate::Once<glm::vec4, ECS::Entity>::Create()
-              ->Duration(0.25f)
-              ->Value(&cBone->color, Colors::DEFAULT)
-              ->Value(&cBone->joints[0].color, Colors::DEFAULT)
-              ->Value(&cBone->joints[1].color, Colors::DEFAULT)
-              ->OnUpdate(
-                  entity,
-                  [](ECS::Entity *entity) { entity->MarkChanged<CBone>(); })
-              ->Play();
+          auto cSelected = entity->Get<CSelected>();
+
+          auto animation = Animate::Once<glm::vec4, ECS::Entity>::Create()
+                               ->Duration(ANIMATION_DURATION)
+                               ->OnUpdate(entity, [](ECS::Entity *entity) {
+                                 entity->MarkChanged<CBone>();
+                               });
+
+          if (!cSelected || cSelected->target == CBone::None)
+            animation->Value(&cBone->color, Colors::DEFAULT)
+                ->Value(&cBone->joints[0].color, Colors::DEFAULT)
+                ->Value(&cBone->joints[1].color, Colors::DEFAULT)
+                ->Play();
+
+          if (cSelected) {
+            if (cSelected->target == CBone::StartJoint)
+              animation->Value(&cBone->color, Colors::DEFAULT)
+                  ->Value(&cBone->joints[CBone::EndJoint].color,
+                          Colors::DEFAULT)
+                  ->Play();
+
+            if (cSelected->target == CBone::EndJoint)
+              animation->Value(&cBone->color, Colors::DEFAULT)
+                  ->Value(&cBone->joints[CBone::StartJoint].color,
+                          Colors::DEFAULT)
+                  ->Play();
+          }
         }
         continue;
       }
@@ -91,7 +115,7 @@ public:
         entity->MarkChanged<CBone>();
 
         auto animation = Animate::Once<glm::vec4, ECS::Entity>::Create()
-                             ->Duration(0.25f)
+                             ->Duration(ANIMATION_DURATION)
                              ->OnUpdate(entity, [](ECS::Entity *entity) {
                                entity->MarkChanged<CBone>();
                              });

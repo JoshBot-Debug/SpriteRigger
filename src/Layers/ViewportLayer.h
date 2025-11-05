@@ -20,6 +20,7 @@
 #include "Systems/BoneRenderSystem.h"
 #include "Systems/Common.h"
 #include "Systems/HoverSystem.h"
+#include "Systems/SelectSystem.h"
 
 #include "SerializableLayer.h"
 #include "State.h"
@@ -37,6 +38,7 @@ private:
 
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
   std::shared_ptr<HoverSystem> m_HoverSystem = nullptr;
+  std::shared_ptr<SelectSystem> m_SelectSystem = nullptr;
 
   SystemData m_SystemData;
 
