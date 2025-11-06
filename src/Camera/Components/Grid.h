@@ -33,7 +33,7 @@ private:
   /// Color of origin (x=0, y=0) grid lines.
   ImU32 m_AxisColor = IM_COL32(200, 200, 200, 200);
 
-  ImVec2 m_Mouse = ImVec2(0, 0);
+  ImVec2 m_Mouse = ImVec2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
   ImVec2 m_PreviousMouse = ImVec2(0, 0);
 
 public:

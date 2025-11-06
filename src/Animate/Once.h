@@ -77,12 +77,13 @@ public:
   }
 
   std::shared_ptr<Once<T, P>> Value(T *current, const T &final) {
-    m_Values.emplace_back(current, *current, final);
+    if (current)
+      m_Values.emplace_back(current, *current, final);
     return this->shared_from_this();
   }
 
   std::shared_ptr<Once<T, P>> OnUpdate(P *userData,
-                                    void (*onUpdate)(P *userData)) {
+                                       void (*onUpdate)(P *userData)) {
     m_UserData = userData;
     m_OnUpdate = onUpdate;
     return this->shared_from_this();

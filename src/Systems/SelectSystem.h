@@ -37,11 +37,14 @@ public:
   void Update(void *d) override {
     auto data = reinterpret_cast<SystemData *>(d);
     if (data->isMouseClicked) {
-      std::cout << "Remove all" << std::endl;
-      m_Registry->Remove<EBone, CSelected>();
+      for (auto &[entity, cSelected] : m_Registry->Get<EBone, CSelected>())
+        if (CHovered *cHovered = entity->Get<CHovered>())
+          if (cHovered->target == cSelected->target)
+            entity->Remove<CHovered, CSelected>();
+
       for (auto &[entity, cHovered] : m_Registry->Get<EBone, CHovered>()) {
-        entity->Add<CSelected>(cHovered->target);
         entity->Remove<CHovered>();
+        entity->Add<CSelected>(cHovered->target);
       }
     }
   }
