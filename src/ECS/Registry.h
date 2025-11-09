@@ -94,6 +94,8 @@ public:
    * @return A point to the entity or nullptr if it was destroyed
    */
   template <typename E> Entity *GetEntity(EntityId id) {
+    if (id == 0)
+      return nullptr;
     return m_EntitiesByETID[GetEntityTypeId<E>()][id - 1];
   }
 
@@ -131,6 +133,8 @@ public:
   template <typename E, typename C, typename... CArgs>
   C *Add(EntityId id, CArgs &&...args) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return nullptr;
     return entity->Add<C>(std::forward<CArgs>(args)...);
   }
 
@@ -173,6 +177,8 @@ public:
    */
   template <typename E, typename C> bool Has(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return false;
     return entity->Has<C>();
   }
 
@@ -186,6 +192,8 @@ public:
    */
   template <typename E, typename C> C *Get(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return nullptr;
     return entity->Get<C>();
   }
 
@@ -216,7 +224,7 @@ public:
     std::vector<std::pair<Entity *, C *>> components;
     for (auto &entities : m_EntitiesByETID)
       for (Entity *entity : entities)
-        if (entity->Has<C>())
+        if (entity && entity->Has<C>())
           components.emplace_back(entity, entity->Get<C>());
     return components;
   }
@@ -231,6 +239,8 @@ public:
    */
   template <typename E, typename C, typename... Rest> void Remove(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return;
     entity->Remove<C, Rest...>();
   }
 
@@ -243,7 +253,8 @@ public:
    */
   template <typename E, typename C, typename... Rest> void Remove() {
     for (Entity *entity : GetEntities<E>())
-      entity->Remove<C, Rest...>();
+      if (entity)
+        entity->Remove<C, Rest...>();
   }
 
   /**
@@ -252,7 +263,8 @@ public:
   void Remove() {
     for (auto &entities : m_EntitiesByETID)
       for (Entity *entity : entities)
-        entity->Remove();
+        if (entity)
+          entity->Remove();
   }
 
   /**
@@ -268,6 +280,8 @@ public:
    */
   template <typename E, typename... C> void MarkForRemoval(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return;
     entity->MarkForRemoval<C...>();
   }
 
@@ -282,7 +296,8 @@ public:
    */
   template <typename E, typename... C> void MarkForRemoval() {
     for (Entity *entity : GetEntities<E>())
-      entity->MarkForRemoval<C...>();
+      if (entity)
+        entity->MarkForRemoval<C...>();
   }
 
   /**
@@ -295,6 +310,8 @@ public:
    */
   template <typename E, typename C> bool MarkedForRemoval(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return false;
     return entity->MarkedForRemoval<C>();
   }
 
@@ -307,6 +324,8 @@ public:
    */
   template <typename E, typename... C> void MarkChanged(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return;
     entity->MarkChanged<C...>();
   }
 
@@ -318,7 +337,8 @@ public:
    */
   template <typename E, typename... C> void MarkChanged() {
     for (Entity *entity : GetEntities<E>())
-      entity->MarkChanged<C...>();
+      if (entity)
+        entity->MarkChanged<C...>();
   }
 
   /**
@@ -331,8 +351,9 @@ public:
     std::vector<std::pair<Entity *, C *>> components;
     for (auto &entities : m_EntitiesByETID)
       for (Entity *entity : entities)
-        if (C *changed = entity->GetChanged<C>())
-          components.emplace_back(entity, changed);
+        if (entity)
+          if (C *changed = entity->GetChanged<C>())
+            components.emplace_back(entity, changed);
     return components;
   }
 
@@ -347,8 +368,9 @@ public:
   std::vector<std::pair<Entity *, C *>> GetChanged() {
     std::vector<std::pair<Entity *, C *>> components;
     for (Entity *entity : GetEntities<E>())
-      if (C *changed = entity->GetChanged<C>())
-        components.emplace_back(entity, changed);
+      if (entity)
+        if (C *changed = entity->GetChanged<C>())
+          components.emplace_back(entity, changed);
     return components;
   }
 
@@ -363,6 +385,8 @@ public:
    */
   template <typename E, typename C> C *GetChanged(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return nullptr;
     return entity->GetChanged<C>();
   }
 
@@ -378,6 +402,8 @@ public:
   template <typename E, typename... C>
   std::tuple<C *...> CollectChanged(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return std::make_tuple();
     return entity->CollectChanged<C...>();
   }
 
@@ -392,7 +418,8 @@ public:
   template <typename E, typename... C> std::tuple<C *...> CollectChanged() {
     std::vector<std::pair<Entity *, std::tuple<C *...>>> components;
     for (Entity *entity : GetEntities<E>())
-      components.emplace_back(entity, entity->GetChanged<C...>());
+      if (entity)
+        components.emplace_back(entity, entity->GetChanged<C...>());
     return components;
   }
 
@@ -407,7 +434,7 @@ public:
    */
   template <typename E, typename C> bool HasChanged() {
     for (Entity *entity : GetEntities<E>())
-      if (entity->HasChanged<C>())
+      if (entity && entity->HasChanged<C>())
         return true;
     return false;
   }
@@ -423,6 +450,8 @@ public:
    */
   template <typename E, typename C> bool HasChanged(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return false;
     return entity->HasChanged<C>();
   }
 
@@ -436,7 +465,7 @@ public:
    */
   template <typename E, typename... C> bool AnyChanged() {
     for (Entity *entity : GetEntities<E>())
-      if (entity->AnyChanged<C...>())
+      if (entity && entity->AnyChanged<C...>())
         return true;
     return false;
   }
@@ -452,6 +481,8 @@ public:
    */
   template <typename E, typename... C> bool AnyChanged(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return false;
     return entity->AnyChanged<C...>();
   }
 
@@ -465,7 +496,8 @@ public:
    */
   template <typename E, typename... C> void ClearChanged() {
     for (Entity *entity : GetEntities<E>())
-      entity->ClearChanged<C...>();
+      if (entity)
+        entity->ClearChanged<C...>();
   }
 
   /**
@@ -479,6 +511,8 @@ public:
    */
   template <typename E, typename... C> void ClearChanged(EntityId id) {
     Entity *entity = GetEntity<E>(id);
+    if (!entity)
+      return;
     entity->ClearChanged<C...>();
   }
 };

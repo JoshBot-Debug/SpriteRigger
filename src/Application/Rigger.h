@@ -27,11 +27,32 @@ public:
 
     hierarchy->id = entity->GetId();
     hierarchy->parent = parent;
+    if (auto pHierarchy = registry->Get<EBone, CHierarchy>(parent))
+      pHierarchy->child = hierarchy->id;
     std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %lu",
                   entity->GetId());
   }
 
   void RemoveBone(ECS::EntityId id) {
-    ServiceLocator::Get<ECS::Registry>()->DestroyEntity<EBone>(id);
+    auto registry = ServiceLocator::Get<ECS::Registry>();
+    ECS::EntityId eid = id;
+
+    // Traverse forward and mark all linked bones
+    std::vector<ECS::EntityId> chain;
+    while (eid) {
+        chain.push_back(eid);
+
+        auto h = registry->Get<EBone, CHierarchy>(eid);
+        if (!h || h->child == 0)
+            break;
+        eid = h->child;
+    }
+
+    // Destroy from last to first
+    for (auto it = chain.rbegin(); it != chain.rend(); ++it) {
+        registry->DestroyEntity<EBone>(*it);
+    }
+
+    registry->MarkChanged<EBone, CHierarchy>();
   }
 };

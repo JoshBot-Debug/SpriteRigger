@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 
+#include <iostream>
 #include <stdint.h>
 #include <unordered_map>
 #include <vector>
@@ -42,9 +43,11 @@ private:
       if (Find(item.id, this))
         return;
       Node *node = Find(item.parent, this);
-      if (node == nullptr)
-        throw std::runtime_error("Invalid parent id: " +
-                                 std::to_string(item.parent));
+      if (node == nullptr) {
+        std::cerr << "Invalid parent id:" << std::to_string(item.parent)
+                  << "\n";
+        return;
+      }
       node->children.emplace_back(new Node{.item = item});
     }
 
@@ -130,7 +133,6 @@ public:
       return;
 
     if (ImGui::BeginTable(id.c_str(), 1, s_TableFlags)) {
-
       for (auto *child : m_Root->children)
         child->Render(m_RenderItem, m_RenderItemData);
 

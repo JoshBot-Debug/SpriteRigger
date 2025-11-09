@@ -33,6 +33,7 @@ struct CDragging {
 struct CHierarchy {
   uint32_t id = 0;
   uint32_t parent = 0;
+  uint32_t child = 0;
   char name[255] = "";
 };
 
