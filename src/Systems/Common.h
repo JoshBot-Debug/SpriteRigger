@@ -7,7 +7,7 @@
 
 #include "Camera/OrthographicCamera.h"
 
-inline const float ANIMATION_DURATION = 0.35f;
+inline const float ANIMATION_DURATION = 0.15f;
 
 struct SystemData {
   float deltaTime = 0.0f;

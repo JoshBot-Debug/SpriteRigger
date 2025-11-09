@@ -38,14 +38,23 @@ public:
     auto data = reinterpret_cast<SystemData *>(d);
     if (data->isMouseClicked) {
       for (auto &[entity, cSelected] : m_Registry->Get<EBone, CSelected>())
-        if (CHovered *cHovered = entity->Get<CHovered>())
+        if (CHovered *cHovered = entity->Get<CHovered>()) {
           if (cHovered->target == cSelected->target)
             entity->Remove<CHovered, CSelected>();
+          continue;
+        } else
+          entity->Remove<CHovered, CSelected>();
 
       for (auto &[entity, cHovered] : m_Registry->Get<EBone, CHovered>()) {
         entity->Remove<CHovered>();
         entity->Add<CSelected>(cHovered->target);
       }
     }
+
+    for (auto &[entity, cSelected] : m_Registry->Get<EBone, CSelected>())
+      if (data->isDragging)
+        entity->Ensure<CDragging>(cSelected->target);
+      else if (entity->Has<CDragging>())
+        entity->Remove<CDragging>();
   }
 };
