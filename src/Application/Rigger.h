@@ -9,8 +9,13 @@
 #include "Components/Hierarchy.h"
 
 class Rigger {
+private:
+  Hierarchy *m_Hierarchy = nullptr;
+
 public:
   Rigger() = default;
+
+  void SetHierarchy(Hierarchy *hierarchy) { m_Hierarchy = hierarchy; }
 
   void NewBone(ECS::EntityId parent) {
     auto registry = ServiceLocator::Get<ECS::Registry>();
@@ -27,32 +32,36 @@ public:
 
     hierarchy->id = entity->GetId();
     hierarchy->parent = parent;
+
     if (auto pHierarchy = registry->Get<EBone, CHierarchy>(parent))
       pHierarchy->child = hierarchy->id;
+
     std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %lu",
                   entity->GetId());
+
+    m_Hierarchy->Add({
+        .id = hierarchy->id,
+        .parent = hierarchy->parent,
+    });
   }
 
   void RemoveBone(ECS::EntityId id) {
     auto registry = ServiceLocator::Get<ECS::Registry>();
     ECS::EntityId eid = id;
 
-    // Traverse forward and mark all linked bones
     std::vector<ECS::EntityId> chain;
     while (eid) {
-        chain.push_back(eid);
+      chain.push_back(eid);
 
-        auto h = registry->Get<EBone, CHierarchy>(eid);
-        if (!h || h->child == 0)
-            break;
-        eid = h->child;
+      auto h = registry->Get<EBone, CHierarchy>(eid);
+      if (!h || h->child == 0)
+        break;
+      eid = h->child;
     }
 
-    // Destroy from last to first
     for (auto it = chain.rbegin(); it != chain.rend(); ++it) {
-        registry->DestroyEntity<EBone>(*it);
+      m_Hierarchy->Remove(*it);
+      registry->DestroyEntity<EBone>(*it);
     }
-
-    registry->MarkChanged<EBone, CHierarchy>();
   }
 };

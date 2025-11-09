@@ -5,9 +5,18 @@
 #include "ECS/Entity.h"
 #include "ServiceLocator/ServiceLocator.h"
 
-HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {}
+HierarchyLayer::HierarchyLayer(State *state) : m_State(state) {
+  ServiceLocator::Get<Rigger>()->SetHierarchy(&m_Hierarchy);
+}
 
 void HierarchyLayer::OnAttach() {
+
+  for (auto &[entity, cHierarchy] :
+       ServiceLocator::Get<ECS::Registry>()->Get<EBone, CHierarchy>())
+    m_Hierarchy.Add({
+        .id = cHierarchy->id,
+        .parent = cHierarchy->parent,
+    });
 
   m_BoneContextMenu.Register(
       {.renderOn = ContextMenu::PopupContext::ITEM,
@@ -44,7 +53,7 @@ void HierarchyLayer::OnAttach() {
 
   m_Hierarchy.OnRenderItem([](Hierarchy::Item *item, void *data) {
     auto boneContextMenu = static_cast<ContextMenu *>(data);
-    
+
     std::string inputId = ("##ID:" + std::to_string(item->id)).c_str();
     std::string ctxId = ("bcm:" + std::to_string(item->id)).c_str();
 
@@ -94,20 +103,7 @@ void HierarchyLayer::OnAttach() {
   });
 }
 
-void HierarchyLayer::OnUpdate(float deltaTime) {
-  auto registry = ServiceLocator::Get<ECS::Registry>();
-
-  if (registry->HasChanged<EBone, CHierarchy>())
-    m_Hierarchy.Clear();
-
-  for (auto &[entity, cHierarchy] : registry->Get<EBone, CHierarchy>()) {
-    entity->ClearChanged<CHierarchy>();
-    m_Hierarchy.Add({
-        .id = cHierarchy->id,
-        .parent = cHierarchy->parent,
-    });
-  }
-}
+void HierarchyLayer::OnUpdate(float deltaTime) {}
 
 void HierarchyLayer::OnRender() {
   ImGui::ShowDemoWindow();
