@@ -71,7 +71,7 @@ public:
       } else if (entity->Has<CHovered>())
         entity->Remove<CHovered>();
 
-      auto resolve = [&](CBone::Part part) {
+      auto resolve = [cHovered, cSelected](CBone::Part part) {
         if (cHovered && cHovered->target == CBone::Shaft)
           return Colors::HIGHLIGHT;
         if (cSelected && cSelected->target == CBone::Shaft)
