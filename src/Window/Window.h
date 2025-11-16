@@ -1,5 +1,7 @@
 #pragma once
 
+#include "glad/glad.h"
+
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -8,7 +10,6 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include "glad/glad.h"
 
 #include "Input.h"
 #include "Layer.h"

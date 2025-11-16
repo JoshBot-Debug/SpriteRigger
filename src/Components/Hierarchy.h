@@ -51,10 +51,20 @@ private:
       node->children.back()->item = item;
     }
 
-    void Remove(NodeId id)
+    bool Remove(NodeId id)
     {
-      auto parent = FindParent(id);
-      std::erase_if(parent->children, [&](const std::unique_ptr<Node>& p) { return p->item.id == id; });
+      for (auto it = children.begin(); it != children.end(); ++it)
+        if ((*it)->item.id == id)
+        {
+          children.erase(it);
+          return true;
+        }
+
+      for (auto& child : children)
+        if (child->Remove(id))
+          return true;
+
+      return false;
     }
 
     Node* FindParent(NodeId id)
@@ -92,7 +102,7 @@ private:
       if (!hasChildren)
         treeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
-      std::string label  = (item.label.size() == 0 ? ("##HierarchyItem:" + std::to_string(item.id)) : label);
+      std::string label  = (item.label.size() == 0 ? ("##HierarchyItem:" + std::to_string(item.id)) : item.label);
       bool        opened = ImGui::TreeNodeEx(label.c_str(), treeFlags);
 
       if (item.onRenderItem)
@@ -127,7 +137,6 @@ public:
   void Add(const Item& item)
   {
     m_PendingAdditions.push_back(item);
-    std::cout << "HERE" << std::endl;
   }
 
   void Remove(NodeId id)
@@ -163,14 +172,24 @@ public:
       ImGui::EndTable();
     }
 
-    for (NodeId removeId : m_PendingRemovals)
-      m_Root->Remove(removeId);
+    if (!m_PendingRemovals.empty())
+    {
+      std::sort(m_PendingRemovals.begin(), m_PendingRemovals.end());
+      m_PendingRemovals.erase(std::unique(m_PendingRemovals.begin(), m_PendingRemovals.end()), m_PendingRemovals.end());
 
-    m_PendingRemovals.clear();
+      for (NodeId removeId : m_PendingRemovals)
+        if (!m_Root->Remove(removeId))
+          std::cerr << "Warning: tried to remove non-existent id " << removeId << "\n";
 
-    for (Item item : m_PendingAdditions)
-      m_Root->Add(item);
+      m_PendingRemovals.clear();
+    }
 
-    m_PendingAdditions.clear();
+    if (!m_PendingAdditions.empty())
+    {
+      for (Item item : m_PendingAdditions)
+        m_Root->Add(item);
+
+      m_PendingAdditions.clear();
+    }
   }
 };

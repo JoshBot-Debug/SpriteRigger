@@ -144,6 +144,8 @@ void State::Save()
   // Serialize bone entity
   for (auto& entity : registry->GetEntities<EBone>())
   {
+    if (!entity)
+      continue;
 
     const auto& [bone, hierarchy, flags] = entity->Collect<CBone, CHierarchy, CFlags>();
 

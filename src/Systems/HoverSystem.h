@@ -17,6 +17,13 @@
 class HoverSystem : public ECS::System
 {
 private:
+  struct AnimationSignal
+  {
+    ECS::EntityId  entityId = 0;
+    ECS::Registry* registry = nullptr;
+  };
+
+private:
   Grid*               m_Grid     = nullptr;
   ECS::Registry*      m_Registry = nullptr;
   OrthographicCamera* m_Camera   = nullptr;
@@ -94,12 +101,14 @@ public:
       glm::vec4 targetStartJoint = resolve(CBone::StartJoint);
       glm::vec4 targetEndJoint   = resolve(CBone::EndJoint);
 
-      Animate::Once<glm::vec4, ECS::Entity>::Create()
+      Animate::Once<glm::vec4>::Create()
+          ->Signal([registry = m_Registry, entityId = entity->GetId()]()
+                   { return !registry->Has<EBone, CBone>(entityId); })
           ->Duration(ANIMATION_DURATION)
           ->Value(&cBone->color, targetShaft)
           ->Value(&cBone->joints[0].color, targetStartJoint)
           ->Value(&cBone->joints[1].color, targetEndJoint)
-          ->OnUpdate(entity, [](ECS::Entity* e) { e->MarkChanged<CBone>(); })
+          ->OnUpdate([entity]() { entity->MarkChanged<CBone>(); })
           ->Play();
     }
   }
