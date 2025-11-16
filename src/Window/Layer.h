@@ -2,18 +2,30 @@
 
 struct Window;
 
-class Layer {
+class Layer
+{
 protected:
-  Window *m_Window = nullptr;
+  Window* m_Window = nullptr;
 
 public:
   virtual ~Layer() = default;
 
-  virtual void OnAttach() {}
-  virtual void OnDetach() {}
+  virtual void OnAttach()
+  {
+  }
+  virtual void OnDetach()
+  {
+  }
 
-  virtual void OnUpdate(float deltaTime) {}
-  virtual void OnRender() {}
+  virtual void OnUpdate(float deltaTime)
+  {
+  }
+  virtual void OnRender()
+  {
+  }
 
-  void SetWindow(Window *window) { m_Window = window; }
+  void SetWindow(Window* window)
+  {
+    m_Window = window;
+  }
 };

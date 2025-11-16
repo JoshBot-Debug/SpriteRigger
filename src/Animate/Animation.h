@@ -2,10 +2,12 @@
 
 #include <memory>
 
-namespace Animate {
+namespace Animate
+{
 class Timeline;
 
-class Animation {
+class Animation
+{
 public:
   virtual std::shared_ptr<Animate::Timeline> GetTimeline() const = 0;
 

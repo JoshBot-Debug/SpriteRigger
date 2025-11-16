@@ -12,39 +12,41 @@
 #include "Fonts/RobotoMedium.embed"
 #include "Fonts/RobotoRegular.embed"
 
-static std::unordered_map<std::string, ImFont *> s_Fonts;
+static std::unordered_map<std::string, ImFont*> s_Fonts;
 
-void ErrorCallback(int error, const char *description) {
+void ErrorCallback(int error, const char* description)
+{
   std::cerr << "GLFW Error " << error << ":" << description << std::endl;
 }
 
-void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id,
-                              GLenum severity, GLsizei length,
-                              const GLchar *message, const void *userParam) {
+void GLAPIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                              const GLchar* message, const void* userParam)
+{
   (void)length;
   (void)userParam;
   std::cerr << "OpenGL Debug Message (" << id << "): " << message << std::endl;
-  std::cerr << "Source: " << source << ", Type: " << type
-            << ", Severity: " << severity << std::endl;
+  std::cerr << "Source: " << source << ", Type: " << type << ", Severity: " << severity << std::endl;
 }
 
-static void SetFrameBufferSize(GLFWwindow *window, int w, int h) {
+static void SetFrameBufferSize(GLFWwindow* window, int w, int h)
+{
   (void)window;
   glViewport(0, 0, w, h);
 }
 
-static void glDebug() {
+static void glDebug()
+{
 #ifdef DEBUG
   glEnable(GL_DEBUG_OUTPUT);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
   glDebugMessageCallback(DebugCallback, nullptr);
-  glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
-                        GL_TRUE);
+  glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 #endif
 }
 
-void Window::Run() {
+void Window::Run()
+{
   if (m_Running)
     return;
 
@@ -55,20 +57,22 @@ void Window::Run() {
   if (m_Options.maximized)
     glfwMaximizeWindow(s_Window);
 
-  auto &shortcutManager = ShortcutManager::Instance();
+  auto& shortcutManager = ShortcutManager::Instance();
 
-  while (!glfwWindowShouldClose(s_Window) && m_Running) {
+  while (!glfwWindowShouldClose(s_Window) && m_Running)
+  {
 
     glfwPollEvents();
 
     shortcutManager.PollEvents();
 
-    if (glfwGetWindowAttrib(s_Window, GLFW_ICONIFIED) != 0) {
+    if (glfwGetWindowAttrib(s_Window, GLFW_ICONIFIED) != 0)
+    {
       ImGui_ImplGlfw_Sleep(10);
       continue;
     }
 
-    for (auto &layer : m_Layers)
+    for (auto& layer : m_Layers)
       layer->OnUpdate(s_TimeStep);
 
     ImGui_ImplOpenGL3_NewFrame();
@@ -85,16 +89,15 @@ void Window::Run() {
       if (m_Menubar)
         windowFlags |= ImGuiWindowFlags_MenuBar;
 
-      const ImGuiViewport *viewport = ImGui::GetMainViewport();
+      const ImGuiViewport* viewport = ImGui::GetMainViewport();
       ImGui::SetNextWindowPos(viewport->WorkPos);
       ImGui::SetNextWindowSize(viewport->WorkSize);
       ImGui::SetNextWindowViewport(viewport->ID);
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
       ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-      windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-      windowFlags |=
-          ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+      windowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+                     ImGuiWindowFlags_NoMove;
+      windowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
       // When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will
       // render our background and handle the pass-thru hole, so we ask Begin()
@@ -115,19 +118,21 @@ void Window::Run() {
       ImGui::PopStyleVar(3);
 
       // Submit the DockSpace
-      ImGuiIO &io = ImGui::GetIO();
-      if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+      ImGuiIO& io = ImGui::GetIO();
+      if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+      {
         ImGuiID dockspaceId = ImGui::GetID("WindowDockspace");
         ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
       }
 
       if (m_Menubar)
-        if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenuBar())
+        {
           m_Menubar();
           ImGui::EndMenuBar();
         }
 
-      for (auto &layer : m_Layers)
+      for (auto& layer : m_Layers)
         layer->OnRender();
 
       ImGui::End();
@@ -138,50 +143,61 @@ void Window::Run() {
 
     glfwSwapBuffers(s_Window);
 
-    double time = glfwGetTime();
-    m_FrameTime = time - m_LastFrameTime;
-    s_TimeStep = glm::min<double>(m_FrameTime, 0.0333f);
+    double time     = glfwGetTime();
+    m_FrameTime     = time - m_LastFrameTime;
+    s_TimeStep      = glm::min<double>(m_FrameTime, 0.0333f);
     m_LastFrameTime = time;
-    s_Scroll.x = 0.0f;
-    s_Scroll.y = 0.0f;
+    s_Scroll.x      = 0.0f;
+    s_Scroll.y      = 0.0f;
   }
 }
 
-void Window::Quit() { m_Running = false; }
-
-ImFont *Window::GetFont(const std::string &name) { return s_Fonts.at(name); }
-
-void Window::AddFont(const std::string &filepath, const std::string &name,
-                     float fontSize, const ImWchar *glyphRanges) {
-  ImGuiIO &io = ImGui::GetIO();
-  s_Fonts.emplace(name, io.Fonts->AddFontFromFileTTF(filepath.c_str(), fontSize,
-                                                     NULL, glyphRanges));
+void Window::Quit()
+{
+  m_Running = false;
 }
 
-glm::vec2 Window::GetMouseScroll() { return s_Scroll; }
+ImFont* Window::GetFont(const std::string& name)
+{
+  return s_Fonts.at(name);
+}
 
-glm::vec2 Window::GetMousePosition() {
+void Window::AddFont(const std::string& filepath, const std::string& name, float fontSize, const ImWchar* glyphRanges)
+{
+  ImGuiIO& io = ImGui::GetIO();
+  s_Fonts.emplace(name, io.Fonts->AddFontFromFileTTF(filepath.c_str(), fontSize, NULL, glyphRanges));
+}
+
+glm::vec2 Window::GetMouseScroll()
+{
+  return s_Scroll;
+}
+
+glm::vec2 Window::GetMousePosition()
+{
   double x, y;
   glfwGetCursorPos(s_Window, &x, &y);
   return glm::vec2(static_cast<float>(x), static_cast<float>(y));
 }
 
-bool Window::GetKey(const KeyboardKey &key, const KeyAction &action) {
-  return glfwGetKey(s_Window, static_cast<int>(key)) ==
-         static_cast<int>(action);
+bool Window::GetKey(const KeyboardKey& key, const KeyAction& action)
+{
+  return glfwGetKey(s_Window, static_cast<int>(key)) == static_cast<int>(action);
 }
 
-bool Window::GetMouseButton(const MouseButton &key, const KeyAction &action) {
-  return glfwGetMouseButton(s_Window, static_cast<int>(key)) ==
-         static_cast<int>(action);
+bool Window::GetMouseButton(const MouseButton& key, const KeyAction& action)
+{
+  return glfwGetMouseButton(s_Window, static_cast<int>(key)) == static_cast<int>(action);
 }
 
-void Window::RegisterShortcut(const ShortcutManager::Shortcut &shortcut) {
+void Window::RegisterShortcut(const ShortcutManager::Shortcut& shortcut)
+{
   ShortcutManager::Instance().Register(shortcut);
 }
 
-void Window::GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
-                                 GLuint &depthBuffer, GLuint &colorAttachment) {
+void Window::GenerateFrameBuffer(const ImVec2& viewport, GLuint& frameBuffer, GLuint& depthBuffer,
+                                 GLuint& colorAttachment)
+{
   if (frameBuffer != 0)
     glDeleteFramebuffers(1, &frameBuffer);
 
@@ -197,20 +213,16 @@ void Window::GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
   // Color attachment
   glGenTextures(1, &colorAttachment);
   glBindTexture(GL_TEXTURE_2D, colorAttachment);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, viewport.x, viewport.y, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, nullptr);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, viewport.x, viewport.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                         colorAttachment, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachment, 0);
 
   // Depth buffer
   glGenRenderbuffers(1, &depthBuffer);
   glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, viewport.x,
-                        viewport.y);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                            GL_RENDERBUFFER, depthBuffer);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, viewport.x, viewport.y);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     std::cerr << "Framebuffer not complete!" << std::endl;
@@ -218,10 +230,9 @@ void Window::GenerateFrameBuffer(const ImVec2 &viewport, GLuint &frameBuffer,
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Window::GenerateMSAAFrameBuffer(const ImVec2 &viewport,
-                                     GLuint &frameBuffer,
-                                     GLuint &colorAttachment,
-                                     GLuint &depthBuffer, GLuint samples) {
+void Window::GenerateMSAAFrameBuffer(const ImVec2& viewport, GLuint& frameBuffer, GLuint& colorAttachment,
+                                     GLuint& depthBuffer, GLuint samples)
+{
 
   if (frameBuffer != 0)
     glDeleteFramebuffers(1, &frameBuffer);
@@ -236,18 +247,14 @@ void Window::GenerateMSAAFrameBuffer(const ImVec2 &viewport,
   // Multi-sampled color renderbuffer
   glGenRenderbuffers(1, &colorAttachment);
   glBindRenderbuffer(GL_RENDERBUFFER, colorAttachment);
-  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8,
-                                   viewport.x, viewport.y);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                            GL_RENDERBUFFER, colorAttachment);
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, viewport.x, viewport.y);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorAttachment);
 
   // Multi-sampled depth/stencil renderbuffer
   glGenRenderbuffers(1, &depthBuffer);
   glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples,
-                                   GL_DEPTH24_STENCIL8, viewport.x, viewport.y);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                            GL_RENDERBUFFER, depthBuffer);
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, viewport.x, viewport.y);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     std::cerr << "MSAA Framebuffer not complete!" << std::endl;
@@ -255,10 +262,11 @@ void Window::GenerateMSAAFrameBuffer(const ImVec2 &viewport,
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-Window::Window(const Window::Options &options) : m_Options(options) {
+Window::Window(const Window::Options& options) : m_Options(options)
+{
   ShortcutManager::Instance().SetWindow(this);
 
-  const char *glsl_version = "#version 330 core";
+  const char* glsl_version = "#version 330 core";
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -268,24 +276,25 @@ Window::Window(const Window::Options &options) : m_Options(options) {
   glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
   glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-  glfwWindowHint(GLFW_DECORATED,
-                 options.enableTitleBar ? GLFW_TRUE : GLFW_FALSE);
+  glfwWindowHint(GLFW_DECORATED, options.enableTitleBar ? GLFW_TRUE : GLFW_FALSE);
 
   glfwWindowHint(GLFW_SAMPLES, options.MSAA);
 
-  const GLFWvidmode *screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
+  const GLFWvidmode* screen = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-  s_Window = glfwCreateWindow(options.width ? options.width : screen->width,
-                              options.height ? options.height : screen->height,
-                              options.title.c_str(), nullptr, nullptr);
-  if (!s_Window) {
+  s_Window =
+      glfwCreateWindow(options.width ? options.width : screen->width, options.height ? options.height : screen->height,
+                       options.title.c_str(), nullptr, nullptr);
+  if (!s_Window)
+  {
     glfwTerminate();
     throw std::runtime_error("Failed to create a window!");
   }
 
   glfwMakeContextCurrent(s_Window);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+  {
     glfwTerminate();
     throw std::runtime_error("Failed to initialize GLAD");
   }
@@ -303,14 +312,13 @@ Window::Window(const Window::Options &options) : m_Options(options) {
 
   int windowWidth, windowHeight;
   glfwGetWindowSize(s_Window, &windowWidth, &windowHeight);
-  glfwSetWindowPos(s_Window, (screen->width - windowWidth) / 2,
-                   (screen->height - windowHeight) / 2);
+  glfwSetWindowPos(s_Window, (screen->width - windowWidth) / 2, (screen->height - windowHeight) / 2);
 
   IMGUI_CHECKVERSION();
 
   ImGui::CreateContext();
 
-  ImGuiIO &io = ImGui::GetIO();
+  ImGuiIO& io = ImGui::GetIO();
 
   if (options.imguiEnableKeyboardNavigation)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -332,25 +340,18 @@ Window::Window(const Window::Options &options) : m_Options(options) {
     ImFontConfig fontConfig;
     fontConfig.FontDataOwnedByAtlas = false;
 
-    auto regularFont = s_Fonts.emplace(
-        "RobotoRegular", io.Fonts->AddFontFromMemoryTTF((void *)g_RobotoRegular,
-                                                        sizeof(g_RobotoRegular),
-                                                        0.0f, &fontConfig));
-    s_Fonts.emplace("RobotoBold", io.Fonts->AddFontFromMemoryTTF(
-                                      (void *)g_RobotoBold,
-                                      sizeof(g_RobotoBold), 0.0f, &fontConfig));
+    auto regularFont =
+        s_Fonts.emplace("RobotoRegular", io.Fonts->AddFontFromMemoryTTF((void*)g_RobotoRegular, sizeof(g_RobotoRegular),
+                                                                        0.0f, &fontConfig));
+    s_Fonts.emplace("RobotoBold",
+                    io.Fonts->AddFontFromMemoryTTF((void*)g_RobotoBold, sizeof(g_RobotoBold), 0.0f, &fontConfig));
     s_Fonts.emplace("RobotoMedium",
-                    io.Fonts->AddFontFromMemoryTTF((void *)g_RobotoMedium,
-                                                   sizeof(g_RobotoMedium), 0.0f,
-                                                   &fontConfig));
+                    io.Fonts->AddFontFromMemoryTTF((void*)g_RobotoMedium, sizeof(g_RobotoMedium), 0.0f, &fontConfig));
     s_Fonts.emplace("RobotoLight",
-                    io.Fonts->AddFontFromMemoryTTF((void *)g_RobotoLight,
-                                                   sizeof(g_RobotoLight), 0.0f,
-                                                   &fontConfig));
-    s_Fonts.emplace("RobotoLightItalic",
-                    io.Fonts->AddFontFromMemoryTTF((void *)g_RobotoLightItalic,
-                                                   sizeof(g_RobotoLightItalic),
-                                                   0.0f, &fontConfig));
+                    io.Fonts->AddFontFromMemoryTTF((void*)g_RobotoLight, sizeof(g_RobotoLight), 0.0f, &fontConfig));
+    s_Fonts.emplace(
+        "RobotoLightItalic",
+        io.Fonts->AddFontFromMemoryTTF((void*)g_RobotoLightItalic, sizeof(g_RobotoLightItalic), 0.0f, &fontConfig));
 
     io.FontDefault = regularFont.first->second;
   }
@@ -358,15 +359,16 @@ Window::Window(const Window::Options &options) : m_Options(options) {
   glfwSetScrollCallback(s_Window, ScrollCallback);
 }
 
-void Window::ScrollCallback(GLFWwindow *window, double xoffset,
-                            double yoffset) {
+void Window::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
   s_Scroll.x += static_cast<float>(xoffset);
   s_Scroll.y += static_cast<float>(yoffset);
   ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
-Window::~Window() {
-  for (auto &layer : m_Layers)
+Window::~Window()
+{
+  for (auto& layer : m_Layers)
     layer->OnDetach();
 
   m_Layers.clear();

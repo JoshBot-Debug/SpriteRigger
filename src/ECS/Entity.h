@@ -1,11 +1,12 @@
 #pragma once
 
+#include <stdint.h>
 #include <array>
 #include <bitset>
 #include <memory>
-#include <stdint.h>
 
-namespace ECS {
+namespace ECS
+{
 
 constexpr size_t MAX_COMPONENTS = 1024;
 
@@ -20,15 +21,16 @@ class Registry;
  * It holds a unique identifier, a name, and a reference to the Registry
  * that manages its components.
  */
-class Entity {
+class Entity
+{
 private:
   EntityTypeId m_TId = 0;
-  EntityId m_Id = 0;
+  EntityId     m_Id  = 0;
 
-  Registry *m_Registry = nullptr;
+  Registry* m_Registry = nullptr;
 
   std::array<std::shared_ptr<void>, MAX_COMPONENTS> m_Components;
-  std::vector<size_t> m_FreeComponentSlots;
+  std::vector<size_t>                               m_FreeComponentSlots;
 
   std::bitset<MAX_COMPONENTS> m_Has;
   std::bitset<MAX_COMPONENTS> m_Dirty;
@@ -38,7 +40,8 @@ private:
   /**
    * A global counter for unique component type.
    */
-  static size_t &GetComponentCounter() {
+  static size_t& GetComponentCounter()
+  {
     static size_t counter = size_t(-1);
     return counter;
   }
@@ -46,7 +49,8 @@ private:
   /**
    * Retrieve a unique, stable ID for a component type.
    */
-  template <typename T> size_t GetComponentTypeId() {
+  template <typename T> size_t GetComponentTypeId()
+  {
     static const size_t id = ++GetComponentCounter();
     return id;
   }
@@ -59,12 +63,12 @@ public:
    * @param id The unique identifier for the entity.
    * @param registry A pointer to the Registry managing this entity.
    */
-  Entity(EntityTypeId tid, EntityId id, Registry *registry)
-      : m_TId(tid), m_Id(id), m_Registry(registry){};
+  Entity(EntityTypeId tid, EntityId id, Registry* registry) : m_TId(tid), m_Id(id), m_Registry(registry){};
 
-  ~Entity() {
-    m_TId = 0;
-    m_Id = 0;
+  ~Entity()
+  {
+    m_TId      = 0;
+    m_Id       = 0;
     m_Registry = nullptr;
 
     for (auto component : m_Components)
@@ -76,7 +80,10 @@ public:
    *
    * @return The entity's ID.
    */
-  EntityId GetId() { return m_Id; }
+  EntityId GetId()
+  {
+    return m_Id;
+  }
 
   /**
    * Adds a component of type C to the entity.
@@ -86,12 +93,13 @@ public:
    * @param args Constructor arguments for the component.
    * @return A pointer to the newly created component.
    */
-  template <typename C, typename... CArgs> C *Add(CArgs &&...args) {
-    size_t id = GetComponentTypeId<C>();
+  template <typename C, typename... CArgs> C* Add(CArgs&&... args)
+  {
+    size_t id        = GetComponentTypeId<C>();
     m_Components[id] = std::make_shared<C>(std::forward<CArgs>(args)...);
     m_Has.set(id, true);
     m_Dirty.set(id, true);
-    return static_cast<C *>(m_Components[id].get());
+    return static_cast<C*>(m_Components[id].get());
   }
 
   /**
@@ -100,7 +108,8 @@ public:
    * @tparam C Component
    * @return True if the entity has the component, false otherwise.
    */
-  template <typename C> bool Has() {
+  template <typename C> bool Has()
+  {
     return m_Has.test(GetComponentTypeId<C>());
   }
 
@@ -110,13 +119,17 @@ public:
    * @tparam C Component
    * @return A pointer to the component, or nullptr if not found.
    */
-  template <typename C> C *Get() {
+  template <typename C> C* Get()
+  {
     size_t id = GetComponentTypeId<C>();
     if (!m_Has.test(id))
       return nullptr;
-    try {
+    try
+    {
       return std::static_pointer_cast<C>(m_Components[id]).get();
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception& e)
+    {
     }
     return nullptr;
   }
@@ -128,13 +141,17 @@ public:
    * @tparam CArgs Component args
    * @return A pointer to the component.
    */
-  template <typename C, typename... CArgs> C *Ensure(CArgs &&...args) {
+  template <typename C, typename... CArgs> C* Ensure(CArgs&&... args)
+  {
     size_t id = GetComponentTypeId<C>();
     if (!m_Has.test(id))
       return Add<C>(std::forward<CArgs>(args)...);
-    try {
+    try
+    {
       return std::static_pointer_cast<C>(m_Components[id]).get();
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception& e)
+    {
     }
     return nullptr;
   }
@@ -145,7 +162,8 @@ public:
    * @tparam C Component
    * @return A pointer to the component, or nullptr if not found.
    */
-  template <typename... C> std::tuple<C *...> Collect() {
+  template <typename... C> std::tuple<C*...> Collect()
+  {
     return std::make_tuple(Get<C>()...);
   }
 
@@ -155,9 +173,11 @@ public:
    * @tparam C Component
    * @tparam Rest Components
    */
-  template <typename C, typename... Rest> void Remove() {
+  template <typename C, typename... Rest> void Remove()
+  {
     size_t id = GetComponentTypeId<C>();
-    if (m_Has.test(id)) {
+    if (m_Has.test(id))
+    {
       m_Components[id].reset();
       m_Has.set(id, false);
       m_Removal.set(id, false);
@@ -169,7 +189,8 @@ public:
   /**
    * Remove all components from the entity
    */
-  void Remove() {
+  void Remove()
+  {
     m_Has.reset();
     for (auto component : m_Components)
       component.reset();
@@ -183,9 +204,11 @@ public:
    * @tparam C Component
    * @tparam Rest Components
    */
-  template <typename C, typename... Rest> void MarkForRemoval() {
+  template <typename C, typename... Rest> void MarkForRemoval()
+  {
     size_t id = GetComponentTypeId<C>();
-    if (m_Has.test(id)) {
+    if (m_Has.test(id))
+    {
       m_Removal.set(id, true);
       m_Dirty.set(id, true);
     }
@@ -199,7 +222,8 @@ public:
    * @tparam C Component
    * @return A bool, true for marked, false otherwise
    */
-  template <typename C> bool MarkedForRemoval() {
+  template <typename C> bool MarkedForRemoval()
+  {
     return m_Removal.test(GetComponentTypeId<C>());
   }
 
@@ -208,7 +232,8 @@ public:
    *
    * @tparam C Component
    */
-  template <typename... C> void MarkChanged() {
+  template <typename... C> void MarkChanged()
+  {
     (m_Dirty.set(GetComponentTypeId<C>(), true), ...);
   }
 
@@ -218,7 +243,8 @@ public:
    * @tparam C Component
    * @return bool True if changed, false otherwise
    */
-  template <typename C> bool HasChanged() {
+  template <typename C> bool HasChanged()
+  {
     return m_Dirty.test(GetComponentTypeId<C>());
   }
 
@@ -228,7 +254,8 @@ public:
    * @tparam C Component
    * @return bool True if changed, false otherwise
    */
-  template <typename... C> bool AnyChanged() {
+  template <typename... C> bool AnyChanged()
+  {
     return (m_Dirty.test(GetComponentTypeId<C>()) || ...);
   }
 
@@ -238,11 +265,12 @@ public:
    * @tparam C Component
    * @return A pointer to the component
    */
-  template <typename C> C *GetChanged() {
+  template <typename C> C* GetChanged()
+  {
     size_t id = GetComponentTypeId<C>();
     if (!m_Has.test(id) || !m_Dirty.test(id))
       return nullptr;
-    return static_cast<C *>(m_Components[id].get());
+    return static_cast<C*>(m_Components[id].get());
   }
 
   /**
@@ -251,7 +279,8 @@ public:
    * @tparam C Component
    * @return A pointer to the component
    */
-  template <typename... C> std::tuple<C *...> CollectChanged() {
+  template <typename... C> std::tuple<C*...> CollectChanged()
+  {
     return std::make_tuple(GetChanged<C>()...);
   }
 
@@ -261,10 +290,12 @@ public:
    * @tparam C Component
    * @tparam Rest Components
    */
-  template <typename C, typename... Rest> void ClearChanged() {
+  template <typename C, typename... Rest> void ClearChanged()
+  {
     size_t id = GetComponentTypeId<C>();
 
-    if (m_Removal.test(id)) {
+    if (m_Removal.test(id))
+    {
       if (m_Has.test(id))
         m_Components[id].reset();
       m_Has.set(id, false);
@@ -283,9 +314,12 @@ public:
    * @tparam C Component
    * @tparam Rest Components
    */
-  void ClearChanged() {
-    for (size_t id = 0; id < MAX_COMPONENTS; id++) {
-      if (m_Removal.test(id)) {
+  void ClearChanged()
+  {
+    for (size_t id = 0; id < MAX_COMPONENTS; id++)
+    {
+      if (m_Removal.test(id))
+      {
         if (m_Has.test(id))
           m_Components[id].reset();
         m_Has.set(id, false);
@@ -302,13 +336,19 @@ public:
    * @param other The other entity to compare.
    * @return True if both entities have the same ID, false otherwise.
    */
-  bool operator==(const Entity &other) const { return m_Id == other.m_Id; };
+  bool operator==(const Entity& other) const
+  {
+    return m_Id == other.m_Id;
+  };
 
   /**
    * Implicit conversion operator to convert Entity to EntityId.
    *
    * @return The entity's ID.
    */
-  operator EntityId() const { return m_Id; }
+  operator EntityId() const
+  {
+    return m_Id;
+  }
 };
 } // namespace ECS

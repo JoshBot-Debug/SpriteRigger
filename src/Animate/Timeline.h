@@ -3,9 +3,11 @@
 #include <memory>
 #include <string>
 
-namespace Animate {
+namespace Animate
+{
 
-template <typename T> class ITimeline {
+template <typename T> class ITimeline
+{
 public:
   virtual ~ITimeline() = default;
 
@@ -19,16 +21,19 @@ public:
 
   virtual std::shared_ptr<T> Reset() = 0;
 
-  virtual float Update(float deltaTime) { return 0.0f; };
+  virtual float Update(float deltaTime)
+  {
+    return 0.0f;
+  };
 };
 
-class Timeline : public ITimeline<Timeline>,
-                 public std::enable_shared_from_this<Timeline> {
+class Timeline : public ITimeline<Timeline>, public std::enable_shared_from_this<Timeline>
+{
 private:
-  float m_Time = 0.0f;
+  float m_Time     = 0.0f;
   float m_Duration = 1.0f;
-  float m_Elapsed = 0.0f;
-  bool m_Play = false;
+  float m_Elapsed  = 0.0f;
+  bool  m_Play     = false;
 
 public:
   static std::shared_ptr<Timeline> Create();

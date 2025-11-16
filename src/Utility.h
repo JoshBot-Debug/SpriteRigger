@@ -2,58 +2,58 @@
 
 #include "imgui.h"
 
+#include <pwd.h>
+#include <unistd.h>
 #include <array>
 #include <cstdlib>
 #include <iostream>
-#include <pwd.h>
 #include <string>
-#include <unistd.h>
 
 #ifdef DEBUG
 
+#include <immintrin.h>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <glm/glm.hpp>
-#include <immintrin.h>
 #include <thread>
 
-#include "Window/Window.h"
 #include "Camera/OrthographicCamera.h"
+#include "Window/Window.h"
 
-template <typename... Args>
-inline void Log(const char *file, int line, const char *functionName,
-                const Args &...args) {
+template <typename... Args> inline void Log(const char* file, int line, const char* functionName, const Args&... args)
+{
   std::cout << "LOG " << file << ":" << line << " (" << functionName << "):";
   ((std::cout << " " << args), ...);
   std::cout << std::endl;
 }
 
-inline void LogIVec3(const char *file, int line, const char *functionName,
-                     const std::string &name, const glm::ivec3 &position) {
+inline void LogIVec3(const char* file, int line, const char* functionName, const std::string& name,
+                     const glm::ivec3& position)
+{
 
-  Log(file, line, functionName, name, "(", position.x, ",", position.y, ",",
-      position.z, ")");
+  Log(file, line, functionName, name, "(", position.x, ",", position.y, ",", position.z, ")");
 }
 
-inline void LogVec3(const char *file, int line, const char *functionName,
-                    const std::string &name, const glm::vec3 &position) {
+inline void LogVec3(const char* file, int line, const char* functionName, const std::string& name,
+                    const glm::vec3& position)
+{
 
-  Log(file, line, functionName, name, "(", position.x, ",", position.y, ",",
-      position.z, ")");
+  Log(file, line, functionName, name, "(", position.x, ",", position.y, ",", position.z, ")");
 }
 
-inline void LogVec4(const char *file, int line, const char *functionName,
-                    const std::string &name, const glm::vec4 &position) {
+inline void LogVec4(const char* file, int line, const char* functionName, const std::string& name,
+                    const glm::vec4& position)
+{
 
-  Log(file, line, functionName, name, "(", position.x, ",", position.y, ",",
-      position.z, ",", position.w, ")");
+  Log(file, line, functionName, name, "(", position.x, ",", position.y, ",", position.z, ",", position.w, ")");
 }
 
 template <typename... Args>
-inline void LogToFile(const char *file, int line, const char *functionName,
-                      const std::string &outputFile, const Args &...args) {
+inline void LogToFile(const char* file, int line, const char* functionName, const std::string& outputFile,
+                      const Args&... args)
+{
   namespace fs = std::filesystem;
 
   const std::string logDir = "logs/";
@@ -68,8 +68,9 @@ inline void LogToFile(const char *file, int line, const char *functionName,
   ofs << std::endl;
 }
 
-inline void Benchmark(const char *file, int line, const char *functionName,
-                      const std::function<void()> &func, int iterations) {
+inline void Benchmark(const char* file, int line, const char* functionName, const std::function<void()>& func,
+                      int iterations)
+{
 
   for (int i = 0; i < 50; ++i)
     func();
@@ -79,35 +80,32 @@ inline void Benchmark(const char *file, int line, const char *functionName,
   for (int i = 0; i < iterations; ++i)
     func();
 
-  auto end = std::chrono::high_resolution_clock::now();
+  auto                                      end     = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double, std::milli> elapsed = end - start;
 
-  Log(file, line, functionName, "Took:", elapsed.count() / iterations,
-      "ms (average) over", iterations, "iterations");
+  Log(file, line, functionName, "Took:", elapsed.count() / iterations, "ms (average) over", iterations, "iterations");
 }
 
 template <typename Tuple, size_t... I>
-void StreamTextArgs(const Tuple &tuple, std::stringstream &ss,
-                    std::index_sequence<I...>) {
+void StreamTextArgs(const Tuple& tuple, std::stringstream& ss, std::index_sequence<I...>)
+{
   (void)std::initializer_list<int>{(ss << std::get<I>(tuple), 0)...};
 }
 
-template <typename... Args>
-inline void EndTimer(const char *file, int line, const char *functionName,
-                     Args &&...args) {
-  static_assert(sizeof...(Args) >= 1,
-                "EndTimer requires at least one argument (startTime)");
+template <typename... Args> inline void EndTimer(const char* file, int line, const char* functionName, Args&&... args)
+{
+  static_assert(sizeof...(Args) >= 1, "EndTimer requires at least one argument (startTime)");
 
-  constexpr size_t N = sizeof...(Args);
-  auto tuple = std::make_tuple(std::forward<Args>(args)...);
+  constexpr size_t N     = sizeof...(Args);
+  auto             tuple = std::make_tuple(std::forward<Args>(args)...);
 
   // Last argument = startTime
-  const auto &startTime = std::get<N - 1>(tuple);
+  const auto& startTime = std::get<N - 1>(tuple);
 
   std::stringstream ss;
   StreamTextArgs(tuple, ss, std::make_index_sequence<N - 1>{});
 
-  auto end = std::chrono::high_resolution_clock::now();
+  auto                                      end      = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double, std::milli> duration = end - startTime;
 
   Log(file, line, functionName, ss.str(), duration.count(), "ms");
@@ -120,8 +118,7 @@ inline void EndTimer(const char *file, int line, const char *functionName,
 #define LOG_IVEC3(...) LogIVec3(__FILE__, __LINE__, __func__, __VA_ARGS__)
 #define LOG_VEC3(...) LogVec3(__FILE__, __LINE__, __func__, __VA_ARGS__)
 #define LOG_VEC4(...) LogVec4(__FILE__, __LINE__, __func__, __VA_ARGS__)
-#define LOG_TO_FILE(outputFile, ...)                                           \
-  LogToFile(__FILE__, __LINE__, __func__, outputFile, __VA_ARGS__)
+#define LOG_TO_FILE(outputFile, ...) LogToFile(__FILE__, __LINE__, __func__, outputFile, __VA_ARGS__)
 
 #else
 #define LOG(...)
@@ -134,28 +131,32 @@ inline void EndTimer(const char *file, int line, const char *functionName,
 #define LOG_TO_FILE(...)
 #endif
 
-inline std::string GetHomeDirectory() {
-  const char *home = std::getenv("HOME");
+inline std::string GetHomeDirectory()
+{
+  const char* home = std::getenv("HOME");
   if (home)
     return home;
-  struct passwd *pw = getpwuid(getuid());
+  struct passwd* pw = getpwuid(getuid());
   return pw ? pw->pw_dir : "";
 }
 
-inline std::string GetExecutableDirectory() {
-  char result[PATH_MAX];
+inline std::string GetExecutableDirectory()
+{
+  char    result[PATH_MAX];
   ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-  return std::filesystem::path(
-             std::string(result,
-                         (count > 0) ? static_cast<unsigned int>(count) : 0))
+  return std::filesystem::path(std::string(result, (count > 0) ? static_cast<unsigned int>(count) : 0))
       .parent_path()
       .string();
 }
 
-enum class EllipsizeType { START, END };
+enum class EllipsizeType
+{
+  START,
+  END
+};
 
-inline std::string Ellipsize(const std::string &text, float maxWidth,
-                             EllipsizeType type = EllipsizeType::END) {
+inline std::string Ellipsize(const std::string& text, float maxWidth, EllipsizeType type = EllipsizeType::END)
+{
   std::string truncatedText = text;
 
   ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
@@ -163,21 +164,22 @@ inline std::string Ellipsize(const std::string &text, float maxWidth,
   if (textSize.x <= maxWidth)
     return truncatedText;
 
-  constexpr const char *ellipsis = "...";
-  float availableWidth = maxWidth - ImGui::CalcTextSize(ellipsis).x;
+  constexpr const char* ellipsis       = "...";
+  float                 availableWidth = maxWidth - ImGui::CalcTextSize(ellipsis).x;
 
   size_t length = text.length() - 1;
 
-  if (type == EllipsizeType::START) {
+  if (type == EllipsizeType::START)
+  {
     while (ImGui::CalcTextSize(text.substr(length).c_str()).x < availableWidth)
       --length;
 
     truncatedText = ellipsis + text.substr(length);
   }
 
-  if (type == EllipsizeType::END) {
-    while (ImGui::CalcTextSize(text.substr(0, length).c_str()).x >
-           availableWidth)
+  if (type == EllipsizeType::END)
+  {
+    while (ImGui::CalcTextSize(text.substr(0, length).c_str()).x > availableWidth)
       --length;
 
     truncatedText = text.substr(0, length) + ellipsis;
@@ -186,10 +188,11 @@ inline std::string Ellipsize(const std::string &text, float maxWidth,
   return truncatedText;
 }
 
-inline std::string ExecCommand(const char *cmd) {
+inline std::string ExecCommand(const char* cmd)
+{
   std::array<char, 128> buffer;
-  std::string result;
-  FILE *pipe = popen(cmd, "r");
+  std::string           result;
+  FILE*                 pipe = popen(cmd, "r");
   if (!pipe)
     return "";
   while (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
@@ -198,14 +201,15 @@ inline std::string ExecCommand(const char *cmd) {
   return result;
 }
 
-inline bool IsDarkMode() {
-  std::string theme =
-      ExecCommand("gsettings get org.gnome.desktop.interface gtk-theme");
+inline bool IsDarkMode()
+{
+  std::string theme = ExecCommand("gsettings get org.gnome.desktop.interface gtk-theme");
   return theme.find("dark") != std::string::npos;
 }
 
-inline std::string RelativeHomePath(const std::filesystem::path &p) {
-  const char *home = std::getenv("HOME");
+inline std::string RelativeHomePath(const std::filesystem::path& p)
+{
+  const char* home = std::getenv("HOME");
   if (!home)
     return p.string();
 
@@ -213,25 +217,28 @@ inline std::string RelativeHomePath(const std::filesystem::path &p) {
 
   // check if `p` starts with home
   auto abs = std::filesystem::absolute(p);
-  if (abs.string().rfind(homePath.string(), 0) == 0) {
+  if (abs.string().rfind(homePath.string(), 0) == 0)
+  {
     return "~" + abs.string().substr(homePath.string().size());
   }
 
   return abs.string();
 }
 
-inline std::string AddFileExtension(const std::string &filepath,
-                                    const std::string &extension) {
+inline std::string AddFileExtension(const std::string& filepath, const std::string& extension)
+{
   std::filesystem::path p(filepath);
   if (p.extension() != extension)
     p.replace_extension(extension);
   return p.string();
 }
 
-inline void *ToVoidPtr(uint32_t value) {
-  return reinterpret_cast<void *>(static_cast<uintptr_t>(value));
+inline void* ToVoidPtr(uint32_t value)
+{
+  return reinterpret_cast<void*>(static_cast<uintptr_t>(value));
 }
 
-inline uint32_t ToInt32(void *value) {
+inline uint32_t ToInt32(void* value)
+{
   return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(value));
 }

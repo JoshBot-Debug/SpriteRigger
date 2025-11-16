@@ -10,16 +10,17 @@
  * camera zoom, aspect ratio, and viewport size. It supports customizable
  * grid spacing, unit size, colors, and text rendering using an ImGui font.
  */
-class Grid {
+class Grid
+{
 private:
   /// Pointer to the orthographic camera used for world-to-screen conversion.
-  OrthographicCamera *m_Camera = nullptr;
+  OrthographicCamera* m_Camera = nullptr;
 
   /// Font size (in pixels) for grid labels.
   float m_FontSize = 14.0f;
 
   /// ImGui font pointer used for drawing text labels.
-  ImFont *m_Font = nullptr;
+  ImFont* m_Font = nullptr;
 
   /// Minimum number of pixels between grid lines (prevents clutter).
   float m_MinLineSpacing = 25.0f;
@@ -33,14 +34,14 @@ private:
   /// Color of origin (x=0, y=0) grid lines.
   ImU32 m_AxisColor = IM_COL32(200, 200, 200, 200);
 
-  ImVec2 m_Mouse = ImVec2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+  ImVec2 m_Mouse         = ImVec2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
   ImVec2 m_PreviousMouse = ImVec2(0, 0);
 
 public:
   /**
    * @param camera Pointer to an OrthographicCamera instance.
    */
-  explicit Grid(OrthographicCamera *camera);
+  explicit Grid(OrthographicCamera* camera);
 
   /**
    * @brief Update the grid state based on user input and viewport interaction.
@@ -70,33 +71,47 @@ public:
    * @brief Set the ImGui font for text labels.
    * @param font Pointer to an ImFont instance.
    */
-  void SetFont(ImFont *font) { m_Font = font; };
+  void SetFont(ImFont* font)
+  {
+    m_Font = font;
+  };
 
   /**
    * @brief Set the minimum pixel spacing between grid lines.
    * @param spacing Pixel distance threshold before a grid line is drawn.
    */
-  void SetMinimumLineSpacing(float spacing) { m_MinLineSpacing = spacing; };
+  void SetMinimumLineSpacing(float spacing)
+  {
+    m_MinLineSpacing = spacing;
+  };
 
   /**
    * @brief Set the grid unit size in world space.
    * @param unit Distance in world units for one grid step.
    */
-  void SetUnitLength(float unit) { m_UnitLength = unit; };
+  void SetUnitLength(float unit)
+  {
+    m_UnitLength = unit;
+  };
 
   /**
    * @brief Set the colors for grid and origin lines.
    * @param gridColor Line color for non-origin grid lines.
    * @param gridOriginColor Line color for origin lines (x=0, y=0).
    */
-  void SetColors(ImU32 gridColor, ImU32 gridOriginColor) {
+  void SetColors(ImU32 gridColor, ImU32 gridOriginColor)
+  {
     m_LineColor = gridColor;
     m_AxisColor = gridOriginColor;
   };
 
-  const ImVec2 &GetMouseCoords() const { return m_Mouse; };
+  const ImVec2& GetMouseCoords() const
+  {
+    return m_Mouse;
+  };
 
-  const ImVec2 GetDeltaMouseCoords() const {
+  const ImVec2 GetDeltaMouseCoords() const
+  {
     return ImVec2(m_Mouse.x - m_PreviousMouse.x, m_Mouse.y - m_PreviousMouse.y);
   };
 };

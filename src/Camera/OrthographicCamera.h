@@ -1,7 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
 
-class OrthographicCamera {
+class OrthographicCamera
+{
 
 private:
   // Matrices
@@ -10,11 +11,11 @@ private:
   glm::mat4 m_ViewProjection{1.0f};
 
 public:
-  float Zoom = 5.0f;
+  float     Zoom = 5.0f;
   glm::vec2 Position{0.0f, 0.0f};
 
-  float Aspect = 0.0f;
-  uint32_t ViewportWidth = 0;
+  float    Aspect         = 0.0f;
+  uint32_t ViewportWidth  = 0;
   uint32_t ViewportHeight = 0;
 
 public:
@@ -27,7 +28,16 @@ public:
   void SetPosition(float x, float y);
   void Translate(float dx, float dy);
 
-  const glm::mat4 &GetViewProjectionMatrix() const { return m_ViewProjection; }
-  const glm::mat4 &GetProjectionMatrix() const { return m_Projection; }
-  const glm::mat4 &GetViewMatrix() const { return m_View; }
+  const glm::mat4& GetViewProjectionMatrix() const
+  {
+    return m_ViewProjection;
+  }
+  const glm::mat4& GetProjectionMatrix() const
+  {
+    return m_Projection;
+  }
+  const glm::mat4& GetViewMatrix() const
+  {
+    return m_View;
+  }
 };

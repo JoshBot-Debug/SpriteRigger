@@ -8,49 +8,55 @@
 #include "Application/Components.h"
 #include "Components/Hierarchy.h"
 
-class Rigger {
+class Rigger
+{
 private:
-  Hierarchy *m_Hierarchy = nullptr;
+  Hierarchy* m_Hierarchy = nullptr;
 
 public:
   Rigger() = default;
 
-  void SetHierarchy(Hierarchy *hierarchy) { m_Hierarchy = hierarchy; }
+  void SetHierarchy(Hierarchy* hierarchy)
+  {
+    m_Hierarchy = hierarchy;
+  }
 
-  void NewBone(ECS::EntityId parent) {
+  void NewBone(ECS::EntityId parent)
+  {
     auto registry = ServiceLocator::Get<ECS::Registry>();
 
-    ECS::Entity *entity = registry->CreateEntity<EBone>();
+    ECS::Entity* entity = registry->CreateEntity<EBone>();
 
-    CBone *bone = entity->Add<CBone>();
-    CHierarchy *hierarchy = entity->Add<CHierarchy>();
-    CFlags *flags = entity->Add<CFlags>();
+    CBone*      bone      = entity->Add<CBone>();
+    CHierarchy* hierarchy = entity->Add<CHierarchy>();
+    CFlags*     flags     = entity->Add<CFlags>();
 
-    bone->thickness = 0.2f;
+    bone->thickness                 = 0.2f;
     bone->joints[CBone::StartJoint] = {.position = glm::vec2(1.0f, 1.0f)};
-    bone->joints[CBone::EndJoint] = {.position = glm::vec2(-2.0f, -2.0f)};
+    bone->joints[CBone::EndJoint]   = {.position = glm::vec2(-2.0f, -2.0f)};
 
-    hierarchy->id = entity->GetId();
+    hierarchy->id     = entity->GetId();
     hierarchy->parent = parent;
 
     if (auto pHierarchy = registry->Get<EBone, CHierarchy>(parent))
       pHierarchy->child = hierarchy->id;
 
-    std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %lu",
-                  entity->GetId());
+    std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %lu", entity->GetId());
 
     m_Hierarchy->Add({
-        .id = hierarchy->id,
+        .id     = hierarchy->id,
         .parent = hierarchy->parent,
     });
   }
 
-  void RemoveBone(ECS::EntityId id) {
-    auto registry = ServiceLocator::Get<ECS::Registry>();
-    ECS::EntityId eid = id;
+  void RemoveBone(ECS::EntityId id)
+  {
+    auto          registry = ServiceLocator::Get<ECS::Registry>();
+    ECS::EntityId eid      = id;
 
     std::vector<ECS::EntityId> chain;
-    while (eid) {
+    while (eid)
+    {
       chain.push_back(eid);
 
       auto h = registry->Get<EBone, CHierarchy>(eid);
@@ -59,7 +65,8 @@ public:
       eid = h->child;
     }
 
-    for (auto it = chain.rbegin(); it != chain.rend(); ++it) {
+    for (auto it = chain.rbegin(); it != chain.rend(); ++it)
+    {
       m_Hierarchy->Remove(*it);
       registry->DestroyEntity<EBone>(*it);
     }

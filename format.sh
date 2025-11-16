@@ -1,0 +1,1 @@
+clang-format -i $(find src -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h")

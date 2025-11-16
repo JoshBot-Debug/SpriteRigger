@@ -6,12 +6,13 @@
 #include "State.h"
 #include "Window/Window.h"
 
-class AssetLayer : public SerializableLayer {
+class AssetLayer : public SerializableLayer
+{
 private:
-  State *m_State = nullptr;
+  State* m_State = nullptr;
 
 public:
-  explicit AssetLayer(State *state);
+  explicit AssetLayer(State* state);
 
   virtual void OnAttach() override;
 
@@ -19,7 +20,7 @@ public:
 
   virtual void OnDetach() override;
 
-  virtual void Save(Serializer &serializer) override;
+  virtual void Save(Serializer& serializer) override;
 
-  virtual void Restore(Serializer &serializer) override;
+  virtual void Restore(Serializer& serializer) override;
 };

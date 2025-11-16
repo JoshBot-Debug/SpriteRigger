@@ -7,12 +7,13 @@
 #include <string>
 #include <vector>
 
-class State {
+class State
+{
 private:
   Serializer m_Serializer;
   Serializer m_RecentSerializer;
 
-  bool m_IsInitialized = false;
+  bool m_IsInitialized      = false;
   bool m_ApplicationRunning = true;
 
   std::string m_ProjectFile;
@@ -24,14 +25,13 @@ private:
 public:
   State();
 
-  std::shared_ptr<SerializableLayer>
-  Register(const std::shared_ptr<SerializableLayer> &layer);
+  std::shared_ptr<SerializableLayer> Register(const std::shared_ptr<SerializableLayer>& layer);
 
   bool New();
 
   bool Open();
 
-  bool Open(const std::string &filepath);
+  bool Open(const std::string& filepath);
 
   void Restore();
 
@@ -41,13 +41,25 @@ public:
 
   void SyncRecentProjects();
 
-  void SyncRecentProjects(const std::string &filepath, bool remove = false);
+  void SyncRecentProjects(const std::string& filepath, bool remove = false);
 
-  bool IsApplicationRunning() { return m_ApplicationRunning; }
+  bool IsApplicationRunning()
+  {
+    return m_ApplicationRunning;
+  }
 
-  bool IsInitialized() { return m_IsInitialized; }
+  bool IsInitialized()
+  {
+    return m_IsInitialized;
+  }
 
-  void Quit() { m_ApplicationRunning = false; }
+  void Quit()
+  {
+    m_ApplicationRunning = false;
+  }
 
-  std::vector<std::string> GetRecentProjects() { return m_RecentProjects; };
+  std::vector<std::string> GetRecentProjects()
+  {
+    return m_RecentProjects;
+  };
 };

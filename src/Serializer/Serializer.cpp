@@ -7,21 +7,23 @@
 #include <fstream>
 #include <iostream>
 
-Serializer::Serializer(const Options &options) : m_Options(options) {}
+Serializer::Serializer(const Options& options) : m_Options(options)
+{
+}
 
-void Serializer::Stage(const std::string &key, const void *data,
-                       uint64_t size) {
+void Serializer::Stage(const std::string& key, const void* data, uint64_t size)
+{
 
   const uint64_t chunkOffset = m_Chunks.size();
 
   // Write the manifest
   {
-    size_t csize = m_Manifest.size();
+    size_t   csize = m_Manifest.size();
     uint64_t ksize = static_cast<uint64_t>(key.size());
 
     m_Manifest.resize(csize + key.size() + sizeof(uint64_t) * 3);
 
-    uint8_t *ptr = m_Manifest.data() + csize;
+    uint8_t* ptr = m_Manifest.data() + csize;
 
     // Write the key
     std::memcpy(ptr, &ksize, sizeof(uint64_t));
@@ -45,13 +47,15 @@ void Serializer::Stage(const std::string &key, const void *data,
   std::memcpy(m_Chunks.data() + chunkOffset, data, size);
 }
 
-void Serializer::Write(const std::filesystem::path &filepath) {
+void Serializer::Write(const std::filesystem::path& filepath)
+{
 
   std::filesystem::create_directories(filepath.parent_path());
 
   std::ofstream file(filepath, std::ios::binary);
 
-  if (!file.is_open()) {
+  if (!file.is_open())
+  {
     std::cerr << "Failed to write data." << std::endl;
     return;
   }
@@ -62,34 +66,36 @@ void Serializer::Write(const std::filesystem::path &filepath) {
     file.write(m_Options.magic.c_str(), m_Options.magic.size());
 
     // Write the version
-    file.write(reinterpret_cast<const char *>(&m_Options.version),
-               sizeof(uint32_t));
+    file.write(reinterpret_cast<const char*>(&m_Options.version), sizeof(uint32_t));
 
     uint64_t manifestSize = m_Manifest.size();
-    uint64_t chunksSize = m_Chunks.size();
+    uint64_t chunksSize   = m_Chunks.size();
 
     // Write the manifest size
-    file.write(reinterpret_cast<const char *>(&manifestSize), sizeof(uint64_t));
+    file.write(reinterpret_cast<const char*>(&manifestSize), sizeof(uint64_t));
 
     // Write the chunks size
-    file.write(reinterpret_cast<const char *>(&chunksSize), sizeof(uint64_t));
+    file.write(reinterpret_cast<const char*>(&chunksSize), sizeof(uint64_t));
   }
 
   // Write the manifest
-  file.write(reinterpret_cast<const char *>(m_Manifest.data()),
-             m_Manifest.size());
+  file.write(reinterpret_cast<const char*>(m_Manifest.data()), m_Manifest.size());
 
   // Write the chunks
-  file.write(reinterpret_cast<const char *>(m_Chunks.data()), m_Chunks.size());
+  file.write(reinterpret_cast<const char*>(m_Chunks.data()), m_Chunks.size());
 
   // Clear data
   Clear();
 }
 
-void Serializer::Move(const std::string &from, const std::string &to) {
-  try {
+void Serializer::Move(const std::string& from, const std::string& to)
+{
+  try
+  {
     std::filesystem::rename(from, to);
-  } catch (std::filesystem::filesystem_error &e) {
+  }
+  catch (std::filesystem::filesystem_error& e)
+  {
     std::filesystem::remove(to);
     std::filesystem::rename(from, to);
   }
@@ -98,13 +104,15 @@ void Serializer::Move(const std::string &from, const std::string &to) {
   Clear();
 }
 
-bool Serializer::Load(const std::string &filepath) {
+bool Serializer::Load(const std::string& filepath)
+{
   // Clear any previous data
   Clear();
 
   std::ifstream file(filepath, std::ios::binary);
 
-  if (!file.is_open()) {
+  if (!file.is_open())
+  {
     std::cerr << "Failed to read file: " << filepath.data() << std::endl;
     return false;
   }
@@ -115,15 +123,15 @@ bool Serializer::Load(const std::string &filepath) {
 
   // Read version
   uint32_t version = 0;
-  file.read(reinterpret_cast<char *>(&version), sizeof(uint32_t));
+  file.read(reinterpret_cast<char*>(&version), sizeof(uint32_t));
 
   // Read manifest size
   uint64_t manifestSize = 0;
-  file.read(reinterpret_cast<char *>(&manifestSize), sizeof(uint64_t));
+  file.read(reinterpret_cast<char*>(&manifestSize), sizeof(uint64_t));
 
   // Read chunks size
   uint64_t chunksSize = 0;
-  file.read(reinterpret_cast<char *>(&chunksSize), sizeof(uint64_t));
+  file.read(reinterpret_cast<char*>(&chunksSize), sizeof(uint64_t));
 
   assert(magic == m_Options.magic);
 
@@ -133,32 +141,33 @@ bool Serializer::Load(const std::string &filepath) {
   m_Manifest.resize(manifestSize);
   m_Chunks.resize(chunksSize);
 
-  file.read(reinterpret_cast<char *>(m_Manifest.data()), manifestSize);
-  file.read(reinterpret_cast<char *>(m_Chunks.data()), chunksSize);
+  file.read(reinterpret_cast<char*>(m_Manifest.data()), manifestSize);
+  file.read(reinterpret_cast<char*>(m_Chunks.data()), chunksSize);
 
   return true;
 }
 
-std::vector<uint8_t> Serializer::Get(const std::string &key) {
+std::vector<uint8_t> Serializer::Get(const std::string& key)
+{
   std::vector<uint8_t> result;
 
-  for (size_t i = 0; i < m_Manifest.size();) {
+  for (size_t i = 0; i < m_Manifest.size();)
+  {
     uint64_t kSize = 0;
 
-    uint8_t *ptr = m_Manifest.data() + i;
+    uint8_t* ptr = m_Manifest.data() + i;
 
     std::memcpy(&kSize, ptr, sizeof(uint64_t));
     ptr += sizeof(uint64_t);
 
-    std::string k(reinterpret_cast<const char *>(ptr),
-                  reinterpret_cast<const char *>(ptr) +
-                      static_cast<size_t>(kSize));
+    std::string k(reinterpret_cast<const char*>(ptr), reinterpret_cast<const char*>(ptr) + static_cast<size_t>(kSize));
 
     ptr += kSize;
 
-    if (k == key) {
+    if (k == key)
+    {
       uint64_t chunkOffset = 0;
-      uint64_t chunkSize = 0;
+      uint64_t chunkSize   = 0;
 
       std::memcpy(&chunkOffset, ptr, sizeof(uint64_t));
       ptr += sizeof(uint64_t);
@@ -170,8 +179,7 @@ std::vector<uint8_t> Serializer::Get(const std::string &key) {
 
       size_t rSize = result.size();
       result.resize(rSize + chunkSize);
-      std::memcpy(result.data() + rSize, m_Chunks.data() + chunkOffset,
-                  chunkSize);
+      std::memcpy(result.data() + rSize, m_Chunks.data() + chunkOffset, chunkSize);
       break;
     }
 
@@ -181,23 +189,26 @@ std::vector<uint8_t> Serializer::Get(const std::string &key) {
   return result;
 }
 
-std::vector<std::vector<uint8_t>> Serializer::GetAll(const std::string &key) {
+std::vector<std::vector<uint8_t>> Serializer::GetAll(const std::string& key)
+{
   std::vector<std::vector<uint8_t>> results;
 
-  for (size_t i = 0; i < m_Manifest.size();) {
+  for (size_t i = 0; i < m_Manifest.size();)
+  {
     uint64_t kSize = 0;
 
-    uint8_t *ptr = m_Manifest.data() + i;
+    uint8_t* ptr = m_Manifest.data() + i;
 
     std::memcpy(&kSize, ptr, sizeof(uint64_t));
     ptr += sizeof(uint64_t);
 
-    std::string k(reinterpret_cast<char *>(ptr), kSize);
+    std::string k(reinterpret_cast<char*>(ptr), kSize);
     ptr += kSize;
 
-    if (k == key) {
+    if (k == key)
+    {
       uint64_t chunkOffset = 0;
-      uint64_t chunkSize = 0;
+      uint64_t chunkSize   = 0;
 
       std::memcpy(&chunkOffset, ptr, sizeof(uint64_t));
       ptr += sizeof(uint64_t);
@@ -210,8 +221,7 @@ std::vector<std::vector<uint8_t>> Serializer::GetAll(const std::string &key) {
       size_t rSize = results.size();
       results.resize(rSize + 1);
       results[rSize].resize(chunkSize);
-      std::memcpy(results[rSize].data(), m_Chunks.data() + chunkOffset,
-                  chunkSize);
+      std::memcpy(results[rSize].data(), m_Chunks.data() + chunkOffset, chunkSize);
     }
 
     i += kSize + sizeof(uint64_t) * 3;
@@ -220,7 +230,8 @@ std::vector<std::vector<uint8_t>> Serializer::GetAll(const std::string &key) {
   return results;
 }
 
-void Serializer::Clear() {
+void Serializer::Clear()
+{
   m_Manifest.clear();
   m_Chunks.clear();
 }

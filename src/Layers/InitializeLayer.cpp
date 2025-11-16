@@ -10,18 +10,19 @@ static const ImWchar GlyphRange[] = {
     0xf000, 0xf8ff, 0xe000, 0xefff, 0,
 };
 
-InitializeLayer::InitializeLayer(State *state) : m_State(state) {}
+InitializeLayer::InitializeLayer(State* state) : m_State(state)
+{
+}
 
-void InitializeLayer::OnAttach() {
-  Window::AddFont(GetExecutableDirectory() +
-                      "/../src/Assets/Fonts/MaterialIcons/MaterialIcons.ttf",
-                  "MaterialIcons", 0.0f, GlyphRange);
+void InitializeLayer::OnAttach()
+{
+  Window::AddFont(GetExecutableDirectory() + "/../src/Assets/Fonts/MaterialIcons/MaterialIcons.ttf", "MaterialIcons",
+                  0.0f, GlyphRange);
 
   int channels;
 
-  unsigned char *imageData =
-      stbi_load_from_memory(BANNER_IMAGE_BUFFER, BANNER_IMAGE_BUFFER_SIZE,
-                            &m_Width, &m_Height, &channels, 0);
+  unsigned char* imageData =
+      stbi_load_from_memory(BANNER_IMAGE_BUFFER, BANNER_IMAGE_BUFFER_SIZE, &m_Width, &m_Height, &channels, 0);
 
   if (!imageData)
     throw std::runtime_error(stbi_failure_reason());
@@ -37,8 +38,7 @@ void InitializeLayer::OnAttach() {
   else
     throw std::runtime_error("Unsupported image format");
 
-  glTexImage2D(GL_TEXTURE_2D, 0, format, m_Width, m_Height, 0, format,
-               GL_UNSIGNED_BYTE, imageData);
+  glTexImage2D(GL_TEXTURE_2D, 0, format, m_Width, m_Height, 0, format, GL_UNSIGNED_BYTE, imageData);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -48,12 +48,11 @@ void InitializeLayer::OnAttach() {
   stbi_image_free(imageData);
 }
 
-void InitializeLayer::OnRender() {
-  ImGuiWindowFlags windowFlags =
-      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollWithMouse |
-      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDocking |
-      ImGuiWindowFlags_NoSavedSettings;
+void InitializeLayer::OnRender()
+{
+  ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+                                 ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar |
+                                 ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings;
 
   ImVec2 windowSize = ImGui::GetWindowSize();
 
@@ -82,7 +81,8 @@ void InitializeLayer::OnRender() {
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.15, 0.15, 0.15, 1});
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0, 0});
-    if (ImGui::Button("\ue5cd", ImVec2{closeButtonSize, closeButtonSize})) {
+    if (ImGui::Button("\ue5cd", ImVec2{closeButtonSize, closeButtonSize}))
+    {
       m_Window->Quit();
       m_State->Quit();
     }
@@ -94,11 +94,9 @@ void InitializeLayer::OnRender() {
 
   // The header
   {
-    ImVec2 containerSize =
-        ImVec2{((windowSize.x / 2) / 1.5f), (windowSize.y / 1.5f)};
+    ImVec2 containerSize = ImVec2{((windowSize.x / 2) / 1.5f), (windowSize.y / 1.5f)};
     ImVec2 centerPos =
-        ImVec2(((windowSize.x / 2) + (windowSize.x - containerSize.x)) * 0.5f,
-               (windowSize.y - containerSize.y) * 0.5f);
+        ImVec2(((windowSize.x / 2) + (windowSize.x - containerSize.x)) * 0.5f, (windowSize.y - containerSize.y) * 0.5f);
     ImGui::SetCursorPos(centerPos);
     ImGui::BeginChild("#CenteredChild", containerSize, ImGuiChildFlags_None);
 
@@ -118,13 +116,15 @@ void InitializeLayer::OnRender() {
   ImGui::Spacing();
   ImGui::Spacing();
 
-  if (ImGui::TextLink("Create a new project")) {
+  if (ImGui::TextLink("Create a new project"))
+  {
     if (m_State->New())
       m_Window->Quit();
   }
 
   ImGui::Spacing();
-  if (ImGui::TextLink("Open a project")) {
+  if (ImGui::TextLink("Open a project"))
+  {
     if (m_State->Open())
       m_Window->Quit();
   }
@@ -137,18 +137,17 @@ void InitializeLayer::OnRender() {
   ImGui::Spacing();
   ImGui::Spacing();
 
-  for (const auto &project : m_State->GetRecentProjects()) {
+  for (const auto& project : m_State->GetRecentProjects())
+  {
     std::filesystem::path filePath = project;
 
-    if (ImGui::TextLink(
-            Ellipsize(RelativeHomePath(project), 230, EllipsizeType::START)
-                .c_str())) {
+    if (ImGui::TextLink(Ellipsize(RelativeHomePath(project), 230, EllipsizeType::START).c_str()))
+    {
       m_State->Open(project);
       m_Window->Quit();
     }
 
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip |
-                             ImGuiHoveredFlags_DelayNormal |
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_DelayNormal |
                              ImGuiHoveredFlags_NoSharedDelay))
       ImGui::SetTooltip("%s", RelativeHomePath(project).c_str());
 
@@ -160,7 +159,8 @@ void InitializeLayer::OnRender() {
   ImGui::End();
 }
 
-void InitializeLayer::OnDetach() {
+void InitializeLayer::OnDetach()
+{
   glDeleteTextures(1, &m_Texture);
   m_State = nullptr;
 }

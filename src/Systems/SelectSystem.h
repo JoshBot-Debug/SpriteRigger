@@ -14,44 +14,51 @@
 #include "Animate/Once.h"
 #include "Animate/Timeline.h"
 
-class SelectSystem : public ECS::System {
+class SelectSystem : public ECS::System
+{
 private:
-  Grid *m_Grid = nullptr;
-  ECS::Registry *m_Registry = nullptr;
-  OrthographicCamera *m_Camera = nullptr;
+  Grid*               m_Grid     = nullptr;
+  ECS::Registry*      m_Registry = nullptr;
+  OrthographicCamera* m_Camera   = nullptr;
 
 public:
-  void Free() {
-    m_Grid = nullptr;
-    m_Camera = nullptr;
+  void Free()
+  {
+    m_Grid     = nullptr;
+    m_Camera   = nullptr;
     m_Registry = nullptr;
   }
 
-  void Initialize(ECS::Registry *registry, Grid *grid,
-                  OrthographicCamera *camera) {
-    m_Grid = grid;
-    m_Camera = camera;
+  void Initialize(ECS::Registry* registry, Grid* grid, OrthographicCamera* camera)
+  {
+    m_Grid     = grid;
+    m_Camera   = camera;
     m_Registry = registry;
   };
 
-  void Update(void *d) override {
-    auto data = reinterpret_cast<SystemData *>(d);
-    if (data->isMouseClicked) {
-      for (auto &[entity, cSelected] : m_Registry->Get<EBone, CSelected>())
-        if (CHovered *cHovered = entity->Get<CHovered>()) {
+  void Update(void* d) override
+  {
+    auto data = reinterpret_cast<SystemData*>(d);
+    if (data->isMouseClicked)
+    {
+      for (auto& [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
+        if (CHovered* cHovered = entity->Get<CHovered>())
+        {
           if (cHovered->target == cSelected->target)
             entity->Remove<CHovered, CSelected>();
           continue;
-        } else
+        }
+        else
           entity->Remove<CHovered, CSelected>();
 
-      for (auto &[entity, cHovered] : m_Registry->Get<EBone, CHovered>()) {
+      for (auto& [entity, cHovered] : m_Registry->Get<EBone, CHovered>())
+      {
         entity->Remove<CHovered>();
         entity->Add<CSelected>(cHovered->target);
       }
     }
 
-    for (auto &[entity, cSelected] : m_Registry->Get<EBone, CSelected>())
+    for (auto& [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
       if (data->isDragging)
         entity->Ensure<CDragging>(cSelected->target);
       else if (entity->Has<CDragging>())
