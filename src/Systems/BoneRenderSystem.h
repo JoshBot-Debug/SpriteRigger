@@ -96,7 +96,7 @@ public:
       glGenBuffers(1, &m_VBO);
       glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
-      GLsizeiptr bufferSize = 1024 * sizeof(Bone);
+      GLsizeiptr bufferSize = 16384 * sizeof(Bone);
 
       glBufferStorage(GL_ARRAY_BUFFER, bufferSize, nullptr,
                       GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
@@ -144,13 +144,21 @@ public:
   {
     auto data = reinterpret_cast<SystemData*>(d);
 
-    auto changes = m_Registry->GetChanged<EBone, CBone>();
+    auto bones = m_Registry->Get<EBone, CBone>();
 
-    if (changes.size())
+    if (bones.empty())
+    {
+      std::memset(m_Buffer, 0, m_Instances * sizeof(Bone));
+      m_Instances = 0;
+      return;
+    }
+
+    if (m_Registry->HasChanged<EBone, CBone>())
     {
       std::vector<Bone> buffer;
+      buffer.reserve(bones.size());
 
-      for (auto [entity, cBone] : changes)
+      for (auto [entity, cBone] : bones)
       {
         entity->ClearChanged<CBone>();
         Bone& bone = buffer.emplace_back();

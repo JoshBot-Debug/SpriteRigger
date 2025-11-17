@@ -16,9 +16,7 @@ concept Interpolatable = std::is_arithmetic_v<T> || requires(T a, T b, float t) 
 
 template <typename T>
 concept Lerpable = requires(T a, T b, float t) {
-  {
-    a + (b - a) * t
-  } -> std::same_as<T>;
+  { a + (b - a) * t } -> std::same_as<T>;
 };
 
 template <Interpolatable T>

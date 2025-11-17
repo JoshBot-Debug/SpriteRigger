@@ -178,10 +178,10 @@ int main(int argc, char** argv)
     }
     else
     {
+      state.Restore();
       window.PushLayer(state.Register(std::make_shared<ViewportLayer>(&state)));
       window.PushLayer(state.Register(std::make_shared<HierarchyLayer>(&state)));
       window.PushLayer(state.Register(std::make_shared<AssetLayer>(&state)));
-      state.Restore();
     }
 
     ImGuiStyle& style              = ImGui::GetStyle();
