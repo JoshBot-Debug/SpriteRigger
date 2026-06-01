@@ -70,7 +70,7 @@ void HierarchyLayer::OnAttach()
         }
 
         ImGui::SameLine(0.0f, 0.0f);
-        ImGui::SetItemAllowOverlap();
+        ImGui::SetNextItemAllowOverlap();
         if (!cFlags->rename)
           ImGui::TextUnformatted(cHierarchy->name);
         else
