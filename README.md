@@ -9,11 +9,11 @@ A **sprite rigger & animator** desktop application.
 Clone the project
 ```bash
 git clone https://github.com/JoshBot-Debug/SpriteRigger.git
+cd SpriteRigger
 ```
 
 Initialize all submodules
 ```bash
-cd SpriteRigger
 git submodule update --init --recursive
 cd vendor/imgui
 git checkout docking
