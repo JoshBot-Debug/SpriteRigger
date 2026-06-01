@@ -12,7 +12,7 @@ public:
     const char* name                        = nullptr;
     const char* shortcut                    = nullptr;
     bool*       selected                    = nullptr;
-    bool        enabled                     = true;
+    bool*       enabled                     = nullptr;
     void (*onRenderItem)(Item* item, void*) = nullptr;
     void (*onClick)(void*)                  = nullptr;
   };
@@ -41,7 +41,7 @@ private:
     {
       if (item.onRenderItem)
         item.onRenderItem(&item, m_Data);
-      else if (ImGui::MenuItem(item.name, item.shortcut, item.selected, item.enabled))
+      else if (ImGui::MenuItem(item.name, item.shortcut, item.selected, item.enabled ? *item.enabled : true))
         item.onClick(m_Data);
     }
   }

@@ -9,17 +9,224 @@
 
 inline const float ANIMATION_DURATION = 0.15f;
 
-struct SystemData
+namespace Systems
 {
-  float  deltaTime      = 0.0f;
-  ImVec2 mouse          = ImVec2(0.0f, 0.0f);
-  ImVec2 deltaMouse     = ImVec2(0.0f, 0.0f);
-  ImVec2 viewport       = ImVec2(0.0f, 0.0f);
-  bool   isDragging     = false;
-  bool   isMouseDown    = false;
-  bool   isMouseClicked = false;
-  bool   isCtrlDown     = false;
+
+enum class MouseButton
+{
+  Left   = ImGuiMouseButton_Left,
+  Right  = ImGuiMouseButton_Right,
+  Middle = ImGuiMouseButton_Middle,
+  Count  = ImGuiMouseButton_COUNT,
 };
+
+enum class KeyboardKey : int
+{
+  None                = ImGuiKey_None,
+  NamedKey_BEGIN      = ImGuiKey_NamedKey_BEGIN,
+  Tab                 = ImGuiKey_Tab,
+  LeftArrow           = ImGuiKey_LeftArrow,
+  RightArrow          = ImGuiKey_RightArrow,
+  UpArrow             = ImGuiKey_UpArrow,
+  DownArrow           = ImGuiKey_DownArrow,
+  PageUp              = ImGuiKey_PageUp,
+  PageDown            = ImGuiKey_PageDown,
+  Home                = ImGuiKey_Home,
+  End                 = ImGuiKey_End,
+  Insert              = ImGuiKey_Insert,
+  Delete              = ImGuiKey_Delete,
+  Backspace           = ImGuiKey_Backspace,
+  Space               = ImGuiKey_Space,
+  Enter               = ImGuiKey_Enter,
+  Escape              = ImGuiKey_Escape,
+  LeftCtrl            = ImGuiKey_LeftCtrl,
+  LeftShift           = ImGuiKey_LeftShift,
+  LeftAlt             = ImGuiKey_LeftAlt,
+  LeftSuper           = ImGuiKey_LeftSuper,
+  RightCtrl           = ImGuiKey_RightCtrl,
+  RightShift          = ImGuiKey_RightShift,
+  RightAlt            = ImGuiKey_RightAlt,
+  RightSuper          = ImGuiKey_RightSuper,
+  Menu                = ImGuiKey_Menu,
+  N0                  = ImGuiKey_0,
+  N1                  = ImGuiKey_1,
+  N2                  = ImGuiKey_2,
+  N3                  = ImGuiKey_3,
+  N4                  = ImGuiKey_4,
+  N5                  = ImGuiKey_5,
+  N6                  = ImGuiKey_6,
+  N7                  = ImGuiKey_7,
+  N8                  = ImGuiKey_8,
+  N9                  = ImGuiKey_9,
+  A                   = ImGuiKey_A,
+  B                   = ImGuiKey_B,
+  C                   = ImGuiKey_C,
+  D                   = ImGuiKey_D,
+  E                   = ImGuiKey_E,
+  F                   = ImGuiKey_F,
+  G                   = ImGuiKey_G,
+  H                   = ImGuiKey_H,
+  I                   = ImGuiKey_I,
+  J                   = ImGuiKey_J,
+  K                   = ImGuiKey_K,
+  L                   = ImGuiKey_L,
+  M                   = ImGuiKey_M,
+  N                   = ImGuiKey_N,
+  O                   = ImGuiKey_O,
+  P                   = ImGuiKey_P,
+  Q                   = ImGuiKey_Q,
+  R                   = ImGuiKey_R,
+  S                   = ImGuiKey_S,
+  T                   = ImGuiKey_T,
+  U                   = ImGuiKey_U,
+  V                   = ImGuiKey_V,
+  W                   = ImGuiKey_W,
+  X                   = ImGuiKey_X,
+  Y                   = ImGuiKey_Y,
+  Z                   = ImGuiKey_Z,
+  F1                  = ImGuiKey_F1,
+  F2                  = ImGuiKey_F2,
+  F3                  = ImGuiKey_F3,
+  F4                  = ImGuiKey_F4,
+  F5                  = ImGuiKey_F5,
+  F6                  = ImGuiKey_F6,
+  F7                  = ImGuiKey_F7,
+  F8                  = ImGuiKey_F8,
+  F9                  = ImGuiKey_F9,
+  F10                 = ImGuiKey_F10,
+  F11                 = ImGuiKey_F11,
+  F12                 = ImGuiKey_F12,
+  F13                 = ImGuiKey_F13,
+  F14                 = ImGuiKey_F14,
+  F15                 = ImGuiKey_F15,
+  F16                 = ImGuiKey_F16,
+  F17                 = ImGuiKey_F17,
+  F18                 = ImGuiKey_F18,
+  F19                 = ImGuiKey_F19,
+  F20                 = ImGuiKey_F20,
+  F21                 = ImGuiKey_F21,
+  F22                 = ImGuiKey_F22,
+  F23                 = ImGuiKey_F23,
+  F24                 = ImGuiKey_F24,
+  Apostrophe          = ImGuiKey_Apostrophe,
+  Comma               = ImGuiKey_Comma,
+  Minus               = ImGuiKey_Minus,
+  Period              = ImGuiKey_Period,
+  Slash               = ImGuiKey_Slash,
+  Semicolon           = ImGuiKey_Semicolon,
+  Equal               = ImGuiKey_Equal,
+  LeftBracket         = ImGuiKey_LeftBracket,
+  Backslash           = ImGuiKey_Backslash,
+  RightBracket        = ImGuiKey_RightBracket,
+  GraveAccent         = ImGuiKey_GraveAccent,
+  CapsLock            = ImGuiKey_CapsLock,
+  ScrollLock          = ImGuiKey_ScrollLock,
+  NumLock             = ImGuiKey_NumLock,
+  PrintScreen         = ImGuiKey_PrintScreen,
+  Pause               = ImGuiKey_Pause,
+  Keypad0             = ImGuiKey_Keypad0,
+  Keypad1             = ImGuiKey_Keypad1,
+  Keypad2             = ImGuiKey_Keypad2,
+  Keypad3             = ImGuiKey_Keypad3,
+  Keypad4             = ImGuiKey_Keypad4,
+  Keypad5             = ImGuiKey_Keypad5,
+  Keypad6             = ImGuiKey_Keypad6,
+  Keypad7             = ImGuiKey_Keypad7,
+  Keypad8             = ImGuiKey_Keypad8,
+  Keypad9             = ImGuiKey_Keypad9,
+  KeypadDecimal       = ImGuiKey_KeypadDecimal,
+  KeypadDivide        = ImGuiKey_KeypadDivide,
+  KeypadMultiply      = ImGuiKey_KeypadMultiply,
+  KeypadSubtract      = ImGuiKey_KeypadSubtract,
+  KeypadAdd           = ImGuiKey_KeypadAdd,
+  KeypadEnter         = ImGuiKey_KeypadEnter,
+  KeypadEqual         = ImGuiKey_KeypadEqual,
+  AppBack             = ImGuiKey_AppBack,
+  AppForward          = ImGuiKey_AppForward,
+  Oem102              = ImGuiKey_Oem102,
+  GamepadStart        = ImGuiKey_GamepadStart,
+  GamepadBack         = ImGuiKey_GamepadBack,
+  GamepadFaceLeft     = ImGuiKey_GamepadFaceLeft,
+  GamepadFaceRight    = ImGuiKey_GamepadFaceRight,
+  GamepadFaceUp       = ImGuiKey_GamepadFaceUp,
+  GamepadFaceDown     = ImGuiKey_GamepadFaceDown,
+  GamepadDpadLeft     = ImGuiKey_GamepadDpadLeft,
+  GamepadDpadRight    = ImGuiKey_GamepadDpadRight,
+  GamepadDpadUp       = ImGuiKey_GamepadDpadUp,
+  GamepadDpadDown     = ImGuiKey_GamepadDpadDown,
+  GamepadL1           = ImGuiKey_GamepadL1,
+  GamepadR1           = ImGuiKey_GamepadR1,
+  GamepadL2           = ImGuiKey_GamepadL2,
+  GamepadR2           = ImGuiKey_GamepadR2,
+  GamepadL3           = ImGuiKey_GamepadL3,
+  GamepadR3           = ImGuiKey_GamepadR3,
+  GamepadLStickLeft   = ImGuiKey_GamepadLStickLeft,
+  GamepadLStickRight  = ImGuiKey_GamepadLStickRight,
+  GamepadLStickUp     = ImGuiKey_GamepadLStickUp,
+  GamepadLStickDown   = ImGuiKey_GamepadLStickDown,
+  GamepadRStickLeft   = ImGuiKey_GamepadRStickLeft,
+  GamepadRStickRight  = ImGuiKey_GamepadRStickRight,
+  GamepadRStickUp     = ImGuiKey_GamepadRStickUp,
+  GamepadRStickDown   = ImGuiKey_GamepadRStickDown,
+  MouseLeft           = ImGuiKey_MouseLeft,
+  MouseRight          = ImGuiKey_MouseRight,
+  MouseMiddle         = ImGuiKey_MouseMiddle,
+  MouseX1             = ImGuiKey_MouseX1,
+  MouseX2             = ImGuiKey_MouseX2,
+  MouseWheelX         = ImGuiKey_MouseWheelX,
+  MouseWheelY         = ImGuiKey_MouseWheelY,
+  ReservedForModCtrl  = ImGuiKey_ReservedForModCtrl,
+  ReservedForModShift = ImGuiKey_ReservedForModShift,
+  ReservedForModAlt   = ImGuiKey_ReservedForModAlt,
+  ReservedForModSuper = ImGuiKey_ReservedForModSuper,
+  NamedKey_END        = ImGuiKey_NamedKey_END,
+  NamedKey_COUNT      = ImGuiKey_NamedKey_COUNT,
+  ModNone             = ImGuiMod_None,
+  ModCtrl             = ImGuiMod_Ctrl,
+  ModShift            = ImGuiMod_Shift,
+  ModAlt              = ImGuiMod_Alt,
+  ModSuper            = ImGuiMod_Super,
+  ModMask             = ImGuiMod_Mask_,
+};
+
+struct Data
+{
+  float  deltaTime  = 0.0f;
+  ImVec2 mouse      = ImVec2(0.0f, 0.0f);
+  ImVec2 deltaMouse = ImVec2(0.0f, 0.0f);
+  ImVec2 viewport   = ImVec2(0.0f, 0.0f);
+
+  bool isKeyPressed(KeyboardKey key)
+  {
+    return ImGui::IsKeyPressed(static_cast<ImGuiKey>(key));
+  }
+  
+  bool isKeyDown(KeyboardKey key)
+  {
+    return ImGui::IsKeyDown(static_cast<ImGuiKey>(key));
+  }
+  
+  bool isKeyReleased(KeyboardKey key)
+  {
+    return ImGui::IsKeyReleased(static_cast<ImGuiKey>(key));
+  }
+
+  bool isMouseDown(MouseButton button)
+  {
+    return ImGui::IsMouseDown(static_cast<ImGuiMouseButton>(button));
+  }
+
+  bool isMouseClicked(MouseButton button)
+  {
+    return ImGui::IsMouseClicked(static_cast<ImGuiMouseButton>(button));
+  }
+
+  bool isMouseDragging(MouseButton button)
+  {
+    return ImGui::IsMouseDragging(static_cast<ImGuiMouseButton>(button));
+  }
+};
+}; // namespace Systems
 
 namespace Colors
 {

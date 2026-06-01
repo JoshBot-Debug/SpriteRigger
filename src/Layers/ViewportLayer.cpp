@@ -1,6 +1,7 @@
 #include "ViewportLayer.h"
 
 #include "Application/Components.h"
+#include "Application/Rigger.h"
 #include "ServiceLocator/ServiceLocator.h"
 
 #include "Utility.h"
@@ -29,6 +30,28 @@ void ViewportLayer::OnAttach()
   m_DragSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
   m_SelectSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
+
+  static bool ENABLED = true;
+
+  m_ContextMenu.Register({
+      .renderOn = ContextMenu::PopupContext::WINDOW,
+      .items    = {{
+             .name     = "Parent",
+             .shortcut = "Ctrl P",
+             .enabled  = &ENABLED,
+             .onClick  = [](void*) { ServiceLocator::Get<Rigger>()->NewBone(0); },
+      }},
+  });
+
+  Window::RegisterShortcut({
+      .ctrl     = true,
+      .key      = ImGuiKey_P,
+      .callback = [](void*) { ENABLED = !ENABLED; },
+  });
+}
+
+void ViewportLayer::OnUpdate(float deltaTime)
+{
 }
 
 void ViewportLayer::OnRender()
@@ -48,13 +71,9 @@ void ViewportLayer::OnRender()
     m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
     m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
 
-    m_SystemData.deltaTime      = static_cast<float>(Window::GetDeltaTime());
-    m_SystemData.mouse          = m_Grid.GetMouseCoords();
-    m_SystemData.isDragging     = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
-    m_SystemData.isMouseDown    = ImGui::IsMouseDown(ImGuiMouseButton_Left);
-    m_SystemData.isCtrlDown     = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
-    m_SystemData.deltaMouse     = m_Grid.GetDeltaMouseCoords();
-    m_SystemData.isMouseClicked = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+    m_SystemData.deltaTime  = static_cast<float>(Window::GetDeltaTime());
+    m_SystemData.mouse      = m_Grid.GetMouseCoords();
+    m_SystemData.deltaMouse = m_Grid.GetDeltaMouseCoords();
 
     m_System->Update<HoverSystem>(&m_SystemData);
     m_System->Update<SelectSystem>(&m_SystemData);
@@ -73,6 +92,8 @@ void ViewportLayer::OnRender()
   }
 
   m_Grid.Render(m_Viewport.size, m_Viewport.min);
+  m_ContextMenu.Render("cm");
+
   ImGui::SetCursorScreenPos(m_Viewport.min);
   ImGui::Image((void*)(intptr_t)m_ColorAttachment, m_Viewport.size);
   ImGui::End();

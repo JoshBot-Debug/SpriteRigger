@@ -38,18 +38,19 @@ public:
 
   void Update(void* d) override
   {
-    auto data = reinterpret_cast<SystemData*>(d);
-    if (data->isMouseClicked)
+    auto data = reinterpret_cast<Systems::Data*>(d);
+    if (data->isMouseClicked(Systems::MouseButton::Left))
     {
-      for (auto& [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
-        if (CHovered* cHovered = entity->Get<CHovered>())
-        {
-          if (cHovered->target == cSelected->target)
+      if(!data->isKeyDown(Systems::KeyboardKey::LeftShift))
+        for (auto& [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
+          if (CHovered* cHovered = entity->Get<CHovered>())
+          {
+            if (cHovered->target == cSelected->target)
+              entity->Remove<CHovered, CSelected>();
+            continue;
+          }
+          else
             entity->Remove<CHovered, CSelected>();
-          continue;
-        }
-        else
-          entity->Remove<CHovered, CSelected>();
 
       for (auto& [entity, cHovered] : m_Registry->Get<EBone, CHovered>())
       {
@@ -59,7 +60,7 @@ public:
     }
 
     for (auto& [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
-      if (data->isDragging)
+      if (data->isMouseDragging(Systems::MouseButton::Left))
         entity->Ensure<CDragging>(cSelected->target);
       else if (entity->Has<CDragging>())
         entity->Remove<CDragging>();

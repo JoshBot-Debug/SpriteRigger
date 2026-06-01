@@ -65,7 +65,7 @@ public:
 
   void Update(void* d) override
   {
-    auto      data  = reinterpret_cast<SystemData*>(d);
+    auto      data  = reinterpret_cast<Systems::Data*>(d);
     glm::vec2 mouse = {data->mouse.x, data->mouse.y};
 
     for (auto& [entity, cBone] : m_Registry->Get<EBone, CBone>())

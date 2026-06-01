@@ -4,6 +4,35 @@ A **sprite rigger & animator** desktop application.
 
 ---
 
+## Setup
+
+Clone the project
+```bash
+git clone https://github.com/JoshBot-Debug/SpriteRigger.git
+```
+
+Initialize all submodules
+```bash
+cd SpriteRigger
+git submodule add https://github.com/ocornut/imgui.git vendor/imgui
+git submodule update --init --recursive
+cd vendor/imgui
+git checkout docking
+cd ../..
+```
+
+Build the project
+```bash
+cmake --build --preset debug
+```
+
+Run the project
+```bash
+./build/SpriteRigger
+```
+
+---
+
 ## Save File Format (`.sprig`)
 
 The project state is stored in a single container file with extension `.sprig`.

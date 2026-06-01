@@ -26,6 +26,8 @@
 #include "SerializableLayer.h"
 #include "State.h"
 
+#include "Components/ContextMenu.h"
+
 #include "Animate/System.h"
 
 class ViewportLayer : public SerializableLayer
@@ -43,7 +45,8 @@ private:
   std::shared_ptr<SelectSystem>     m_SelectSystem     = nullptr;
   std::shared_ptr<DragSystem>       m_DragSystem       = nullptr;
 
-  SystemData m_SystemData;
+  Systems::Data m_SystemData;
+  ContextMenu   m_ContextMenu;
 
   GLuint m_FrameBuffer     = 0;
   GLuint m_ColorAttachment = 0;
@@ -64,6 +67,8 @@ public:
   explicit ViewportLayer(State* state);
 
   virtual void OnAttach() override;
+
+  virtual void OnUpdate(float deltaTime) override;
 
   virtual void OnRender() override;
 

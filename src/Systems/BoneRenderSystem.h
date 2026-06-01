@@ -98,11 +98,11 @@ public:
 
       GLsizeiptr bufferSize = 16384 * sizeof(Bone);
 
-      glBufferStorage(GL_ARRAY_BUFFER, bufferSize, nullptr,
-                      GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+      GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
 
-      m_Buffer = glMapBufferRange(GL_ARRAY_BUFFER, 0, bufferSize,
-                                  GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+      glBufferStorage(GL_ARRAY_BUFFER, bufferSize, nullptr, flags);
+
+      m_Buffer = glMapBufferRange(GL_ARRAY_BUFFER, 0, bufferSize, flags);
     }
 
     // layout(location = 1) in vec2 a_start;
@@ -142,7 +142,7 @@ public:
 
   void Update(void* d) override
   {
-    auto data = reinterpret_cast<SystemData*>(d);
+    auto data = reinterpret_cast<Systems::Data*>(d);
 
     auto bones = m_Registry->Get<EBone, CBone>();
 

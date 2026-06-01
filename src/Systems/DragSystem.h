@@ -37,7 +37,7 @@ public:
 
   void Update(void* d) override
   {
-    auto data       = reinterpret_cast<SystemData*>(d);
+    auto data       = reinterpret_cast<Systems::Data*>(d);
     auto mouse      = glm::vec2(data->mouse.x, data->mouse.y);
     auto deltaMouse = glm::vec2(data->deltaMouse.x, data->deltaMouse.y);
 
