@@ -4,7 +4,7 @@ A **sprite rigger & animator** desktop application.
 
 ---
 
-## Setup
+## Setup (Linux)
 
 Clone the project
 ```bash
