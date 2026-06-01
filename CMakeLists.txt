@@ -11,6 +11,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# === Google Test Setup ===
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.17.0   # or latest stable
+)
+FetchContent_MakeAvailable(googletest)
+enable_testing()
+
 # === Add vendor libraries ===
 add_subdirectory(vendor/imgui-cmake)
 add_subdirectory(vendor/tinyfiledialogs-cmake)
@@ -37,17 +47,19 @@ target_include_directories(sprigg PRIVATE
 )
 
 # === Link Libraries ===
-target_link_libraries(sprigg PRIVATE
+target_link_libraries(sprigg PUBLIC
   ${OPENGL_LIBRARIES}
   imgui
   tinyfiledialogs
+  gtest
+  gtest_main
 )
 
 # === Create the executable ===
 add_executable(SpriteRigger src/main.cpp)
 
 # === Include Directories ===
-target_include_directories(SpriteRigger PRIVATE 
+target_include_directories(SpriteRigger PUBLIC 
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_SOURCE_DIR}/vendor/glad/include
   ${CMAKE_SOURCE_DIR}/vendor/imgui
@@ -58,22 +70,11 @@ target_include_directories(SpriteRigger PRIVATE
 # === Link the Project Library to the executable ===
 target_link_libraries(SpriteRigger PRIVATE sprigg)
 
-# === Google Test Setup ===
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG        v1.17.0   # or latest stable
-)
-FetchContent_MakeAvailable(googletest)
-
-enable_testing()
-
 # === Tests executable ===
 file(GLOB_RECURSE TEST_SRC ${CMAKE_SOURCE_DIR}/tests/*.cpp)
 
 add_executable(tests ${TEST_SRC})
-target_link_libraries(tests PRIVATE gtest_main sprigg)
+target_link_libraries(tests PRIVATE sprigg)
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 include(GoogleTest)

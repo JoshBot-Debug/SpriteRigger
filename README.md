@@ -95,3 +95,7 @@ filename.sprig
 - [ ] Animation system store a raw pointer, this may pose a problem, may want to use Weak Handles (Generation IDs)
 
 ---
+
+## Known issues
+- [ ] There is an issue, when you create a bone save the file, then open a new file and hit Ctr+S, you get an out-of-bounds index. 
+This is because the `GetEntityTypeId<E>()` in Registry.h is static. When the project reopens, since the program did not stop, all global statics remain cached. I don't want to use **RTTI** to keep track of entity types so this is pending until I find a better solution

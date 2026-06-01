@@ -1,35 +1,45 @@
-#include "ECS/Registry.h"
 #include <gtest/gtest.h>
+#include "ECS/Registry.h"
 
-TEST(Registry, CreateEntity) {
+namespace ECS
+{
+TEST(Registry, CreateEntity)
+{
 
   ECS::Registry registry;
 
-  struct EBone {};
-  struct EHierarchy {};
+  struct EBone
+  {
+  };
+  struct EHierarchy
+  {
+  };
 
-  auto bone_1 = registry.CreateEntity<EBone>();
+  auto bone_1      = registry.CreateEntity<EBone>();
   auto hierarchy_1 = registry.CreateEntity<EHierarchy>();
-  auto h1 = hierarchy_1->GetId();
-  auto b1 = bone_1->GetId();
+  auto h1          = hierarchy_1->GetId();
+  auto b1          = bone_1->GetId();
 
   EXPECT_EQ(b1, 1);
   EXPECT_EQ(h1, 1);
 
-  auto bone_2 = registry.CreateEntity<EBone>();
+  auto bone_2      = registry.CreateEntity<EBone>();
   auto hierarchy_2 = registry.CreateEntity<EHierarchy>();
-  auto h2 = hierarchy_2->GetId();
-  auto b2 = bone_2->GetId();
+  auto h2          = hierarchy_2->GetId();
+  auto b2          = bone_2->GetId();
 
   EXPECT_EQ(b2, 2);
   EXPECT_EQ(h2, 2);
 }
 
-TEST(Registry, GetEntity) {
+TEST(Registry, GetEntity)
+{
 
   ECS::Registry registry;
 
-  struct EBone {};
+  struct EBone
+  {
+  };
 
   auto bone_1 = registry.CreateEntity<EBone>();
   auto bone_2 = registry.CreateEntity<EBone>();
@@ -44,16 +54,21 @@ TEST(Registry, GetEntity) {
   EXPECT_EQ(b2, getBone_2->GetId());
 }
 
-TEST(Registry, DeleteEntity) {
+TEST(Registry, DeleteEntity)
+{
 
   ECS::Registry registry;
 
-  struct EBone {};
-  struct EHierarchy {};
+  struct EBone
+  {
+  };
+  struct EHierarchy
+  {
+  };
 
-  auto bone_1 = registry.CreateEntity<EBone>();
+  auto bone_1      = registry.CreateEntity<EBone>();
   auto hierarchy_1 = registry.CreateEntity<EHierarchy>();
-  auto bone_2 = registry.CreateEntity<EBone>();
+  auto bone_2      = registry.CreateEntity<EBone>();
   auto hierarchy_2 = registry.CreateEntity<EHierarchy>();
 
   auto h1 = hierarchy_1->GetId();
@@ -77,13 +92,20 @@ TEST(Registry, DeleteEntity) {
   EXPECT_EQ(entities.size(), 2);
 }
 
-TEST(Registry, AddComponents) {
+TEST(Registry, AddComponents)
+{
 
   ECS::Registry registry;
 
-  struct EBone {};
-  struct CHovered {};
-  struct CSelected {};
+  struct EBone
+  {
+  };
+  struct CHovered
+  {
+  };
+  struct CSelected
+  {
+  };
 
   auto bone = registry.CreateEntity<EBone>();
 
@@ -96,28 +118,33 @@ TEST(Registry, AddComponents) {
   EXPECT_EQ(bone->Has<CHovered>(), true);
   EXPECT_EQ(bone->Has<CSelected>(), true);
 
-  auto cHovered = registry.Get<EBone, CHovered>(bone->GetId());
+  auto cHovered  = registry.Get<EBone, CHovered>(bone->GetId());
   auto cSelected = registry.Get<EBone, CSelected>(bone->GetId());
 
   EXPECT_TRUE(cHovered != nullptr);
   EXPECT_TRUE(cSelected != nullptr);
 
-  auto hovered = registry.Get<EBone, CHovered>();
+  auto hovered  = registry.Get<EBone, CHovered>();
   auto selected = registry.Get<EBone, CSelected>();
 
   EXPECT_EQ(hovered.size(), 1);
   EXPECT_EQ(selected.size(), 1);
 }
 
-TEST(Registry, GetComponents) {
+TEST(Registry, GetComponents)
+{
 
   ECS::Registry registry;
 
-  struct EBone {};
-  struct CHovered {
+  struct EBone
+  {
+  };
+  struct CHovered
+  {
     int id;
   };
-  struct CSelected {
+  struct CSelected
+  {
     int id;
   };
 
@@ -140,17 +167,22 @@ TEST(Registry, GetComponents) {
   EXPECT_EQ(g4, 4);
 }
 
-TEST(Entity, Changes) {
+TEST(Entity, Changes)
+{
 
   ECS::Registry registry;
 
-  struct EBone {};
+  struct EBone
+  {
+  };
 
-  struct CHovered {
+  struct CHovered
+  {
     int id;
   };
 
-  struct CSelected {
+  struct CSelected
+  {
     int id;
   };
 
@@ -170,9 +202,9 @@ TEST(Entity, Changes) {
 
   bone_1->MarkChanged<CHovered, CSelected>();
 
-  bool anyChanged = bone_1->AnyChanged<CHovered, CSelected>();
-  bool hasChanged = bone_1->HasChanged<CHovered>();
-  auto getChanged = bone_1->GetChanged<CHovered>();
+  bool anyChanged     = bone_1->AnyChanged<CHovered, CSelected>();
+  bool hasChanged     = bone_1->HasChanged<CHovered>();
+  auto getChanged     = bone_1->GetChanged<CHovered>();
   auto collectChanged = bone_1->CollectChanged<CHovered, CSelected>();
 
   EXPECT_EQ(anyChanged, true);
@@ -186,7 +218,29 @@ TEST(Entity, Changes) {
   EXPECT_EQ(hasChanged, false);
 }
 
-int main(int argc, char **argv) {
+TEST(ECSRegistryTest, GetEntityTypeId)
+{
+  ECS::Registry registry;
+
+  class EntityType1;
+  class EntityType2;
+  class EntityType3;
+
+  EXPECT_EQ(registry.GetEntityTypeId<EntityType1>(), 0);
+  EXPECT_EQ(registry.GetEntityTypeId<EntityType2>(), 1);
+
+  EXPECT_EQ(registry.GetEntityTypeId<EntityType1>(), 0);
+  EXPECT_EQ(registry.GetEntityTypeId<EntityType2>(), 1);
+  EXPECT_EQ(registry.GetEntityTypeId<EntityType3>(), 2);
+
+  EXPECT_EQ(registry.GetEntityTypeId<EntityType1>(), 0);
+  EXPECT_EQ(registry.GetEntityTypeId<EntityType2>(), 1);
+  EXPECT_EQ(registry.GetEntityTypeId<EntityType3>(), 2);
+}
+} // namespace ECS
+
+int main(int argc, char** argv)
+{
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

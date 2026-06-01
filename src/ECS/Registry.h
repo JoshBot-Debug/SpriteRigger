@@ -7,7 +7,10 @@
 #include <vector>
 
 #include <iostream>
+#include <unordered_set>
 #include "Entity.h"
+
+#include <gtest/gtest_prod.h>
 
 namespace ECS
 {
@@ -70,6 +73,8 @@ private:
     EntityId id = m_EntitiesByETID[tid].size();
     return {id, false};
   }
+
+  FRIEND_TEST(ECSRegistryTest, GetEntityTypeId);
 
 public:
   Registry() = default;
