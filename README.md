@@ -14,7 +14,6 @@ git clone https://github.com/JoshBot-Debug/SpriteRigger.git
 Initialize all submodules
 ```bash
 cd SpriteRigger
-git submodule add https://github.com/ocornut/imgui.git vendor/imgui
 git submodule update --init --recursive
 cd vendor/imgui
 git checkout docking
@@ -23,7 +22,7 @@ cd ../..
 
 Build the project
 ```bash
-cmake --build --preset debug
+cmake -B build -DCMAKE_BUILD_TYPE=Debug && cmake --build build
 ```
 
 Run the project
