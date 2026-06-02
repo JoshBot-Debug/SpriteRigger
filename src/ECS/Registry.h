@@ -6,11 +6,11 @@
 #include <memory>
 #include <vector>
 
-#include <iostream>
-#include <unordered_set>
-#include "Entity.h"
-
 #include <gtest/gtest_prod.h>
+#include <iostream>
+#include <typeindex>
+#include <unordered_map>
+#include "Entity.h"
 
 namespace ECS
 {
@@ -29,6 +29,8 @@ private:
 
   /// @brief Vector of Entity ids by Entity type id
   std::vector<std::vector<EntityId>> m_FreeEntitySlotsByETID;
+
+  std::unordered_map<std::type_index, EntityTypeId> m_TypeIds;
 
   /**
    * Registers a new entity type and returns it's id
@@ -49,8 +51,21 @@ private:
    */
   template <typename T> EntityTypeId GetEntityTypeId()
   {
-    static const EntityTypeId id = RegisterEntityType<T>();
-    return id;
+    // static const EntityTypeId id = RegisterEntityType<T>();
+    // return id;
+    std::type_index typeIdx(typeid(T));
+
+    auto it = m_TypeIds.find(typeIdx);
+    if (it == m_TypeIds.end())
+    {
+      EntityTypeId id    = m_EntitiesByETID.size();
+      m_TypeIds[typeIdx] = id;
+      m_EntitiesByETID.resize(id + 1);
+      m_FreeEntitySlotsByETID.resize(id + 1);
+      return id;
+    }
+
+    return it->second;
   }
 
   /**

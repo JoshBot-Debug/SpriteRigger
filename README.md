@@ -113,4 +113,6 @@ filename.sprig
 
 ## Known issues
 - [ ] There is an issue, when you create a bone save the file, then open a new file and hit Ctr+S, you get an out-of-bounds index. 
-This is because the `GetEntityTypeId<E>()` in Registry.h is static. When the project reopens, since the program did not stop, all global statics remain cached. I don't want to use **RTTI** to keep track of entity types so this is pending until I find a better solution
+This is because the `GetEntityTypeId<E>()` in Registry.h is static. When the project reopens, since the program did not stop, all global statics remain cached. I don't want to use **RTTI** to keep track of entity types so this is pending until I find a better solution. The name of the bone disappears because the id returned int State.cpp `State::Restore()` `registry->CreateEntity<EBone>()` is 2, then 3. The id I extract from the save file is unused atm. Need to fix this.
+  - Okay, I finally ended up using RTTI, Performance here is not as important as the voxel engine so I'll let this go for now.
+  - This issue will remain unchecked so I'm aware of it.

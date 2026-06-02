@@ -113,7 +113,7 @@ void State::Restore()
 
     uint8_t* ptr = buffer.data();
 
-    uint32_t id;
+    uint64_t id;
     std::memcpy(&id, ptr, sizeof(id));
     ptr += sizeof(id);
 
@@ -160,9 +160,9 @@ void State::Save()
     const auto& [bone, hierarchy, flags] = entity->Collect<CBone, CHierarchy, CFlags>();
 
     std::vector<uint8_t> buffer;
-    uint32_t             id = entity->GetId();
+    uint64_t             id = entity->GetId();
 
-    serialize(buffer, &id, sizeof(uint32_t));
+    serialize(buffer, &id, sizeof(uint64_t));
     serialize(buffer, bone, sizeof(CBone));
     serialize(buffer, hierarchy, sizeof(CHierarchy));
     serialize(buffer, flags, sizeof(CFlags));

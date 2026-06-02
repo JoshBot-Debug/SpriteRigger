@@ -222,9 +222,9 @@ TEST(ECSRegistryTest, GetEntityTypeId)
 {
   ECS::Registry registry;
 
-  class EntityType1;
-  class EntityType2;
-  class EntityType3;
+  class EntityType1{};
+  class EntityType2{};
+  class EntityType3{};
 
   EXPECT_EQ(registry.GetEntityTypeId<EntityType1>(), 0);
   EXPECT_EQ(registry.GetEntityTypeId<EntityType2>(), 1);

@@ -33,11 +33,11 @@ void HierarchyLayer::OnAttach()
            {
                   .name = "Rename",
                   .onRenderItem =
-                   [](ContextMenu::Item* item, void* data)
+                  [](ContextMenu::Item* item, void* data)
                {
-                 ImGui::Separator();
-                 if (ImGui::MenuItem(item->name, item->shortcut, item->selected, item->enabled))
-                   ServiceLocator::Get<ECS::Registry>()->Get<EBone, CFlags>(ToInt32(data))->rename = true;
+                  ImGui::Separator();
+                  if (ImGui::MenuItem(item->name, item->shortcut, item->selected, item->enabled ? *item->enabled : true))
+                    ServiceLocator::Get<ECS::Registry>()->Get<EBone, CFlags>(ToInt32(data))->rename = true;
                },
            },
        }});

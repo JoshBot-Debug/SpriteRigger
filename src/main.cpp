@@ -21,11 +21,11 @@ int main(int argc, char** argv)
 
   State state;
 
-  ServiceLocator::Register<Rigger>();
-  ServiceLocator::Register<ECS::Registry>();
-
+  
   while (state.IsApplicationRunning())
   {
+    ServiceLocator::Register<Rigger>();
+    ServiceLocator::Register<ECS::Registry>();
     ServiceLocator::Register<ECS::SystemManager>();
 
     bool initialized = state.IsInitialized();
@@ -206,10 +206,10 @@ int main(int argc, char** argv)
 
     window.Run();
     ServiceLocator::Unregister<ECS::SystemManager>();
+    ServiceLocator::Unregister<ECS::Registry>();
+    ServiceLocator::Unregister<Rigger>();
   }
 
-  ServiceLocator::Unregister<ECS::Registry>();
-  ServiceLocator::Unregister<Rigger>();
 
   Window::Shutdown();
   return 0;
