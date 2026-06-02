@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     }
 
     Window window(options);
-    ImGui::StyleColorsDark(); 
+    ImGui::StyleColorsDark();
 
     if (initialized)
     {
@@ -54,8 +54,12 @@ int main(int argc, char** argv)
           .callback =
               [&state](Window* window)
           {
-            if (state.New())
-              window->Quit();
+            state.New(
+                [&window](bool success)
+                {
+                  if (success)
+                    window->Quit();
+                });
           },
       });
 
@@ -65,8 +69,12 @@ int main(int argc, char** argv)
           .callback =
               [&state](Window* window)
           {
-            if (state.Open())
-              window->Quit();
+            state.Open(
+                [&window](bool success)
+                {
+                  if (success)
+                    window->Quit();
+                });
           },
       });
 
@@ -111,12 +119,20 @@ int main(int argc, char** argv)
             {
 
               if (ImGui::MenuItem("New", "Crtl N"))
-                if (state.New())
-                  window.Quit();
+                state.New(
+                    [&window](bool success)
+                    {
+                      if (success)
+                        window.Quit();
+                    });
 
               if (ImGui::MenuItem("Open", "Crtl O"))
-                if (state.Open())
-                  window.Quit();
+                state.Open(
+                    [&window](bool success)
+                    {
+                      if (success)
+                        window.Quit();
+                    });
 
               if (ImGui::BeginMenu("Recent"))
               {

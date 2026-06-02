@@ -106,6 +106,7 @@ filename.sprig
 - [ ] Support incremental save if necessary
 - [ ] Need to add Deferred deletion
 - [ ] Animation system store a raw pointer, this may pose a problem, may want to use Weak Handles (Generation IDs)
+- [ ] Add light theme support
 
 ---
 

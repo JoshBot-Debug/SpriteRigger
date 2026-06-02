@@ -32,43 +32,53 @@ std::shared_ptr<SerializableLayer> State::Register(const std::shared_ptr<Seriali
   return m_Layers.emplace_back(layer);
 }
 
-bool State::New()
+void State::New(const std::function<void(bool)>& onComplete)
 {
-  const char* filter[] = {"*.sprig"};
+  std::thread(
+      [&, onComplete]()
+      {
+        const char* filter[] = {"*.sprig"};
 
-  const char* file = tinyfd_saveFileDialog("Create a new project", "project.sprig", 1, filter, "SpriteRigger files");
+        const char* file =
+            tinyfd_saveFileDialog("Create a new project", "project.sprig", 1, filter, "SpriteRigger files");
 
-  if (!file)
-    return false;
+        if (!file)
+          return onComplete(false);
 
-  std::string filepath = AddFileExtension(file, ".sprig");
+        std::string filepath = AddFileExtension(file, ".sprig");
 
-  m_Serializer.Write(filepath);
+        m_Serializer.Write(filepath);
 
-  m_ProjectFile = filepath;
+        m_ProjectFile = filepath;
 
-  m_IsInitialized = true;
+        m_IsInitialized = true;
 
-  SyncRecentProjects(filepath);
+        SyncRecentProjects(filepath);
 
-  return true;
+        onComplete(true);
+      })
+      .detach();
 }
 
-bool State::Open()
+void State::Open(const std::function<void(bool)>& onComplete)
 {
-  const char* filter[] = {"*.sprig"};
+  std::thread(
+      [&, onComplete]()
+      {
+        const char* filter[] = {"*.sprig"};
 
-  const char* file = tinyfd_openFileDialog("Select a project", "", 1, filter, "SpriteRigger files", 0);
+        const char* file = tinyfd_openFileDialog("Select a project", "", 1, filter, "SpriteRigger files", 0);
 
-  if (!file)
-    return false;
+        if (!file)
+          return onComplete(false);
 
-  return Open(std::string(file));
+        onComplete(Open(std::string(file)));
+      })
+      .detach();
 }
 
 bool State::Open(const std::string& filepath)
 {
-
   if (!m_Serializer.Load(filepath))
   {
     SyncRecentProjects(filepath, true);
@@ -165,20 +175,25 @@ void State::Save()
 
 void State::SaveAs()
 {
-  const char* filter[] = {"*.sprig"};
+  std::thread(
+      [&]()
+      {
+        const char* filter[] = {"*.sprig"};
 
-  const char* file = tinyfd_saveFileDialog("Save as", "project.sprig", 1, filter, "SpriteRigger files");
+        const char* file = tinyfd_saveFileDialog("Save as", "project.sprig", 1, filter, "SpriteRigger files");
 
-  if (!file)
-    return;
+        if (!file)
+          return;
 
-  std::string filepath = AddFileExtension(file, ".sprig");
+        std::string filepath = AddFileExtension(file, ".sprig");
 
-  SyncRecentProjects(filepath);
+        SyncRecentProjects(filepath);
 
-  m_ProjectFile = filepath;
+        m_ProjectFile = filepath;
 
-  Save();
+        Save();
+      })
+      .detach();
 }
 
 void State::SyncRecentProjects()

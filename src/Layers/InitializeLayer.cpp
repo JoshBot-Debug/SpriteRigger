@@ -119,15 +119,23 @@ void InitializeLayer::OnRender()
 
   if (ImGui::TextLink("Create a new project"))
   {
-    if (m_State->New())
-      m_Window->Quit();
+    m_State->New(
+        [&window = m_Window](bool success)
+        {
+          if (success)
+            window->Quit();
+        });
   }
 
   ImGui::Spacing();
   if (ImGui::TextLink("Open a project"))
   {
-    if (m_State->Open())
-      m_Window->Quit();
+    m_State->Open(
+        [&window = m_Window](bool success)
+        {
+          if (success)
+            window->Quit();
+        });
   }
 
   ImGui::Spacing();

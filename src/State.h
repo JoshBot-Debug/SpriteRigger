@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <thread>
+#include <functional>
 
 class State
 {
@@ -27,9 +29,9 @@ public:
 
   std::shared_ptr<SerializableLayer> Register(const std::shared_ptr<SerializableLayer>& layer);
 
-  bool New();
+  void New(const std::function<void(bool)> &onComplete);
 
-  bool Open();
+  void Open(const std::function<void(bool)> &onComplete);
 
   bool Open(const std::string& filepath);
 
