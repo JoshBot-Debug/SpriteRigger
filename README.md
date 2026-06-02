@@ -107,6 +107,7 @@ filename.sprig
 - [ ] Need to add Deferred deletion
 - [ ] Animation system store a raw pointer, this may pose a problem, may want to use Weak Handles (Generation IDs)
 - [ ] Add light theme support
+- [x] Remove tinyfd from the main thread, it's blocking.
 
 ---
 
