@@ -106,15 +106,15 @@ public:
        * Registry passed into the callback becomes a dangling pointer when the registry is freed.
        * Modern C++ win. Animate is also a mayers singleton, that is not great either. Gotta come up with a better solution to that maybe.
        */
-      Animate::Once<glm::vec4>::Create()
-          ->Signal([registry = m_Registry, entityId = entity->GetId()]()
-                   { return !registry->Has<EBone, CBone>(entityId); })
-          ->Duration(ANIMATION_DURATION)
-          ->Value(&cBone->color, targetShaft)
-          ->Value(&cBone->joints[0].color, targetStartJoint)
-          ->Value(&cBone->joints[1].color, targetEndJoint)
-          ->OnUpdate([entity]() { entity->MarkChanged<CBone>(); })
-          ->Play();
+      // Animate::Once<glm::vec4>::Create()
+      //     ->Signal([registry = m_Registry, entityId = entity->GetId()]()
+      //              { return !registry->Has<EBone, CBone>(entityId); })
+      //     ->Duration(ANIMATION_DURATION)
+      //     ->Value(&cBone->color, targetShaft)
+      //     ->Value(&cBone->joints[0].color, targetStartJoint)
+      //     ->Value(&cBone->joints[1].color, targetEndJoint)
+      //     ->OnUpdate([entity]() { entity->MarkChanged<CBone>(); })
+      //     ->Play();
     }
   }
 };
