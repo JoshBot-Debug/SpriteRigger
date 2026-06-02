@@ -19,6 +19,19 @@ cd vendor/imgui
 git checkout docking
 cd ../..
 ```
+Install dependencies like glm, opengl
+```bash
+sudo apt update
+sudo apt install \
+  libgl1-mesa-dev \
+  libglu1-mesa-dev \
+  mesa-common-dev \
+  libglfw3-dev \
+  libopengl-dev \
+  libglx-dev \
+  libglm-dev \
+  libstb-dev
+```
 
 Build the project
 ```bash
