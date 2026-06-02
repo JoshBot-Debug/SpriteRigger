@@ -44,6 +44,7 @@ int main(int argc, char** argv)
     }
 
     Window window(options);
+    ImGui::StyleColorsDark(); 
 
     if (initialized)
     {

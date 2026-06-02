@@ -59,7 +59,8 @@ void InitializeLayer::OnRender()
   ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f, 0.0f});
-  ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(50, 50, 50, 255));
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{1.0f, 1.0f, 1.0f, 1.0f});
+  ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4{0.196f, 0.196f, 0.196f, 1.0f});
   ImGui::SetNextWindowPos(ImVec2{0, 0});
   ImGui::SetNextWindowSize(windowSize);
   ImGui::Begin("##Initialize", nullptr, windowFlags);
@@ -76,9 +77,9 @@ void InitializeLayer::OnRender()
     float closeButtonSize = 20;
     ImGui::SetCursorPos(ImVec2{windowSize.x - closeButtonSize - 5, 5});
     ImGui::PushFont(Window::GetFont("MaterialIcons"), 16.0f);
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.3, 0.3, 0.3, 1});
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.25, 0.25, 0.25, 1});
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.15, 0.15, 0.15, 1});
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.3f, 0.3f, 0.3f, 1.0f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.25f, 0.25f, 0.25f, 1.0f});
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.15f, 0.15f, 0.15f, 1.0f});
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0, 0});
     if (ImGui::Button("\ue5cd", ImVec2{closeButtonSize, closeButtonSize}))
@@ -155,8 +156,8 @@ void InitializeLayer::OnRender()
   }
 
   ImGui::EndChild();
-
   ImGui::End();
+  ImGui::PopStyleColor(1);
 }
 
 void InitializeLayer::OnDetach()
