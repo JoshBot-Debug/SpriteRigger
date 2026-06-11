@@ -33,11 +33,11 @@ void HierarchyLayer::OnAttach()
            {
                   .name = "Rename",
                   .onRenderItem =
-                  [](ContextMenu::Item* item, void* data)
+                   [](ContextMenu::Item* item, void* data)
                {
-                  ImGui::Separator();
-                  if (ImGui::MenuItem(item->name, item->shortcut, item->selected, item->enabled ? *item->enabled : true))
-                    ServiceLocator::Get<ECS::Registry>()->Get<EBone, CFlags>(ToInt32(data))->rename = true;
+                 ImGui::Separator();
+                 if (ImGui::MenuItem(item->name, item->shortcut, item->selected, item->enabled ? *item->enabled : true))
+                   ServiceLocator::Get<ECS::Registry>()->Get<EBone, CFlags>(ToInt32(data))->rename = true;
                },
            },
        }});
@@ -65,8 +65,8 @@ void HierarchyLayer::OnAttach()
         if (ImGui::IsItemClicked())
         {
           for (auto [_, cFlag] : registry->Get<EBone, CFlags>())
-            cFlag->selected = false;
-          cFlags->selected = true;
+            registry->Remove<EBone, CSelected>(item->id);
+          registry->Add<EBone, CSelected>(item->id, CBone::Shaft);
         }
 
         ImGui::SameLine(0.0f, 0.0f);
@@ -82,7 +82,7 @@ void HierarchyLayer::OnAttach()
             cFlags->rename = false;
         }
 
-        if (cFlags->selected)
+        if (registry->Get<EBone, CSelected>(item->id))
           item->flags = ImGuiTreeNodeFlags_Selected;
         else
           item->flags = ImGuiTreeNodeFlags_None;
