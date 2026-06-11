@@ -38,12 +38,11 @@ private:
   std::shared_ptr<ECS::Registry>      m_Registry = nullptr;
   std::shared_ptr<ECS::SystemManager> m_System   = nullptr;
 
-  Animate::System* m_AnimateSystem = nullptr;
-
   std::shared_ptr<BoneRenderSystem> m_BoneRenderSystem = nullptr;
   std::shared_ptr<HoverSystem>      m_HoverSystem      = nullptr;
   std::shared_ptr<SelectSystem>     m_SelectSystem     = nullptr;
   std::shared_ptr<DragSystem>       m_DragSystem       = nullptr;
+  std::shared_ptr<Animate::System>  m_AnimationSystem  = nullptr;
 
   Systems::Data m_SystemData;
   ContextMenu   m_ContextMenu;

@@ -113,6 +113,7 @@ void State::Restore()
 
     uint8_t* ptr = buffer.data();
 
+    // Unused id, CreateEntity creates new ids
     uint64_t id;
     std::memcpy(&id, ptr, sizeof(id));
     ptr += sizeof(id);

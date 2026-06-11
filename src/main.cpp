@@ -12,6 +12,8 @@
 #include "ECS/System.h"
 #include "ServiceLocator/ServiceLocator.h"
 
+#include "Animate/System.h"
+
 #include "Utility.h"
 
 int main(int argc, char** argv)
@@ -27,6 +29,7 @@ int main(int argc, char** argv)
     ServiceLocator::Register<Rigger>();
     ServiceLocator::Register<ECS::Registry>();
     ServiceLocator::Register<ECS::SystemManager>();
+    ServiceLocator::Register<Animate::System>();
 
     bool initialized = state.IsInitialized();
 
@@ -205,6 +208,7 @@ int main(int argc, char** argv)
     style.WindowMenuButtonPosition = ImGuiDir_None;
 
     window.Run();
+    ServiceLocator::Unregister<Animate::System>();
     ServiceLocator::Unregister<ECS::SystemManager>();
     ServiceLocator::Unregister<ECS::Registry>();
     ServiceLocator::Unregister<Rigger>();

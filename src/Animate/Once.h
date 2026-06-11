@@ -1,6 +1,5 @@
 #pragma once
 #include "Animation.h"
-#include "System.h"
 #include "Timeline.h"
 
 #include <functional>
@@ -66,7 +65,6 @@ public:
   std::shared_ptr<Once<T>> Play() override
   {
     m_Timeline->Play();
-    System::Instance().Attach(this->shared_from_this());
     return this->shared_from_this();
   }
 

@@ -12,6 +12,7 @@
 #include "Common.h"
 
 #include "Animate/Once.h"
+#include "Animate/System.h"
 #include "Animate/Timeline.h"
 
 class HoverSystem : public ECS::System
@@ -24,9 +25,10 @@ private:
   };
 
 private:
-  Grid*               m_Grid     = nullptr;
-  ECS::Registry*      m_Registry = nullptr;
-  OrthographicCamera* m_Camera   = nullptr;
+  Grid*               m_Grid            = nullptr;
+  ECS::Registry*      m_Registry        = nullptr;
+  OrthographicCamera* m_Camera          = nullptr;
+  Animate::System*    m_AnimationSystem = nullptr;
 
 private:
   CBone::Part HoveredOver(CBone* bone, glm::vec2 mouse)
@@ -51,16 +53,18 @@ private:
 public:
   void Free()
   {
-    m_Grid     = nullptr;
-    m_Camera   = nullptr;
-    m_Registry = nullptr;
+    m_Grid            = nullptr;
+    m_Camera          = nullptr;
+    m_Registry        = nullptr;
+    m_AnimationSystem = nullptr;
   }
 
-  void Initialize(ECS::Registry* registry, Grid* grid, OrthographicCamera* camera)
+  void Initialize(ECS::Registry* registry, Grid* grid, OrthographicCamera* camera, Animate::System* animationSystem)
   {
-    m_Grid     = grid;
-    m_Camera   = camera;
-    m_Registry = registry;
+    m_Grid            = grid;
+    m_Camera          = camera;
+    m_Registry        = registry;
+    m_AnimationSystem = animationSystem;
   };
 
   void Update(void* d) override
@@ -101,20 +105,16 @@ public:
       glm::vec4 targetStartJoint = resolve(CBone::StartJoint);
       glm::vec4 targetEndJoint   = resolve(CBone::EndJoint);
 
-      /**
-       * TODO:
-       * Registry passed into the callback becomes a dangling pointer when the registry is freed.
-       * Modern C++ win. Animate is also a mayers singleton, that is not great either. Gotta come up with a better solution to that maybe.
-       */
-      // Animate::Once<glm::vec4>::Create()
-      //     ->Signal([registry = m_Registry, entityId = entity->GetId()]()
-      //              { return !registry->Has<EBone, CBone>(entityId); })
-      //     ->Duration(ANIMATION_DURATION)
-      //     ->Value(&cBone->color, targetShaft)
-      //     ->Value(&cBone->joints[0].color, targetStartJoint)
-      //     ->Value(&cBone->joints[1].color, targetEndJoint)
-      //     ->OnUpdate([entity]() { entity->MarkChanged<CBone>(); })
-      //     ->Play();
+      auto animation = Animate::Once<glm::vec4>::Create()
+          ->Signal([registry = m_Registry, entityId = entity->GetId()]() { return !registry->Has<EBone, CBone>(entityId); })
+          ->Duration(ANIMATION_DURATION)
+          ->Value(&cBone->color, targetShaft)
+          ->Value(&cBone->joints[0].color, targetStartJoint)
+          ->Value(&cBone->joints[1].color, targetEndJoint)
+          ->OnUpdate([entity]() { entity->MarkChanged<CBone>(); })
+          ->Play();
+
+      m_AnimationSystem->Attach(animation);
     }
   }
 };

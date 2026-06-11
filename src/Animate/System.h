@@ -11,25 +11,19 @@ class Animation;
 class System
 {
 private:
-  System() = default;
-
-  ~System() = default;
-
-  System(const System&) = delete;
-
-  System& operator=(const System&) = delete;
-
-private:
   std::vector<std::shared_ptr<Animation>> m_Animations{};
 
 public:
-  static System& Instance()
-  {
-    static System instance;
-    return instance;
-  }
+  System()  = default;
+  ~System() = default;
 
-  void Attach(const std::shared_ptr<Animation>& animation);
+  System(const System&)            = delete;
+  System& operator=(const System&) = delete;
+
+  template <typename... Args> void Attach(Args&&... animations)
+  {
+    (m_Animations.emplace_back(std::forward<Args>(animations)), ...);
+  }
 
   void Update(float deltaTime);
 };

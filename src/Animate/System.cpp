@@ -6,10 +6,10 @@
 namespace Animate
 {
 
-void System::Attach(const std::shared_ptr<Animation>& animation)
-{
-  m_Animations.emplace_back(animation);
-}
+// void System::Attach(const std::shared_ptr<Animation>& animation)
+// {
+//   m_Animations.emplace_back(animation);
+// }
 
 void System::Update(float deltaTime)
 {
