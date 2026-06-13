@@ -39,9 +39,13 @@ public:
   void Update(void* d) override
   {
     auto data = reinterpret_cast<Systems::Data*>(d);
+
+    if (!AABBCollision(data->viewport.min, data->viewport.max, ImGui::GetMousePos()))
+      return;
+
     if (data->isMouseClicked(Systems::MouseButton::Left))
     {
-      if(!data->isKeyDown(Systems::KeyboardKey::LeftShift))
+      if (!data->isKeyDown(Systems::KeyboardKey::LeftShift))
         for (auto& [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
           if (CHovered* cHovered = entity->Get<CHovered>())
           {

@@ -72,6 +72,7 @@ void ViewportLayer::OnRender()
   m_SystemData.deltaTime  = static_cast<float>(Window::GetDeltaTime());
   m_SystemData.mouse      = m_Grid.GetMouseCoords();
   m_SystemData.deltaMouse = m_Grid.GetDeltaMouseCoords();
+  m_SystemData.viewport = m_Viewport;
 
   m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
   m_System->Update<HoverSystem>(&m_SystemData);

@@ -25,6 +25,7 @@
 
 #include "SerializableLayer.h"
 #include "State.h"
+#include "Types.h"
 
 #include "Components/ContextMenu.h"
 
@@ -54,13 +55,7 @@ private:
   Grid               m_Grid;
   Shader             m_Shader;
   OrthographicCamera m_Camera;
-
-  struct Viewport
-  {
-    ImVec2 size{0, 0};
-    ImVec2 min{0, 0};
-    ImVec2 max{0, 0};
-  } m_Viewport;
+  Viewport           m_Viewport;
 
 public:
   explicit ViewportLayer(State* state);

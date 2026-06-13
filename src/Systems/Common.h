@@ -6,6 +6,7 @@
 #include "imgui.h"
 
 #include "Camera/OrthographicCamera.h"
+#include "Types.h"
 
 inline const float ANIMATION_DURATION = 0.15f;
 
@@ -191,21 +192,21 @@ enum class KeyboardKey : int
 
 struct Data
 {
-  float  deltaTime  = 0.0f;
-  ImVec2 mouse      = ImVec2(0.0f, 0.0f);
-  ImVec2 deltaMouse = ImVec2(0.0f, 0.0f);
-  ImVec2 viewport   = ImVec2(0.0f, 0.0f);
+  float    deltaTime  = 0.0f;
+  ImVec2   mouse      = ImVec2(0.0f, 0.0f);
+  ImVec2   deltaMouse = ImVec2(0.0f, 0.0f);
+  Viewport viewport;
 
   bool isKeyPressed(KeyboardKey key)
   {
     return ImGui::IsKeyPressed(static_cast<ImGuiKey>(key));
   }
-  
+
   bool isKeyDown(KeyboardKey key)
   {
     return ImGui::IsKeyDown(static_cast<ImGuiKey>(key));
   }
-  
+
   bool isKeyReleased(KeyboardKey key)
   {
     return ImGui::IsKeyReleased(static_cast<ImGuiKey>(key));

@@ -38,6 +38,7 @@ public:
     hierarchy->id     = entity->GetId();
     hierarchy->parent = parent;
 
+    /// TODO: Every parent can have multiple children
     if (auto pHierarchy = registry->Get<EBone, CHierarchy>(parent))
       pHierarchy->child = hierarchy->id;
 

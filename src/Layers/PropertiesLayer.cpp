@@ -37,10 +37,10 @@ void PropertiesLayer::OnRender()
     auto* hierarchy = m_Entity->Get<CHierarchy>();
     auto* bone = m_Entity->Get<CBone>();
     
-    ImGui::Text("%s", hierarchy->name);
     ImGui::InputText("Name", hierarchy->name, IM_ARRAYSIZE(hierarchy->name), ImGuiInputTextFlags_EnterReturnsTrue);
-    ImGui::ColorPicker4("Color", glm::value_ptr(bone->color));
     ImGui::InputFloat("Thickness", &bone->thickness, 0.01f, 0.1f);
+    ImGui::InputFloat2("Start Joint Position", glm::value_ptr(bone->joints[0].position));
+    ImGui::InputFloat2("End Joint Position", glm::value_ptr(bone->joints[1].position));
   }
 
   ImGui::End();

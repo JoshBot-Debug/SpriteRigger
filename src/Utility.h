@@ -242,3 +242,18 @@ inline uint32_t ToInt32(void* value)
 {
   return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(value));
 }
+
+inline bool AABBCollision(const ImVec2& min, const ImVec2& max, const ImVec2& pmin, const ImVec2& pmax)
+{
+  if (min.x > pmax.x || max.x < pmin.x)
+    return false;
+  if (min.y > pmax.y || max.y < pmin.y)
+    return false;
+  return true;
+}
+
+inline bool AABBCollision(const ImVec2& min, const ImVec2& max, const ImVec2& point) {
+  if (point.x < min.x || point.x > max.x) return false;
+  if (point.y < min.y || point.y > max.y) return false;
+  return true;
+}
