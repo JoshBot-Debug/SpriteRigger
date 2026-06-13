@@ -106,12 +106,11 @@ void State::Restore()
 
   std::vector<std::vector<uint8_t>> entities = m_Serializer.GetAll("entity:bone");
 
-  // TODO, do not use entity id as the id for hierarchy.
   for (auto& buffer : entities)
   {
     uint8_t* ptr = buffer.data();
 
-    // Unused id, CreateEntity creates new ids
+    /// TODO: Will need to use this id to remap parent to child in hierarchies.
     uint64_t id;
     std::memcpy(&id, ptr, sizeof(id));
     ptr += sizeof(id);
