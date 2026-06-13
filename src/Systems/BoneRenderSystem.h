@@ -164,10 +164,10 @@ public:
         Bone& bone = buffer.emplace_back();
 
         bone.color     = cBone->color;
-        bone.start     = cBone->joints[CBone::StartJoint].position;
-        bone.end       = cBone->joints[CBone::EndJoint].position;
-        bone.sColor    = cBone->joints[CBone::StartJoint].color;
-        bone.eColor    = cBone->joints[CBone::EndJoint].color;
+        bone.start     = cBone->joints[static_cast<int>(CBone::Part::StartJoint)].position;
+        bone.end       = cBone->joints[static_cast<int>(CBone::Part::EndJoint)].position;
+        bone.sColor    = cBone->joints[static_cast<int>(CBone::Part::StartJoint)].color;
+        bone.eColor    = cBone->joints[static_cast<int>(CBone::Part::EndJoint)].color;
         bone.thickness = cBone->thickness;
       }
 

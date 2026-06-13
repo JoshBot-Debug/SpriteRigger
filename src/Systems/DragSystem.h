@@ -45,16 +45,16 @@ public:
     {
       auto cBone = entity->Get<CBone>();
 
-      if (cDragging->target == CBone::Shaft)
+      if (cDragging->target == CBone::Part::Shaft)
       {
-        auto& sp = cBone->joints[CBone::StartJoint].position;
-        auto& ep = cBone->joints[CBone::EndJoint].position;
+        auto& sp = cBone->joints[static_cast<int>(CBone::Part::StartJoint)].position;
+        auto& ep = cBone->joints[static_cast<int>(CBone::Part::EndJoint)].position;
         ECS::Mutate<CBone, glm::vec2>(entity, sp, sp + deltaMouse);
         ECS::Mutate<CBone, glm::vec2>(entity, ep, ep + deltaMouse);
       }
       else
       {
-        auto& position = cBone->joints[cDragging->target].position;
+        auto& position = cBone->joints[static_cast<int>(cDragging->target)].position;
         ECS::Mutate<CBone, glm::vec2>(entity, position, mouse);
       }
     }

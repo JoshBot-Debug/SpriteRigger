@@ -24,11 +24,11 @@ void HierarchyLayer::OnAttach()
        .items    = {
            {
                   .name    = "Add child",
-                  .onClick = [](void* data) { ServiceLocator::Get<Rigger>()->NewBone(ToInt32(data)); },
+                  .onClick = [](void* data) { ServiceLocator::Get<Rigger>()->NewBone(ToInt64(data)); },
            },
            {
                   .name    = "Remove child",
-                  .onClick = [](void* data) { ServiceLocator::Get<Rigger>()->RemoveBone(ToInt32(data)); },
+                  .onClick = [](void* data) { ServiceLocator::Get<Rigger>()->RemoveBone(ToInt64(data)); },
            },
            {
                   .name = "Rename",
@@ -37,7 +37,7 @@ void HierarchyLayer::OnAttach()
                {
                  ImGui::Separator();
                  if (ImGui::MenuItem(item->name, item->shortcut, item->selected, item->enabled ? *item->enabled : true))
-                   ServiceLocator::Get<ECS::Registry>()->Get<EBone, CFlags>(ToInt32(data))->rename = true;
+                   ServiceLocator::Get<ECS::Registry>()->Get<EBone, CFlags>(ToInt64(data))->rename = true;
                },
            },
        }});
@@ -66,7 +66,7 @@ void HierarchyLayer::OnAttach()
         {
           for (auto [_, cFlag] : registry->Get<EBone, CFlags>())
             registry->Remove<EBone, CSelected>(item->id);
-          registry->Add<EBone, CSelected>(item->id, CBone::Shaft);
+          registry->Add<EBone, CSelected>(item->id, CBone::Part::Shaft);
         }
 
         ImGui::SameLine(0.0f, 0.0f);

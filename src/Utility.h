@@ -238,9 +238,9 @@ inline void* ToVoidPtr(uint32_t value)
   return reinterpret_cast<void*>(static_cast<uintptr_t>(value));
 }
 
-inline uint32_t ToInt32(void* value)
+inline uint64_t ToInt64(void* value)
 {
-  return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(value));
+  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(value));
 }
 
 inline bool AABBCollision(const ImVec2& min, const ImVec2& max, const ImVec2& pmin, const ImVec2& pmax)

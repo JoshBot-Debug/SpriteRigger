@@ -10,7 +10,7 @@ struct EBone
 
 struct CBone
 {
-  enum Part : uint8_t
+  enum class Part : uint8_t
   {
     StartJoint = 0,
     EndJoint,
@@ -49,7 +49,7 @@ struct CHierarchy
   ECS::EntityId id        = 0;
   ECS::EntityId parent    = 0;
   char          name[255] = "";
-  CBone::Part   attach    = CBone::None;
+  CBone::Part   attach    = CBone::Part::None;
 };
 
 struct CFlags

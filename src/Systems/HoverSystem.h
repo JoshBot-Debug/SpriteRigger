@@ -33,8 +33,8 @@ private:
 private:
   CBone::Part HoveredOver(CBone* bone, glm::vec2 mouse)
   {
-    auto& start = bone->joints[CBone::StartJoint];
-    auto& end   = bone->joints[CBone::EndJoint];
+    auto& start = bone->joints[static_cast<int>(CBone::Part::StartJoint)];
+    auto& end   = bone->joints[static_cast<int>(CBone::Part::EndJoint)];
 
     float     radius    = bone->thickness * 0.5f;
     glm::vec2 direction = glm::normalize(start.position - end.position);
@@ -90,9 +90,9 @@ public:
 
       auto resolve = [cHovered, cSelected](CBone::Part part)
       {
-        if (cHovered && cHovered->target == CBone::Shaft)
+        if (cHovered && cHovered->target == CBone::Part::Shaft)
           return Colors::HIGHLIGHT;
-        if (cSelected && cSelected->target == CBone::Shaft)
+        if (cSelected && cSelected->target == CBone::Part::Shaft)
           return Colors::HIGHLIGHT;
         if (cSelected && cSelected->target == part)
           return Colors::HIGHLIGHT;
@@ -101,9 +101,9 @@ public:
         return Colors::DEFAULT;
       };
 
-      glm::vec4 targetShaft      = resolve(CBone::Shaft);
-      glm::vec4 targetStartJoint = resolve(CBone::StartJoint);
-      glm::vec4 targetEndJoint   = resolve(CBone::EndJoint);
+      glm::vec4 targetShaft      = resolve(CBone::Part::Shaft);
+      glm::vec4 targetStartJoint = resolve(CBone::Part::StartJoint);
+      glm::vec4 targetEndJoint   = resolve(CBone::Part::EndJoint);
 
       auto animation = Animate::Once<glm::vec4>::Create()
           ->Signal([registry = m_Registry, entityId = entity->GetId()]() { return !registry->Has<EBone, CBone>(entityId); })
