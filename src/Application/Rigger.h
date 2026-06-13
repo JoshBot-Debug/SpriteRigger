@@ -38,10 +38,6 @@ public:
     hierarchy->id     = entity->GetId();
     hierarchy->parent = parent;
 
-    /// TODO: Every parent can have multiple children
-    if (auto pHierarchy = registry->Get<EBone, CHierarchy>(parent))
-      pHierarchy->child = hierarchy->id;
-
     std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %lu", entity->GetId());
 
     m_Hierarchy->Add({
@@ -52,19 +48,21 @@ public:
 
   void RemoveBone(ECS::EntityId id)
   {
-    auto          registry = ServiceLocator::Get<ECS::Registry>();
-    ECS::EntityId eid      = id;
+    auto registry = ServiceLocator::Get<ECS::Registry>();
 
-    std::vector<ECS::EntityId> chain;
-    while (eid)
+    std::vector<ECS::EntityId> chain{id};
+
+    auto search = [&](auto&& self, ECS::EntityId target) -> void
     {
-      chain.push_back(eid);
+      for (auto& [bone, hierarchy] : registry->Get<EBone, CHierarchy>())
+        if (hierarchy->parent == target)
+        {
+          chain.push_back(hierarchy->id);
+          self(self, hierarchy->id);
+        }
+    };
 
-      auto h = registry->Get<EBone, CHierarchy>(eid);
-      if (!h || h->child == 0)
-        break;
-      eid = h->child;
-    }
+    search(search, id);
 
     for (auto it = chain.rbegin(); it != chain.rend(); ++it)
     {

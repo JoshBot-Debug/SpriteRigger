@@ -48,7 +48,6 @@ struct CHierarchy
 {
   ECS::EntityId id        = 0;
   ECS::EntityId parent    = 0;
-  ECS::EntityId child     = 0;
   char          name[255] = "";
   CBone::Part   attach    = CBone::None;
 };
