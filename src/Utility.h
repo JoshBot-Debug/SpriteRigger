@@ -238,7 +238,7 @@ inline void* ToVoidPtr(uint32_t value)
   return reinterpret_cast<void*>(static_cast<uintptr_t>(value));
 }
 
-inline uint64_t ToInt64(void* value)
+inline uint64_t ToUInt64(void* value)
 {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(value));
 }
