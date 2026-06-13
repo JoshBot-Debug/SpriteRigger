@@ -37,7 +37,6 @@ public:
 
     hierarchy->id     = entity->GetId();
     hierarchy->parent = parent;
-    hierarchy->attach = CBone::Part::StartJoint;
 
     std::snprintf(hierarchy->name, sizeof(hierarchy->name), "Bone %lu", entity->GetId());
 

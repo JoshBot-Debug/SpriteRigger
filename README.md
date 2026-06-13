@@ -108,9 +108,11 @@ filename.sprig
 - [ ] Animation system store a raw pointer, this may pose a problem, may want to use Weak Handles (Generation IDs)
 - [ ] Add light theme support
 - [x] Remove tinyfd from the main thread, it's blocking.
-- [ ] Every parent can have multiple children, a dynamic amount of children is an issue for serialization, to keep it simple a node can keep track only of it's parent, we can remove the `CHierarchy` `child` field. The problem is that when deleting or doing an work on the entire chain, searching for children is O(n^2). 
+- [x] Every parent can have multiple children, a dynamic amount of children is an issue for serialization, to keep it simple a node can keep track only of it's parent, we can remove the `CHierarchy` `child` field. The problem is that when deleting or doing an work on the entire chain, searching for children is O(n^2). 
   - We could add a fixed amount of children. Each Bone can have x children, memory will be allocated upfront so it will be `x * uint64_t`. For few children this is reasonable in this project but maybe we want to have unlimited children attached to a single bone? Like rays of light from a point...
   - We could allow dynamic amount of children and begin the work on serializer to be able to handle vectors. More dev time but saves memory and allows $n$ children.
+  **Solution Chosen**: Choose to go with the pointer to parent stored in each Bone, selecting the entire hierarchy may be expensive but I can optimise that down the line if needed.
+- [ ] `CHierarchy` has attach, need more memory to properly define that relationship. Attached head to head, head to tail, tail to tail, etc.
 
 ---
 
