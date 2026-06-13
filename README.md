@@ -120,3 +120,4 @@ This is because the `GetEntityTypeId<E>()` in Registry.h is static. When the pro
   - Okay, I finally ended up using RTTI, Performance here is not as important as the voxel engine so I'll let this go for now.
   
   **Issue resolved**: Used RTTI, remove the static behaviour of `Animation`, added it to the `ServiceLocator`. 
+  **Reworked**: Remove RTTI, if the existing EntityTypeId does not exist, resize the container so that it does.
