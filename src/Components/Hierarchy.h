@@ -11,7 +11,7 @@
 class Hierarchy
 {
 public:
-  using NodeId = uint32_t;
+  using NodeId = uint64_t;
 
   struct Item
   {

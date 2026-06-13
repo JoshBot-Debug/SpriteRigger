@@ -5,6 +5,7 @@
 #include "Layers/HierarchyLayer.h"
 #include "Layers/InitializeLayer.h"
 #include "Layers/ViewportLayer.h"
+#include "Layers/PropertiesLayer.h"
 
 #include "Application/Rigger.h"
 #include "Components/Hierarchy.h"
@@ -202,6 +203,7 @@ int main(int argc, char** argv)
       window.PushLayer(state.Register(std::make_shared<ViewportLayer>(&state)));
       window.PushLayer(state.Register(std::make_shared<HierarchyLayer>(&state)));
       window.PushLayer(state.Register(std::make_shared<AssetLayer>(&state)));
+      window.PushLayer(state.Register(std::make_shared<PropertiesLayer>(&state)));
     }
 
     ImGuiStyle& style              = ImGui::GetStyle();

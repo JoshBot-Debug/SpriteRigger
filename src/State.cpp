@@ -109,8 +109,6 @@ void State::Restore()
   // TODO, do not use entity id as the id for hierarchy.
   for (auto& buffer : entities)
   {
-    size_t offset = 0;
-
     uint8_t* ptr = buffer.data();
 
     // Unused id, CreateEntity creates new ids

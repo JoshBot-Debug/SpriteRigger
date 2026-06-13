@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <glm/glm.hpp>
+#include "ECS/Entity.h"
 
 struct EBone
 {
@@ -45,16 +46,16 @@ struct CDragging
 
 struct CHierarchy
 {
-  uint32_t    id        = 0;
-  uint32_t    parent    = 0;
-  uint32_t    child     = 0;
-  char        name[255] = "";
-  CBone::Part attach    = CBone::None;
+  ECS::EntityId id        = 0;
+  ECS::EntityId parent    = 0;
+  ECS::EntityId child     = 0;
+  char          name[255] = "";
+  CBone::Part   attach    = CBone::None;
 };
 
 struct CFlags
 {
-  bool rename   = false;
+  bool rename = false;
 };
 
 struct CAnimationTimeline

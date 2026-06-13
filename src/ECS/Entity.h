@@ -8,11 +8,11 @@
 namespace ECS
 {
 
-constexpr size_t MAX_COMPONENTS = 1024;
+constexpr uint64_t MAX_COMPONENTS = 1024;
 
-using EntityId = size_t;
+using EntityId = uint64_t;
 
-using EntityTypeId = size_t;
+using EntityTypeId = uint64_t;
 
 class Registry;
 
@@ -30,7 +30,7 @@ private:
   Registry* m_Registry = nullptr;
 
   std::array<std::shared_ptr<void>, MAX_COMPONENTS> m_Components;
-  std::vector<size_t>                               m_FreeComponentSlots;
+  std::vector<uint64_t>                               m_FreeComponentSlots;
 
   std::bitset<MAX_COMPONENTS> m_Has;
   std::bitset<MAX_COMPONENTS> m_Dirty;
@@ -40,18 +40,18 @@ private:
   /**
    * A global counter for unique component type.
    */
-  static size_t& GetComponentCounter()
+  static uint64_t& GetComponentCounter()
   {
-    static size_t counter = size_t(-1);
+    static uint64_t counter = uint64_t(-1);
     return counter;
   }
 
   /**
    * Retrieve a unique, stable ID for a component type.
    */
-  template <typename T> size_t GetComponentTypeId()
+  template <typename T> uint64_t GetComponentTypeId()
   {
-    static const size_t id = ++GetComponentCounter();
+    static const uint64_t id = ++GetComponentCounter();
     return id;
   }
 
@@ -95,7 +95,7 @@ public:
    */
   template <typename C, typename... CArgs> C* Add(CArgs&&... args)
   {
-    size_t id        = GetComponentTypeId<C>();
+    uint64_t id        = GetComponentTypeId<C>();
     m_Components[id] = std::make_shared<C>(std::forward<CArgs>(args)...);
     m_Has.set(id, true);
     m_Dirty.set(id, true);
@@ -121,7 +121,7 @@ public:
    */
   template <typename C> C* Get()
   {
-    size_t id = GetComponentTypeId<C>();
+    uint64_t id = GetComponentTypeId<C>();
     if (!m_Has.test(id))
       return nullptr;
     try
@@ -143,7 +143,7 @@ public:
    */
   template <typename C, typename... CArgs> C* Ensure(CArgs&&... args)
   {
-    size_t id = GetComponentTypeId<C>();
+    uint64_t id = GetComponentTypeId<C>();
     if (!m_Has.test(id))
       return Add<C>(std::forward<CArgs>(args)...);
     try
@@ -175,7 +175,7 @@ public:
    */
   template <typename C, typename... Rest> void Remove()
   {
-    size_t id = GetComponentTypeId<C>();
+    uint64_t id = GetComponentTypeId<C>();
     if (m_Has.test(id))
     {
       m_Components[id].reset();
@@ -206,7 +206,7 @@ public:
    */
   template <typename C, typename... Rest> void MarkForRemoval()
   {
-    size_t id = GetComponentTypeId<C>();
+    uint64_t id = GetComponentTypeId<C>();
     if (m_Has.test(id))
     {
       m_Removal.set(id, true);
@@ -267,7 +267,7 @@ public:
    */
   template <typename C> C* GetChanged()
   {
-    size_t id = GetComponentTypeId<C>();
+    uint64_t id = GetComponentTypeId<C>();
     if (!m_Has.test(id) || !m_Dirty.test(id))
       return nullptr;
     return static_cast<C*>(m_Components[id].get());
@@ -292,7 +292,7 @@ public:
    */
   template <typename C, typename... Rest> void ClearChanged()
   {
-    size_t id = GetComponentTypeId<C>();
+    uint64_t id = GetComponentTypeId<C>();
 
     if (m_Removal.test(id))
     {
@@ -316,7 +316,7 @@ public:
    */
   void ClearChanged()
   {
-    for (size_t id = 0; id < MAX_COMPONENTS; id++)
+    for (uint64_t id = 0; id < MAX_COMPONENTS; id++)
     {
       if (m_Removal.test(id))
       {
