@@ -12,7 +12,6 @@ HierarchyLayer::HierarchyLayer(State* state) : m_State(state)
 
 void HierarchyLayer::OnAttach()
 {
-
   for (auto& [entity, cHierarchy] : ServiceLocator::Get<ECS::Registry>()->Get<EBone, CHierarchy>())
     m_Hierarchy.Add({
         .id     = cHierarchy->id,
@@ -64,8 +63,8 @@ void HierarchyLayer::OnAttach()
 
         if (ImGui::IsItemClicked())
         {
-          for (auto [_, cFlag] : registry->Get<EBone, CFlags>())
-            registry->Remove<EBone, CSelected>(item->id);
+          for (auto [i, cFlag] : registry->Get<EBone, CFlags>())
+            registry->Remove<EBone, CSelected>(i->GetId());
           registry->Add<EBone, CSelected>(item->id, CBone::Part::Shaft);
         }
 
@@ -100,6 +99,17 @@ void HierarchyLayer::OnAttach()
 
 void HierarchyLayer::OnUpdate(float deltaTime)
 {
+  auto registry = ServiceLocator::Get<ECS::Registry>();
+
+  // if (!registry->HasChanged<EBone, CHierarchy>())
+  //   return;
+
+  // m_Hierarchy.Clear();
+  // for (auto& [entity, cHierarchy] : registry->Get<EBone, CHierarchy>())
+  //   m_Hierarchy.Add({
+  //       .id     = cHierarchy->id,
+  //       .parent = cHierarchy->parent,
+  //   });
 }
 
 void HierarchyLayer::OnRender()

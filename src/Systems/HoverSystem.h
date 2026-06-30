@@ -33,17 +33,17 @@ private:
 private:
   CBone::Part HoveredOver(CBone* bone, glm::vec2 mouse)
   {
-    auto& start = bone->joints[static_cast<int>(CBone::Part::StartJoint)];
-    auto& end   = bone->joints[static_cast<int>(CBone::Part::EndJoint)];
+    auto& start = bone->joints[static_cast<int>(CBone::Part::Head)];
+    auto& end   = bone->joints[static_cast<int>(CBone::Part::Tail)];
 
     float     radius    = bone->thickness * 0.5f;
     glm::vec2 direction = glm::normalize(start.position - end.position);
     glm::vec2 offset    = direction * radius * radius;
 
     if (Intersect::Circle(mouse, start.position - offset, radius))
-      return CBone::Part::StartJoint;
+      return CBone::Part::Head;
     if (Intersect::Circle(mouse, end.position + offset, radius))
-      return CBone::Part::EndJoint;
+      return CBone::Part::Tail;
     if (Intersect::Line(mouse, start.position - offset, end.position + offset, bone->thickness))
       return CBone::Part::Shaft;
 
@@ -51,7 +51,7 @@ private:
   }
 
 public:
-  void Free()
+  void Free() override
   {
     m_Grid            = nullptr;
     m_Camera          = nullptr;
@@ -102,8 +102,8 @@ public:
       };
 
       glm::vec4 targetShaft      = resolve(CBone::Part::Shaft);
-      glm::vec4 targetStartJoint = resolve(CBone::Part::StartJoint);
-      glm::vec4 targetEndJoint   = resolve(CBone::Part::EndJoint);
+      glm::vec4 targetStartJoint = resolve(CBone::Part::Head);
+      glm::vec4 targetEndJoint   = resolve(CBone::Part::Tail);
 
       auto animation = Animate::Once<glm::vec4>::Create()
           ->Signal([registry = m_Registry, entityId = entity->GetId()]() { return !registry->Has<EBone, CBone>(entityId); })

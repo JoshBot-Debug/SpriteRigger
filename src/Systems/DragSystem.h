@@ -21,7 +21,7 @@ private:
   OrthographicCamera* m_Camera   = nullptr;
 
 public:
-  void Free()
+  void Free() override
   {
     m_Grid     = nullptr;
     m_Camera   = nullptr;
@@ -47,8 +47,8 @@ public:
 
       if (cDragging->target == CBone::Part::Shaft)
       {
-        auto& sp = cBone->joints[static_cast<int>(CBone::Part::StartJoint)].position;
-        auto& ep = cBone->joints[static_cast<int>(CBone::Part::EndJoint)].position;
+        auto& sp = cBone->joints[static_cast<int>(CBone::Part::Head)].position;
+        auto& ep = cBone->joints[static_cast<int>(CBone::Part::Tail)].position;
         ECS::Mutate<CBone, glm::vec2>(entity, sp, sp + deltaMouse);
         ECS::Mutate<CBone, glm::vec2>(entity, ep, ep + deltaMouse);
       }

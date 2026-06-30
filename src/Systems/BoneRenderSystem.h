@@ -44,7 +44,7 @@ private:
   GLsizei m_Instances = 0;
 
 public:
-  void Free()
+  void Free() override
   {
     if (m_VBO)
       glDeleteBuffers(1, &m_VBO);
@@ -164,10 +164,10 @@ public:
         Bone& bone = buffer.emplace_back();
 
         bone.color     = cBone->color;
-        bone.start     = cBone->joints[static_cast<int>(CBone::Part::StartJoint)].position;
-        bone.end       = cBone->joints[static_cast<int>(CBone::Part::EndJoint)].position;
-        bone.sColor    = cBone->joints[static_cast<int>(CBone::Part::StartJoint)].color;
-        bone.eColor    = cBone->joints[static_cast<int>(CBone::Part::EndJoint)].color;
+        bone.start     = cBone->joints[static_cast<int>(CBone::Part::Head)].position;
+        bone.end       = cBone->joints[static_cast<int>(CBone::Part::Tail)].position;
+        bone.sColor    = cBone->joints[static_cast<int>(CBone::Part::Head)].color;
+        bone.eColor    = cBone->joints[static_cast<int>(CBone::Part::Tail)].color;
         bone.thickness = cBone->thickness;
       }
 

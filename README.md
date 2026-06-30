@@ -113,7 +113,7 @@ filename.sprig
   - We could allow dynamic amount of children and begin the work on serializer to be able to handle vectors. More dev time but saves memory and allows $n$ children.
   **Solution Chosen**: Choose to go with the pointer to parent stored in each Bone, selecting the entire hierarchy may be expensive but I can optimise that down the line if needed.
 - [ ] `CHierarchy` has attach, need more memory to properly define that relationship. Attached head to head, head to tail, tail to tail, etc.
-
+- [ ] The hierarchy layer's bone controls are similar if not the same as the viewport controls with regards to selecting one or many bones, the dropdown menu, etc..
 ---
 
 ## Known issues

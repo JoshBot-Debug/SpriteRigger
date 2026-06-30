@@ -31,22 +31,30 @@ void ViewportLayer::OnAttach()
   m_SelectSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
 
-  static bool ENABLED = true;
-
   m_ContextMenu.Register({
       .renderOn = ContextMenu::PopupContext::WINDOW,
-      .items    = {{
-             .name     = "Parent",
-             .shortcut = "Ctrl P",
-             .enabled  = &ENABLED,
-             .onClick  = [](void*) { ServiceLocator::Get<Rigger>()->NewBone(0); },
-      }},
-  });
+      .items    = {{.name     = "Parent",
+                    .shortcut = "Ctrl P",
+                    .enabled  = &m_TwoBoneSelected,
+                    .onClick =
+                        [](void*)
+                    {
 
-  Window::RegisterShortcut({
-      .ctrl     = true,
-      .key      = ImGuiKey_P,
-      .callback = [](void*) { ENABLED = !ENABLED; },
+                   auto registry      = ServiceLocator::Get<ECS::Registry>();
+                   auto selectedBones = registry->Get<EBone, CSelected>();
+
+                   if (selectedBones.size() != 2)
+                     return;
+
+                   auto cEntityA = selectedBones[0].first;
+                   auto cEntityB = selectedBones[1].first;
+
+                   auto cHierarchyA = registry->Get<EBone, CHierarchy>(cEntityA->GetId());
+                   auto cHierarchyB = registry->Get<EBone, CHierarchy>(cEntityB->GetId());
+
+                   cHierarchyA->parent = cHierarchyB->id;
+                   std::cout << cHierarchyA->name << " Parented to " << cHierarchyB->name << std::endl;
+                 }}},
   });
 }
 
@@ -72,7 +80,7 @@ void ViewportLayer::OnRender()
   m_SystemData.deltaTime  = static_cast<float>(Window::GetDeltaTime());
   m_SystemData.mouse      = m_Grid.GetMouseCoords();
   m_SystemData.deltaMouse = m_Grid.GetDeltaMouseCoords();
-  m_SystemData.viewport = m_Viewport;
+  m_SystemData.viewport   = m_Viewport;
 
   m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
   m_System->Update<HoverSystem>(&m_SystemData);

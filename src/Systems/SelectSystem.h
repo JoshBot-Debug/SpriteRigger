@@ -22,7 +22,7 @@ private:
   OrthographicCamera* m_Camera   = nullptr;
 
 public:
-  void Free()
+  void Free() override
   {
     m_Grid     = nullptr;
     m_Camera   = nullptr;
@@ -43,7 +43,9 @@ public:
     if (!AABBCollision(data->viewport.min, data->viewport.max, ImGui::GetMousePos()))
       return;
 
-    if (data->isMouseClicked(Systems::MouseButton::Left))
+    bool rightClicked = data->isMouseClicked(Systems::MouseButton::Right);
+
+    if (data->isMouseClicked(Systems::MouseButton::Left) || rightClicked)
     {
       if (!data->isKeyDown(Systems::KeyboardKey::LeftShift))
         for (auto& [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
@@ -53,8 +55,10 @@ public:
               entity->Remove<CHovered, CSelected>();
             continue;
           }
-          else
+          else if (!rightClicked)
+          {
             entity->Remove<CHovered, CSelected>();
+          }
 
       for (auto& [entity, cHovered] : m_Registry->Get<EBone, CHovered>())
       {

@@ -44,7 +44,7 @@ public:
     return ptr;
   }
 
-  std::shared_ptr<Once<T>> Timeline(Animate::Timeline* timeline)
+  std::shared_ptr<Once<T>> Timeline(std::shared_ptr<Animate::Timeline> timeline)
   {
     m_Timeline = timeline;
     return this->shared_from_this();
@@ -99,7 +99,7 @@ public:
     return this->shared_from_this();
   }
 
-  float Update()
+  float Update() override
   {
     if (m_Signal && m_Signal())
     {

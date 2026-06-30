@@ -76,7 +76,7 @@ void Grid::Render(ImVec2 viewportSize, ImVec2 viewportMin)
 
   // Vertical lines
   float firstX = std::floor(left / m_UnitLength) * m_UnitLength;
-  for (float x = firstX; x <= right; x += m_UnitLength)
+  for (int x = firstX; x <= right; x += m_UnitLength)
   {
     if ((int)std::round(x / lineStepX) * lineStepX != (int)x)
       continue;
@@ -95,7 +95,7 @@ void Grid::Render(ImVec2 viewportSize, ImVec2 viewportMin)
 
   // Horizontal lines
   float firstY = std::floor(bottom / m_UnitLength) * m_UnitLength;
-  for (float y = firstY; y <= top; y += m_UnitLength)
+  for (int y = firstY; y <= top; y += m_UnitLength)
   {
     if ((int)std::round(y / lineStepY) * lineStepY != (int)y)
       continue;

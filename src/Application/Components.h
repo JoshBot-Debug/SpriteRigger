@@ -12,8 +12,8 @@ struct CBone
 {
   enum class Part : uint8_t
   {
-    StartJoint = 0,
-    EndJoint,
+    Head = 0,
+    Tail,
     Shaft,
     None
   };
@@ -49,7 +49,6 @@ struct CHierarchy
   ECS::EntityId id        = 0;
   ECS::EntityId parent    = 0;
   char          name[255] = "";
-  CBone::Part   attach    = CBone::Part::None;
 };
 
 struct CFlags

@@ -192,10 +192,11 @@ enum class KeyboardKey : int
 
 struct Data
 {
-  float    deltaTime  = 0.0f;
-  ImVec2   mouse      = ImVec2(0.0f, 0.0f);
-  ImVec2   deltaMouse = ImVec2(0.0f, 0.0f);
-  Viewport viewport;
+  float         deltaTime  = 0.0f;
+  ImVec2        mouse      = ImVec2(0.0f, 0.0f);
+  ImVec2        deltaMouse = ImVec2(0.0f, 0.0f);
+  Viewport      viewport;
+  ECS::EntityId selectedBone = 0;
 
   bool isKeyPressed(KeyboardKey key)
   {

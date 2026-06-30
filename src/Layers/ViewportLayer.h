@@ -57,6 +57,9 @@ private:
   OrthographicCamera m_Camera;
   Viewport           m_Viewport;
 
+  /// TODO: Set this by checking CSelected
+  bool m_TwoBoneSelected = true;
+
 public:
   explicit ViewportLayer(State* state);
 

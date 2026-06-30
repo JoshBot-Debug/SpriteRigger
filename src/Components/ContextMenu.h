@@ -41,7 +41,7 @@ private:
     {
       if (item.onRenderItem)
         item.onRenderItem(&item, m_Data);
-      else if (ImGui::MenuItem(item.name, item.shortcut, item.selected, item.enabled ? *item.enabled : true))
+      else if (ImGui::MenuItem(item.name, item.shortcut, item.selected ? *item.selected : false, item.enabled ? *item.enabled : true))
         item.onClick(m_Data);
     }
   }

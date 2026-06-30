@@ -32,8 +32,8 @@ public:
     CFlags*     flags     = entity->Add<CFlags>();
 
     bone->thickness                 = 0.2f;
-    bone->joints[static_cast<int>(CBone::Part::StartJoint)] = {.position = glm::vec2(1.0f, 1.0f)};
-    bone->joints[static_cast<int>(CBone::Part::EndJoint)]   = {.position = glm::vec2(-2.0f, -2.0f)};
+    bone->joints[static_cast<int>(CBone::Part::Head)] = {.position = glm::vec2(1.0f, 1.0f)};
+    bone->joints[static_cast<int>(CBone::Part::Tail)]   = {.position = glm::vec2(-2.0f, -2.0f)};
 
     hierarchy->id     = entity->GetId();
     hierarchy->parent = parent;
