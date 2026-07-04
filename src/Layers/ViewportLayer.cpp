@@ -31,64 +31,71 @@ void ViewportLayer::OnAttach()
   m_SelectSystem->Initialize(m_Registry.get(), &m_Grid, &m_Camera);
   m_BoneRenderSystem->Initialize(m_Registry.get(), &m_Shader, &m_Camera);
 
-  m_ContextMenu.Register({
-      .renderOn = ContextMenu::PopupContext::WINDOW,
+  m_ContextMenu.OnCaptureState(
+      [&](VContextMenuState*& data)
+      {
+        auto registry      = ServiceLocator::Get<ECS::Registry>();
+        auto selectedBones = registry->Get<EBone, CSelected>();
+
+        if (selectedBones.size() != 2)
+          return;
+
+        auto cEntityA = selectedBones[0].first;
+        auto cEntityB = selectedBones[1].first;
+
+        auto cHierarchyA = registry->Get<EBone, CHierarchy>(cEntityA->GetId());
+        auto cHierarchyB = registry->Get<EBone, CHierarchy>(cEntityB->GetId());
+
+        m_ContextMenuState.parenting = std::make_pair(cHierarchyA, cHierarchyB);
+
+        data = &m_ContextMenuState;
+      });
+
+  m_ContextMenu.SetOptions({
+      .renderOn = VContextMenu::PopupContext::WINDOW,
       .items    = {{.name     = "Parent",
                     .shortcut = "Ctrl P",
                     .enabled  = &m_TwoBoneSelected,
                     .onClick =
-                        [](void*)
+                        [](VContextMenuState* data)
                     {
-
-                   auto registry      = ServiceLocator::Get<ECS::Registry>();
-                   auto selectedBones = registry->Get<EBone, CSelected>();
-
-                   if (selectedBones.size() != 2)
+                   if (!data || !data->parenting.has_value())
                      return;
-
-                   auto cEntityA = selectedBones[0].first;
-                   auto cEntityB = selectedBones[1].first;
-
-                   auto cHierarchyA = registry->Get<EBone, CHierarchy>(cEntityA->GetId());
-                   auto cHierarchyB = registry->Get<EBone, CHierarchy>(cEntityB->GetId());
-
-                   cHierarchyA->parent = cHierarchyB->id;
-                   std::cout << cHierarchyA->name << " Parented to " << cHierarchyB->name << std::endl;
+                   auto cHierarchyPair          = data->parenting.value();
+                   cHierarchyPair.first->parent = cHierarchyPair.second->id;
                  }}},
   });
 }
 
-void ViewportLayer::OnUpdate(float deltaTime)
-{
-}
-
-void ViewportLayer::OnRender()
+void ViewportLayer::OnBegin()
 {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_None);
   ImGui::PopStyleVar();
 
-  ImGuiIO& io             = ImGui::GetIO();
-  ImVec2   viewport       = ImGui::GetContentRegionAvail();
-  ImVec2   windowPosition = ImGui::GetWindowPos();
+  ImVec2 windowPosition = ImGui::GetWindowPos();
+  m_Viewport.min        = windowPosition + ImGui::GetWindowContentRegionMin();
+  m_Viewport.max        = windowPosition + ImGui::GetWindowContentRegionMax();
+}
 
-  m_Viewport.min = windowPosition + ImGui::GetWindowContentRegionMin();
-  m_Viewport.max = windowPosition + ImGui::GetWindowContentRegionMax();
-
-  m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
-
+void ViewportLayer::OnUpdate(float deltaTime)
+{
   m_SystemData.deltaTime  = static_cast<float>(Window::GetDeltaTime());
   m_SystemData.mouse      = m_Grid.GetMouseCoords();
   m_SystemData.deltaMouse = m_Grid.GetDeltaMouseCoords();
   m_SystemData.viewport   = m_Viewport;
 
+  m_Grid.Update(m_Viewport.size, m_Viewport.min, m_Viewport.max);
   m_Camera.Update((uint32_t)m_Viewport.size.x, (uint32_t)m_Viewport.size.y);
   m_System->Update<HoverSystem>(&m_SystemData);
   m_System->Update<SelectSystem>(&m_SystemData);
   m_System->Update<DragSystem>(&m_SystemData);
   m_AnimationSystem->Update(m_SystemData.deltaTime);
+}
 
-  ResizeFramebuffer(viewport);
+void ViewportLayer::OnRender()
+{
+  ResizeFramebuffer(ImGui::GetContentRegionAvail());
 
   {
     glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
@@ -99,10 +106,14 @@ void ViewportLayer::OnRender()
   }
 
   m_Grid.Render(m_Viewport.size, m_Viewport.min);
-  m_ContextMenu.Render("cm");
+  m_ContextMenu.Render();
 
   ImGui::SetCursorScreenPos(m_Viewport.min);
   ImGui::Image((void*)(intptr_t)m_ColorAttachment, m_Viewport.size);
+}
+
+void ViewportLayer::OnEnd()
+{
   ImGui::End();
 }
 

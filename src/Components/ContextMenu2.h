@@ -1,20 +1,22 @@
 #pragma once
 
 #include <exception>
+#include <functional>
+#include <string>
 #include <vector>
 #include "imgui.h"
 
-class ContextMenu
+template <typename T> class ContextMenu2
 {
 public:
   struct Item
   {
-    const char* name                        = nullptr;
-    const char* shortcut                    = nullptr;
-    bool*       selected                    = nullptr;
-    bool*       enabled                     = nullptr;
-    void (*onRenderItem)(Item* item, void*) = nullptr;
-    void (*onClick)(void*)                  = nullptr;
+    const char* name                           = nullptr;
+    const char* shortcut                       = nullptr;
+    bool*       selected                       = nullptr;
+    bool*       enabled                        = nullptr;
+    void (*onRenderItem)(Item* item, T* state) = nullptr;
+    void (*onClick)(T* state)                  = nullptr;
   };
 
   enum class PopupContext
@@ -31,11 +33,11 @@ public:
   };
 
 private:
-  Options m_Options;
-  void*   m_State = nullptr;
+  std::string m_Id;
+  Options     m_Options;
+  T*          m_State = nullptr;
 
-  using CaptureStateCallback          = void* (*)();
-  CaptureStateCallback m_CaptureState = nullptr;
+  std::function<void(T*&)> m_CaptureState = nullptr;
 
 private:
   void RenderItems()
@@ -51,22 +53,22 @@ private:
   }
 
 public:
-  ContextMenu() = default;
+  ContextMenu2(const std::string& id) : m_Id(id){};
 
-  void Register(const Options& options)
+  void SetOptions(const Options& options)
   {
     m_Options = options;
   }
 
-  void Open(const char* id, void* state = nullptr)
+  void OnCaptureState(const std::function<void(T*&)>& callback)
   {
-    if (state)
-      m_State = state;
-    ImGui::OpenPopup(id);
+    m_CaptureState = callback;
   }
 
-  void Render(const char* id, void* state = nullptr)
+  void Render()
   {
+    const char* id = m_Id.c_str();
+
     switch (m_Options.renderOn)
     {
     case PopupContext::NONE:
@@ -83,7 +85,9 @@ public:
       if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup) &&
           ImGui::IsMouseClicked(ImGuiMouseButton_Right))
       {
-        Open(id, state);
+        if (m_CaptureState)
+          m_CaptureState(m_State);
+        ImGui::OpenPopup(id);
       }
 
       if (ImGui::BeginPopup(id))
@@ -97,7 +101,9 @@ public:
     {
       if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
       {
-        Open(id, state);
+        if (m_CaptureState)
+          m_CaptureState(m_State);
+        ImGui::OpenPopup(id);
       }
 
       if (ImGui::BeginPopup(id))

@@ -89,7 +89,7 @@ void Grid::Render(ImVec2 viewportSize, ImVec2 viewportMin)
     drawList->AddLine(p0, p1, color, 1.0f);
 
     char buf[16];
-    snprintf(buf, sizeof(buf), "%.0f", x);
+    snprintf(buf, sizeof(buf), "%.0f", (float)x);
     drawList->AddText(m_Font, m_FontSize, ImVec2(p0.x + 4, p0.y - m_FontSize - 4), m_AxisColor, buf);
   }
 
@@ -108,7 +108,7 @@ void Grid::Render(ImVec2 viewportSize, ImVec2 viewportMin)
     drawList->AddLine(p0, p1, color, 1.0f);
 
     char buf[16];
-    snprintf(buf, sizeof(buf), "%.0f", y);
+    snprintf(buf, sizeof(buf), "%.0f", (float)y);
     drawList->AddText(m_Font, m_FontSize, ImVec2(p0.x + 4, p0.y + 4), m_AxisColor, buf);
   }
 }

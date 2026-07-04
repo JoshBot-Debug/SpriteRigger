@@ -27,12 +27,19 @@
 #include "State.h"
 #include "Types.h"
 
-#include "Components/ContextMenu.h"
+#include "Components/ContextMenu2.h"
 
 #include "Animate/System.h"
-
 class ViewportLayer : public SerializableLayer
 {
+private:
+  struct VContextMenuState
+  {
+    std::optional<std::pair<CHierarchy*, CHierarchy*>> parenting;
+  };
+
+  using VContextMenu = ContextMenu2<VContextMenuState>;
+
 private:
   State* m_State = nullptr;
 
@@ -46,7 +53,9 @@ private:
   std::shared_ptr<Animate::System>  m_AnimationSystem  = nullptr;
 
   Systems::Data m_SystemData;
-  ContextMenu   m_ContextMenu;
+
+  VContextMenuState m_ContextMenuState;
+  VContextMenu      m_ContextMenu{"vcx"};
 
   GLuint m_FrameBuffer     = 0;
   GLuint m_ColorAttachment = 0;
@@ -65,9 +74,13 @@ public:
 
   virtual void OnAttach() override;
 
+  virtual void OnBegin() override;
+
   virtual void OnUpdate(float deltaTime) override;
 
   virtual void OnRender() override;
+
+  virtual void OnEnd() override;
 
   virtual void OnDetach() override;
 

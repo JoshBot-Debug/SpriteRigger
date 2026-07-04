@@ -13,14 +13,24 @@ public:
   virtual void OnAttach()
   {
   }
+
   virtual void OnDetach()
+  {
+  }
+
+  virtual void OnBegin()
   {
   }
 
   virtual void OnUpdate(float deltaTime)
   {
   }
+
   virtual void OnRender()
+  {
+  }
+
+  virtual void OnEnd()
   {
   }
 

@@ -47,7 +47,7 @@ public:
 
     if (data->isMouseClicked(Systems::MouseButton::Left) || rightClicked)
     {
-      if (!data->isKeyDown(Systems::KeyboardKey::LeftShift))
+      if (!rightClicked && !data->isKeyDown(Systems::KeyboardKey::LeftShift))
         for (auto& [entity, cSelected] : m_Registry->Get<EBone, CSelected>())
           if (CHovered* cHovered = entity->Get<CHovered>())
           {
@@ -55,7 +55,7 @@ public:
               entity->Remove<CHovered, CSelected>();
             continue;
           }
-          else if (!rightClicked)
+          else
           {
             entity->Remove<CHovered, CSelected>();
           }

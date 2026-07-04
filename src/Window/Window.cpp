@@ -72,9 +72,6 @@ void Window::Run()
       continue;
     }
 
-    for (auto& layer : m_Layers)
-      layer->OnUpdate(s_TimeStep);
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -133,7 +130,16 @@ void Window::Run()
         }
 
       for (auto& layer : m_Layers)
+        layer->OnBegin();
+
+      for (auto& layer : m_Layers)
+        layer->OnUpdate(s_TimeStep);
+
+      for (auto& layer : m_Layers)
         layer->OnRender();
+
+      for (auto& layer : m_Layers)
+        layer->OnEnd();
 
       ImGui::End();
     }
